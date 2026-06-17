@@ -1,0 +1,16 @@
+# Node / Vite
+web/node_modules/
+web/dist/
+web/.env
+web/.env.local
+web/.env.*.local
+
+# Python
+jobs/__pycache__/
+jobs/.venv/
+*.pyc
+
+# Divers
+.DS_Store
+public/
+*.log

@@ -1,0 +1,291 @@
+-- =============================================================================
+-- Mon Petit Vélo (MPV) — schéma initial
+-- =============================================================================
+-- À exécuter sur ton projet Supabase :
+--   supabase db push          (CLI)
+-- ou bien copier/coller dans : Dashboard > SQL Editor.
+--
+-- Modèle de jeu :
+--   points = côte / place finale          (place de 1 à 10)
+--          × 2  si 1ᵉ de l'étape
+--          × 2  si le parieur a utilisé un bonus
+--          = 0  si le coureur est hors du top 10
+--   - Pari à réaliser avant 12h00 (heure de Paris).
+--   - 2 bonus disponibles par parieur pour tout le Tour.
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- Tables
+-- -----------------------------------------------------------------------------
+
+-- Profil applicatif lié à un compte auth Supabase (email + pseudo).
+create table if not exists public.profiles (
+  id         uuid primary key references auth.users (id) on delete cascade,
+  email      text not null,
+  pseudo     text not null unique,
+  is_admin   boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+-- Une étape du Tour.
+create table if not exists public.stages (
+  id             bigint generated always as identity primary key,
+  season         int  not null,
+  stage_no       int  not null,
+  label          text not null,                       -- ex : "Étape 5"
+  name           text,                                -- ex : "Tours → Châteauroux"
+  profile_type   text,                                -- flat / hilly / mountain / itt ...
+  date           date not null,
+  bet_deadline   timestamptz not null,                -- date du jour à 12h00 (Europe/Paris)
+  odds_status    text not null default 'pending',     -- pending / published
+  results_status text not null default 'pending',     -- pending / official
+  unique (season, stage_no)
+);
+
+-- Coureurs au départ d'une étape, avec leur côte (calculée chaque matin).
+create table if not exists public.stage_riders (
+  id          bigint generated always as identity primary key,
+  stage_id    bigint not null references public.stages (id) on delete cascade,
+  rider_name  text   not null,
+  rider_pcs_id text,
+  odds        numeric(7,2) not null check (odds >= 1.0),
+  unique (stage_id, rider_name)
+);
+
+-- Résultats officiels d'une étape (positions, top 10 suffit pour le score).
+create table if not exists public.stage_results (
+  id         bigint generated always as identity primary key,
+  stage_id   bigint not null references public.stages (id) on delete cascade,
+  rider_name text   not null,
+  position   int    not null check (position >= 1),
+  unique (stage_id, position),
+  unique (stage_id, rider_name)
+);
+
+-- Paris des participants : un seul pari par étape et par parieur.
+create table if not exists public.bets (
+  id         bigint generated always as identity primary key,
+  user_id    uuid   not null references public.profiles (id) on delete cascade,
+  stage_id   bigint not null references public.stages (id) on delete cascade,
+  rider_name text   not null,
+  bonus_used boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, stage_id)
+);
+
+create index if not exists bets_stage_idx on public.bets (stage_id);
+create index if not exists stage_riders_stage_idx on public.stage_riders (stage_id);
+
+-- -----------------------------------------------------------------------------
+-- Vues de scoring
+-- -----------------------------------------------------------------------------
+
+-- Score de chaque pari. security_invoker => la visibilité respecte les
+-- politiques RLS de la table bets (on ne voit le pari d'autrui qu'après la
+-- deadline de l'étape concernée).
+create or replace view public.bet_scores
+with (security_invoker = true) as
+select
+  b.id          as bet_id,
+  b.user_id,
+  b.stage_id,
+  b.rider_name,
+  b.bonus_used,
+  sr.odds,
+  res.position,
+  case
+    when sr.odds is null               then 0
+    when res.position is null           then 0
+    when res.position > 10              then 0
+    else round(
+           (sr.odds / res.position)
+           * (case when res.position = 1 then 2 else 1 end)
+           * (case when b.bonus_used     then 2 else 1 end)
+         , 2)
+  end as points
+from public.bets b
+left join public.stage_riders  sr  on sr.stage_id  = b.stage_id and sr.rider_name  = b.rider_name
+left join public.stage_results res on res.stage_id = b.stage_id and res.rider_name = b.rider_name;
+
+-- Classement agrégé public (pseudo + total), sans fuiter les pronostics
+-- individuels. security definer : lit tous les paris scorés pour le total.
+create or replace function public.get_leaderboard()
+returns table (
+  user_id       uuid,
+  pseudo        text,
+  total_points  numeric,
+  bets_count    bigint,
+  scored_stages bigint
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    p.id,
+    p.pseudo,
+    coalesce(sum(bs.points), 0)::numeric            as total_points,
+    count(bs.bet_id)                                as bets_count,
+    count(bs.bet_id) filter (where bs.position is not null) as scored_stages
+  from public.profiles p
+  left join public.bet_scores bs on bs.user_id = p.id
+  group by p.id, p.pseudo
+  order by total_points desc, p.pseudo asc;
+$$;
+
+-- -----------------------------------------------------------------------------
+-- Règles métier (triggers)
+-- -----------------------------------------------------------------------------
+
+-- Maintient updated_at.
+create or replace function public.touch_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+-- Valide un pari : deadline, coureur valide, quota de bonus.
+create or replace function public.check_bet_rules()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_deadline timestamptz;
+  v_bonus_count int;
+begin
+  -- 1) deadline (12h00 Paris) — défense en profondeur en plus de la RLS
+  select bet_deadline into v_deadline from public.stages where id = new.stage_id;
+  if v_deadline is null then
+    raise exception 'Étape inconnue.';
+  end if;
+  if now() >= v_deadline then
+    raise exception 'Les paris pour cette étape sont clôturés (deadline %).', v_deadline;
+  end if;
+
+  -- 2) le coureur doit faire partie des partants cotés de l'étape
+  if not exists (
+    select 1 from public.stage_riders
+    where stage_id = new.stage_id and rider_name = new.rider_name
+  ) then
+    raise exception 'Coureur "%" non disponible pour cette étape.', new.rider_name;
+  end if;
+
+  -- 3) quota : 2 bonus maximum par parieur sur tout le Tour
+  if new.bonus_used then
+    select count(*) into v_bonus_count
+    from public.bets
+    where user_id = new.user_id
+      and bonus_used = true
+      and id is distinct from new.id;
+    if v_bonus_count >= 2 then
+      raise exception 'Quota de bonus atteint (2 maximum pour tout le Tour).';
+    end if;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_bets_touch on public.bets;
+create trigger trg_bets_touch
+  before update on public.bets
+  for each row execute function public.touch_updated_at();
+
+drop trigger if exists trg_bets_rules on public.bets;
+create trigger trg_bets_rules
+  before insert or update on public.bets
+  for each row execute function public.check_bet_rules();
+
+-- -----------------------------------------------------------------------------
+-- Row Level Security
+-- -----------------------------------------------------------------------------
+alter table public.profiles      enable row level security;
+alter table public.stages        enable row level security;
+alter table public.stage_riders  enable row level security;
+alter table public.stage_results enable row level security;
+alter table public.bets          enable row level security;
+
+-- Helper : l'utilisateur courant est-il admin ?
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (select is_admin from public.profiles where id = auth.uid()),
+    false
+  );
+$$;
+
+-- profiles : lecture publique (pour afficher les pseudos), écriture de soi.
+drop policy if exists profiles_read       on public.profiles;
+drop policy if exists profiles_insert_self on public.profiles;
+drop policy if exists profiles_update_self on public.profiles;
+create policy profiles_read        on public.profiles for select using (true);
+create policy profiles_insert_self on public.profiles for insert with check (id = auth.uid());
+create policy profiles_update_self on public.profiles for update using (id = auth.uid()) with check (id = auth.uid());
+
+-- stages / stage_riders / stage_results : lecture publique, écriture admin.
+-- (Les jobs CI écrivent avec la clé service_role, qui contourne la RLS.)
+drop policy if exists stages_read  on public.stages;
+drop policy if exists stages_admin on public.stages;
+create policy stages_read  on public.stages for select using (true);
+create policy stages_admin on public.stages for all using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists riders_read  on public.stage_riders;
+drop policy if exists riders_admin on public.stage_riders;
+create policy riders_read  on public.stage_riders for select using (true);
+create policy riders_admin on public.stage_riders for all using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists results_read  on public.stage_results;
+drop policy if exists results_admin on public.stage_results;
+create policy results_read  on public.stage_results for select using (true);
+create policy results_admin on public.stage_results for all using (public.is_admin()) with check (public.is_admin());
+
+-- bets :
+--   - lecture : son propre pari toujours ; celui des autres seulement
+--               après la deadline de l'étape (anti-triche).
+--   - écriture : uniquement les siens, avant la deadline.
+drop policy if exists bets_read       on public.bets;
+drop policy if exists bets_insert_own on public.bets;
+drop policy if exists bets_update_own on public.bets;
+drop policy if exists bets_delete_own on public.bets;
+
+create policy bets_read on public.bets for select using (
+  user_id = auth.uid()
+  or exists (
+    select 1 from public.stages s
+    where s.id = bets.stage_id and now() >= s.bet_deadline
+  )
+);
+
+create policy bets_insert_own on public.bets for insert with check (
+  user_id = auth.uid()
+);
+
+create policy bets_update_own on public.bets for update using (
+  user_id = auth.uid()
+) with check (
+  user_id = auth.uid()
+);
+
+create policy bets_delete_own on public.bets for delete using (
+  user_id = auth.uid()
+  and exists (
+    select 1 from public.stages s
+    where s.id = bets.stage_id and now() < s.bet_deadline
+  )
+);
+
+-- -----------------------------------------------------------------------------
+-- Droits sur vues / fonctions
+-- -----------------------------------------------------------------------------
+grant select  on public.bet_scores to anon, authenticated;
+grant execute on function public.get_leaderboard() to anon, authenticated;

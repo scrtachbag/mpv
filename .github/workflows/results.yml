@@ -1,0 +1,37 @@
+name: Résultats du soir
+
+# ⏰ cron en UTC. En juillet, Paris = UTC+2 (CEST).
+#    17:30 UTC = 19h30 Paris ; 20:00 UTC = 22h00 Paris (2e passage de rattrapage).
+on:
+  schedule:
+    - cron: '30 17 * * *'
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+    inputs:
+      stage_no:
+        description: "Numéro d'étape (vide = étape du jour)"
+        required: false
+        default: ''
+
+jobs:
+  results:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --no-cache-dir -r jobs/requirements.txt
+      - name: Récupération des résultats et scoring
+        working-directory: jobs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          MPV_SEASON: ${{ vars.MPV_SEASON }}
+          MPV_RACE_SLUG: ${{ vars.MPV_RACE_SLUG }}
+        run: |
+          if [ -n "${{ inputs.stage_no }}" ]; then
+            python fetch_results.py --stage "${{ inputs.stage_no }}"
+          else
+            python fetch_results.py
+          fi

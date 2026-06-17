@@ -1,0 +1,26 @@
+name: Côtes du matin
+
+# ⏰ cron en UTC. En juillet, Paris = UTC+2 (CEST).
+#    05:30 UTC = 07:30 Paris (bien avant la deadline de 12h00).
+on:
+  schedule:
+    - cron: '30 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  odds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --no-cache-dir -r jobs/requirements.txt
+      - name: Calcul et publication des côtes
+        working-directory: jobs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          MPV_SEASON: ${{ vars.MPV_SEASON }}
+          MPV_RACE_SLUG: ${{ vars.MPV_RACE_SLUG }}
+        run: python fetch_odds.py
