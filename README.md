@@ -140,14 +140,14 @@ cd web && npm install && npm run dev      # http://localhost:5173
 > Les e-mails par défaut sont en anglais ; tu peux les traduire dans
 > Supabase (Auth > Email Templates) ou dans `supabase/config.toml`.
 
-**Voir le scoring sans attendre une vraie étape** : place un pari sur l'étape de
-démo, puis dans **Supabase Studio** (http://127.0.0.1:54323) ou en SQL, enregistre
-un faux résultat :
+**Voir le scoring sans attendre une vraie étape** : place un pari sur l'étape du
+jour (étape 7), puis dans **Supabase Studio** (http://127.0.0.1:54323) ou en SQL,
+enregistre un faux résultat :
 
 ```sql
 -- Podium de démo (ré-exécutable : on efface puis on réinsère).
 delete from stage_results
-where stage_id = (select id from stages where season = 2099 and stage_no = 1);
+where stage_id = (select id from stages where season = 2099 and stage_no = 7);
 
 insert into stage_results (stage_id, position, rider_name)
 select s.id, v.position, v.rider_name
@@ -157,9 +157,9 @@ join (values
   (2, 'Jonas Vingegaard'),
   (3, 'Remco Evenepoel')
 ) as v(position, rider_name) on true
-where s.season = 2099 and s.stage_no = 1;
+where s.season = 2099 and s.stage_no = 7;
 
-update stages set results_status = 'official' where season = 2099 and stage_no = 1;
+update stages set results_status = 'official' where season = 2099 and stage_no = 7;
 ```
 
 Le classement et l'historique se mettent à jour immédiatement.
