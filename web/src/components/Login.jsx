@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../supabaseClient'
+import { useAuth } from '../auth.jsx'
 
 function traduire(error) {
   const m = error?.message || ''
@@ -19,6 +20,11 @@ export default function Login() {
   const [error, setError] = useState(null)
   const [info, setInfo] = useState(null)
   const [busy, setBusy] = useState(false)
+
+  // Avis transmis depuis l'appli (ex. compte supprimé) : affiché une fois.
+  const { notice, setNotice } = useAuth()
+  const [banner] = useState(notice)
+  useEffect(() => { if (notice) setNotice(null) }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
   function go(next) { setMode(next); setError(null); setInfo(null) }
 
@@ -52,6 +58,8 @@ export default function Login() {
     <div className="card narrow">
       <h1>🚴 Mon Petit Vélo</h1>
       <p className="muted">Paris entre amis sur le Tour de France — sans argent, pour la gloire.</p>
+
+      {banner && <p className="banner-notice">{banner}</p>}
 
       <form onSubmit={submit}>
         <label htmlFor="email">E-mail</label>

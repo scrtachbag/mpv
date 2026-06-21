@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [recovery, setRecovery] = useState(false)   // lien "mot de passe oublié" cliqué
+  const [notice, setNotice] = useState(null)        // message à afficher sur l'écran de connexion
 
   const loadProfile = useCallback(async (userId) => {
     if (!userId) { setProfile(null); return }
@@ -40,6 +41,8 @@ export function AuthProvider({ children }) {
     loading,
     recovery,
     clearRecovery: () => setRecovery(false),
+    notice,
+    setNotice,
     refreshProfile: () => loadProfile(session?.user?.id),
     signOut: async () => { setRecovery(false); await supabase.auth.signOut() },
   }

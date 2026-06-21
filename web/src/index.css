@@ -210,5 +210,10 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 }
 .danger-btn:disabled { opacity: .5; cursor: default; }
 
+.banner-notice {
+  background: #e8f7ee; border: 1px solid #b6e2c6; color: #166534;
+  padding: .6rem .8rem; border-radius: 10px; font-weight: 600; margin: .2rem 0 .4rem;
+}
+
 /* ---------------- footer ---------------- */
 .footer { text-align: center; padding: 1.5rem 1rem; font-size: .82rem; }

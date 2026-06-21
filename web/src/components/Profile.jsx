@@ -4,7 +4,7 @@ import { useAuth } from '../auth.jsx'
 import { AVATARS } from '../lib/avatars'
 
 export default function Profile() {
-  const { user, profile, refreshProfile, signOut } = useAuth()
+  const { user, profile, refreshProfile, signOut, setNotice } = useAuth()
 
   const [pseudo, setPseudo] = useState(profile.pseudo)
   const [avatar, setAvatar] = useState(profile.avatar)
@@ -51,6 +51,7 @@ export default function Profile() {
     setDeleting(true); setMsgDel(null)
     const { error } = await supabase.rpc('delete_account')
     if (error) { setDeleting(false); setMsgDel({ type: 'error', text: error.message }); return }
+    setNotice('Ton compte a bien été supprimé. À bientôt sur les routes ! 🚴')
     await signOut()   // session invalide -> retour à l'écran de connexion
   }
 
