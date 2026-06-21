@@ -1,0 +1,30 @@
+name: Rappel de pari (push)
+
+# ⏰ cron en UTC. En juillet, Paris = UTC+2 (CEST).
+#    09:45 UTC = 11h45 Paris, soit ~15 min avant la clôture de 12h00.
+#    (Le cron GitHub n'est pas précis à la minute : léger décalage possible.)
+on:
+  schedule:
+    - cron: '45 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --no-cache-dir -r jobs/requirements.txt
+      - name: Envoi des rappels push
+        working-directory: jobs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ vars.VAPID_SUBJECT }}
+          MPV_SITE_URL: ${{ vars.MPV_SITE_URL }}
+          MPV_SEASON: ${{ vars.MPV_SEASON }}
+        run: python notify_reminder.py

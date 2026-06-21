@@ -8,6 +8,7 @@ web/.env.*.local
 # Python
 jobs/__pycache__/
 jobs/.venv/
+jobs/.env
 *.pyc
 
 # Divers

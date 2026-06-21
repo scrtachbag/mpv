@@ -48,6 +48,13 @@ ODDS_FLOOR_POINTS = _float("MPV_ODDS_FLOOR_POINTS", 5.0)
 # Nombre de positions de résultat à enregistrer (le top 10 suffit au score).
 RESULTS_TOP_N = _int("MPV_RESULTS_TOP_N", 30)
 
+# --- Notifications push (Web Push / VAPID) ----------------------------------
+VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "")
+VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "")
+VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "mailto:admin@example.com")
+# URL ouverte au clic sur la notification (idéalement l'URL GitHub Pages).
+SITE_URL = os.environ.get("MPV_SITE_URL", "/")
+
 
 def require_supabase() -> None:
     missing = [n for n, v in (("SUPABASE_URL", SUPABASE_URL),
