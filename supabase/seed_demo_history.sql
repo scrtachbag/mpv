@@ -74,4 +74,27 @@ on conflict (user_id, stage_id) do update
 
 alter table public.bets enable trigger trg_bets_rules;
 
+-- 5) Avatars de démo
+update public.profiles set avatar = case pseudo
+  when 'TwentyCent'  then 'jaune'
+  when 'Bernard'     then 'grimpeur'
+  when 'Le Blaireau' then 'diable'
+  when 'Testos'      then 'frites'
+  when 'Admin'       then 'ds'
+  else avatar end
+where pseudo in ('TwentyCent', 'Bernard', 'Le Blaireau', 'Testos', 'Admin');
+
+-- 6) Quelques messages de chat (uniquement si le chat est vide)
+insert into public.messages (user_id, content, created_at)
+select p.id, m.content, now() - (m.mins || ' minutes')::interval
+from (values
+  ('Bernard',     'Vous allez tous perdre, j''ai mis un bonus sur Vinge 💪', 180),
+  ('Le Blaireau', 'Didi le Diable a parlé : Pogačar écrase tout 😈',          150),
+  ('Testos',      'Encore parié sur un sprinteur en montagne... 🤦',          120),
+  ('Admin',       'Pensez à parier AVANT midi les amis 🚴',                    60),
+  ('TwentyCent',  'Le maillot jaune me va trop bien 🟡',                       15)
+) m(pseudo, content, mins)
+join public.profiles p on p.pseudo = m.pseudo
+where (select count(*) from public.messages) = 0;
+
 commit;
