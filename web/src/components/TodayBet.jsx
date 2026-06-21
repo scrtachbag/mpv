@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { parisToday, formatDateFr, msUntil, formatCountdown } from '../lib/time'
+import Avatar from './Avatar.jsx'
 
 export default function TodayBet() {
   const { user } = useAuth()
@@ -46,7 +47,7 @@ export default function TodayBet() {
       // Pronostics des autres : visibles seulement après la deadline (RLS).
       if (msUntil(st.bet_deadline) <= 0) {
         const { data: others } = await supabase
-          .from('bets').select('user_id, rider_name, bonus_used, profiles(pseudo)')
+          .from('bets').select('user_id, rider_name, bonus_used, profiles(pseudo, avatar)')
           .eq('stage_id', st.id)
         setOthersBets(others ?? [])
       }
@@ -181,6 +182,7 @@ export default function TodayBet() {
           <ul className="picks">
             {othersBets.map((b) => (
               <li key={b.user_id}>
+                <Avatar name={b.profiles?.avatar} size={26} />
                 <strong>{b.profiles?.pseudo ?? '?'}</strong>
                 {b.user_id === user.id ? ' (toi)' : ''} → {b.rider_name}
                 {b.bonus_used ? ' ⚡️' : ''}

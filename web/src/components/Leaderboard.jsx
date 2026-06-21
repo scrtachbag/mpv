@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
+import Avatar from './Avatar.jsx'
+
+const MEDALS = ['🟡', '🥈', '🥉']  // maillot jaune pour le leader
 
 export default function Leaderboard() {
   const { profile } = useAuth()
@@ -14,30 +17,20 @@ export default function Leaderboard() {
     })
   }, [])
 
-  if (loading) return <div className="card">Chargement…</div>
+  if (loading) return <p className="muted">Chargement…</p>
+  if (rows.length === 0) return <p className="muted">Aucun point marqué pour l’instant.</p>
 
   return (
-    <div className="card">
-      <h2>Classement général</h2>
-      {rows.length === 0 ? (
-        <p className="muted">Aucun point marqué pour l’instant.</p>
-      ) : (
-        <table className="table">
-          <thead>
-            <tr><th>#</th><th>Parieur</th><th>Points</th><th>Étapes</th></tr>
-          </thead>
-          <tbody>
-            {rows.map((r, i) => (
-              <tr key={r.user_id} className={r.pseudo === profile?.pseudo ? 'me' : ''}>
-                <td>{i + 1}</td>
-                <td>{r.pseudo}</td>
-                <td className="num">{Number(r.total_points).toFixed(2)}</td>
-                <td className="num muted">{r.scored_stages}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+    <ol className="lb">
+      {rows.map((r, i) => (
+        <li key={r.user_id}
+          className={`lb-row${r.pseudo === profile?.pseudo ? ' me' : ''}${i === 0 ? ' leader' : ''}`}>
+          <span className="lb-rank">{MEDALS[i] ?? i + 1}</span>
+          <Avatar name={r.avatar} size={34} />
+          <span className="lb-name">{r.pseudo}</span>
+          <span className="lb-pts">{Number(r.total_points).toFixed(2)}<small> pts</small></span>
+        </li>
+      ))}
+    </ol>
   )
 }
