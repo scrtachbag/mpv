@@ -63,7 +63,7 @@ export default function Profile() {
         <p className="muted">Compte : <strong>{user.email}</strong></p>
         <form onSubmit={saveProfile}>
           <label htmlFor="pseudo">Pseudo</label>
-          <input id="pseudo" required minLength={2} maxLength={24} value={pseudo}
+          <input id="pseudo" type="text" required minLength={2} maxLength={24} value={pseudo}
             onChange={(e) => setPseudo(e.target.value)} />
 
           <label>Avatar</label>

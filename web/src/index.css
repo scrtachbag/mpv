@@ -73,7 +73,7 @@ small { font-size: .7em; color: var(--muted); }
 
 /* ---------------- forms ---------------- */
 label { display: block; margin: .8rem 0 .3rem; font-weight: 600; font-size: .9rem; }
-input[type=email], input[type=text], input[type=password], select, .chat-input input {
+input[type=email], input[type=text], input[type=password], input:not([type]), select, .chat-input input {
   width: 100%; padding: .7rem .85rem; border: 1.5px solid #dcdfe6;
   border-radius: 11px; font-size: 1rem; background: #fbfbfc; color: var(--ink);
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;

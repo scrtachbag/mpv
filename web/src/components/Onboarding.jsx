@@ -38,7 +38,7 @@ export default function Onboarding() {
       <p className="muted">Identifié par <strong>{user.email}</strong>.</p>
       <form onSubmit={submit}>
         <label htmlFor="pseudo">Pseudo</label>
-        <input id="pseudo" required minLength={2} maxLength={24} value={pseudo}
+        <input id="pseudo" type="text" required minLength={2} maxLength={24} value={pseudo}
           onChange={(e) => setPseudo(e.target.value)} placeholder="Le Blaireau" />
 
         <label htmlFor="password">Mot de passe</label>
