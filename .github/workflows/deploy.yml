@@ -40,6 +40,8 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           # Lien (facultatif) vers la page Actions, pour le bouton admin.
           VITE_MPV_ACTIONS_URL: ${{ vars.VITE_MPV_ACTIONS_URL }}
+          # Clé VAPID publique (notifications push). Publique -> variable, pas secret.
+          VITE_VAPID_PUBLIC_KEY: ${{ vars.VITE_VAPID_PUBLIC_KEY }}
         run: npm run build
 
       - uses: actions/configure-pages@v5

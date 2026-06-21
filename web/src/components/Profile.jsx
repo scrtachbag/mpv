@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { AVATARS } from '../lib/avatars'
+import NotificationsCard from './NotificationsCard.jsx'
 
 export default function Profile() {
   const { user, profile, refreshProfile, signOut, setNotice } = useAuth()
@@ -98,6 +99,9 @@ export default function Profile() {
           {msgPw && <p className={msgPw.type}>{msgPw.text}</p>}
         </form>
       </div>
+
+      {/* --- Notifications push --- */}
+      <NotificationsCard />
 
       {/* --- Zone dangereuse --- */}
       <div className="card danger">
