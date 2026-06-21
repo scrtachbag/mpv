@@ -23,8 +23,11 @@ export default function Nav({ view, setView }) {
         ))}
       </nav>
       <div className="user">
-        <Avatar name={profile?.avatar} size={32} />
-        <span className="pseudo">{profile?.pseudo}</span>
+        <button className={`user-chip${view === 'profile' ? ' active' : ''}`}
+          onClick={() => setView('profile')} title="Mon profil">
+          <Avatar name={profile?.avatar} size={32} />
+          <span className="pseudo">{profile?.pseudo}</span>
+        </button>
         <button className="link" onClick={signOut}>Déconnexion</button>
       </div>
     </header>

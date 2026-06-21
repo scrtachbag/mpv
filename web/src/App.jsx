@@ -7,6 +7,7 @@ import Nav from './components/Nav.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import Chat from './components/Chat.jsx'
 import Admin from './components/Admin.jsx'
+import Profile from './components/Profile.jsx'
 
 export default function App() {
   const { session, profile, loading, recovery } = useAuth()
@@ -23,6 +24,7 @@ export default function App() {
       <main className="container">
         {view === 'tour' && <Dashboard />}
         {view === 'chat' && <Chat />}
+        {view === 'profile' && <Profile />}
         {view === 'admin' && profile.is_admin && <Admin />}
       </main>
       <footer className="footer muted">
