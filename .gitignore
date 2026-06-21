@@ -13,5 +13,5 @@ jobs/.env
 
 # Divers
 .DS_Store
-public/
+/public/        # ancien artefact Pages à la racine (pas web/public/ de Vite)
 *.log
