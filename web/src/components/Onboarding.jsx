@@ -53,7 +53,6 @@ export default function Onboarding() {
               className={`avatar-choice${avatar === a.key ? ' selected' : ''}`}
               onClick={() => setAvatar(a.key)} title={a.label}>
               <span className="avatar" style={{ background: a.color }}>{a.emoji}</span>
-              <span className="avatar-label">{a.label}</span>
             </button>
           ))}
         </div>
