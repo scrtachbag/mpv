@@ -13,12 +13,13 @@ begin;
 -- 1) Étapes (deadline = midi Paris du jour J-n, donc passée ; résultats officiels)
 insert into public.stages (season, stage_no, label, name, profile_type, date, bet_deadline, odds_status, results_status)
 values
+  -- Dates cohérentes avec le numéro : Étape 1 la plus ancienne (J-6) → Étape 6 hier (J-1) ; l'Étape 7 (aujourd'hui) est dans seed.sql.
   (2099, 1, 'Étape 1', 'Grand Départ → Première arrivée', 'flat', current_date - 6, ((current_date - 6) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
-  (2099, 2, 'Étape 2', 'Sprintville → Bunchgallop', 'flat',     current_date - 1, ((current_date - 1) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
-  (2099, 3, 'Étape 3', 'Montcol → Grand Sommet',    'mountain', current_date - 2, ((current_date - 2) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
+  (2099, 2, 'Étape 2', 'Sprintville → Bunchgallop', 'flat',     current_date - 5, ((current_date - 5) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
+  (2099, 3, 'Étape 3', 'Montcol → Grand Sommet',    'mountain', current_date - 4, ((current_date - 4) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
   (2099, 4, 'Étape 4', 'Vallons → Mur final',        'hilly',    current_date - 3, ((current_date - 3) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
-  (2099, 5, 'Étape 5', 'Chrono-les-Bains (CLM)',     'itt',      current_date - 4, ((current_date - 4) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
-  (2099, 6, 'Étape 6', 'Plaine → Bord de mer',       'flat',     current_date - 5, ((current_date - 5) + time '12:00') at time zone 'Europe/Paris', 'published', 'official')
+  (2099, 5, 'Étape 5', 'Chrono-les-Bains (CLM)',     'itt',      current_date - 2, ((current_date - 2) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
+  (2099, 6, 'Étape 6', 'Plaine → Bord de mer',       'flat',     current_date - 1, ((current_date - 1) + time '12:00') at time zone 'Europe/Paris', 'published', 'official')
 on conflict (season, stage_no) do update
   set name = excluded.name, profile_type = excluded.profile_type, date = excluded.date,
       bet_deadline = excluded.bet_deadline, odds_status = excluded.odds_status,
