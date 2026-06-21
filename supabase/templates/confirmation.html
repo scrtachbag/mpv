@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;background:#eef2f7;font-family:'Segoe UI',Arial,sans-serif;color:#1b1c22;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f7;padding:24px 0;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(20,22,30,.08);">
+        <tr><td style="background:linear-gradient(120deg,#ffd21f,#ffe88a);padding:22px 28px;">
+          <span style="font-size:20px;font-weight:800;color:#1b1c22;">🚵 Mon Petit Vélo</span>
+        </td></tr>
+        <tr><td style="padding:28px;">
+          <h1 style="margin:0 0 12px;font-size:22px;">Confirme ton inscription</h1>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.5;color:#374151;">
+            Bienvenue dans le peloton ! Confirme ton adresse e-mail pour activer ton compte
+            <strong>Mon Petit Vélo</strong> et commencer à parier sur les étapes.
+          </p>
+          <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:10px;background:#ffd21f;">
+            <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:13px 24px;font-size:15px;font-weight:800;color:#1b1c22;text-decoration:none;border-radius:10px;">Confirmer mon adresse</a>
+          </td></tr></table>
+          <p style="margin:22px 0 0;font-size:13px;color:#6b7280;">
+            Si le bouton ne fonctionne pas, copie ce lien dans ton navigateur :<br>
+            <a href="{{ .ConfirmationURL }}" style="color:#b8860b;word-break:break-all;">{{ .ConfirmationURL }}</a>
+          </p>
+          <p style="margin:14px 0 0;font-size:13px;color:#9aa1ad;">Si tu n'es pas à l'origine de cette inscription, ignore cet e-mail.</p>
+        </td></tr>
+        <tr><td style="padding:18px 28px;border-top:1px solid #e7e9ee;font-size:12px;color:#9aa1ad;">
+          Paris entre amis sur le Tour de France — sans argent, pour la gloire. 🚴
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>
