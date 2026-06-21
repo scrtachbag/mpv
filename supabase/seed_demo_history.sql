@@ -13,6 +13,7 @@ begin;
 -- 1) Étapes (deadline = midi Paris du jour J-n, donc passée ; résultats officiels)
 insert into public.stages (season, stage_no, label, name, profile_type, date, bet_deadline, odds_status, results_status)
 values
+  (2099, 1, 'Étape 1', 'Grand Départ → Première arrivée', 'flat', current_date - 6, ((current_date - 6) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
   (2099, 2, 'Étape 2', 'Sprintville → Bunchgallop', 'flat',     current_date - 1, ((current_date - 1) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
   (2099, 3, 'Étape 3', 'Montcol → Grand Sommet',    'mountain', current_date - 2, ((current_date - 2) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
   (2099, 4, 'Étape 4', 'Vallons → Mur final',        'hilly',    current_date - 3, ((current_date - 3) + time '12:00') at time zone 'Europe/Paris', 'published', 'official'),
@@ -27,6 +28,8 @@ on conflict (season, stage_no) do update
 insert into public.stage_riders (stage_id, rider_name, odds)
 select s.id, v.rider, v.odds
 from (values
+  -- étape 1
+  (1,'Jasper Philipsen',3.5),(1,'Biniam Girmay',5.0),(1,'Mathieu van der Poel',6.0),(1,'Mads Pedersen',8.0),(1,'Tadej Pogačar',9.0),(1,'Jonas Vingegaard',14.0),(1,'Remco Evenepoel',16.0),(1,'Primož Roglič',20.0),(1,'Juan Ayuso',35.0),(1,'Romain Bardet',70.0),
   -- étape 2
   (2,'Jasper Philipsen',3.0),(2,'Mathieu van der Poel',5.0),(2,'Biniam Girmay',6.0),(2,'Mads Pedersen',7.0),(2,'Tadej Pogačar',9.0),(2,'Jonas Vingegaard',12.0),(2,'Remco Evenepoel',15.0),(2,'Primož Roglič',18.0),(2,'Juan Ayuso',30.0),(2,'Romain Bardet',60.0),
   -- étape 3
@@ -45,6 +48,7 @@ on conflict (stage_id, rider_name) do update set odds = excluded.odds;
 insert into public.stage_results (stage_id, position, rider_name)
 select s.id, v.position, v.rider
 from (values
+  (1,1,'Jasper Philipsen'),(1,2,'Mads Pedersen'),(1,3,'Biniam Girmay'),(1,4,'Mathieu van der Poel'),(1,5,'Tadej Pogačar'),(1,6,'Jonas Vingegaard'),(1,7,'Remco Evenepoel'),(1,8,'Primož Roglič'),(1,9,'Juan Ayuso'),(1,10,'Romain Bardet'),
   (2,1,'Jasper Philipsen'),(2,2,'Biniam Girmay'),(2,3,'Mathieu van der Poel'),(2,4,'Mads Pedersen'),(2,5,'Tadej Pogačar'),(2,6,'Jonas Vingegaard'),(2,7,'Remco Evenepoel'),(2,8,'Primož Roglič'),(2,9,'Juan Ayuso'),(2,10,'Romain Bardet'),
   (3,1,'Jonas Vingegaard'),(3,2,'Tadej Pogačar'),(3,3,'Primož Roglič'),(3,4,'Remco Evenepoel'),(3,5,'Juan Ayuso'),(3,6,'David Gaudu'),(3,7,'Romain Bardet'),(3,8,'Mads Pedersen'),(3,9,'Biniam Girmay'),(3,10,'Jasper Philipsen'),
   (4,1,'Tadej Pogačar'),(4,2,'Mathieu van der Poel'),(4,3,'Mads Pedersen'),(4,4,'Remco Evenepoel'),(4,5,'Jasper Philipsen'),(4,6,'Biniam Girmay'),(4,7,'Jonas Vingegaard'),(4,8,'Primož Roglič'),(4,9,'Juan Ayuso'),(4,10,'Romain Bardet'),
@@ -61,6 +65,7 @@ insert into public.bets (user_id, stage_id, rider_name, bonus_used)
 select p.id, s.id, v.rider, v.bonus
 from (values
   -- (stage_no, pseudo, coureur, bonus)
+  (1,'TwentyCent','Jasper Philipsen',true),(1,'Bernard','Mads Pedersen',false),(1,'Le Blaireau','Biniam Girmay',false),(1,'Testos','Mathieu van der Poel',false),(1,'Admin','Tadej Pogačar',false),
   (2,'TwentyCent','Jasper Philipsen',false),(2,'Bernard','Mathieu van der Poel',false),(2,'Le Blaireau','Biniam Girmay',true),(2,'Testos','Mads Pedersen',false),(2,'Admin','Tadej Pogačar',false),
   (3,'TwentyCent','Tadej Pogačar',false),(3,'Bernard','Jonas Vingegaard',true),(3,'Le Blaireau','David Gaudu',false),(3,'Testos','Primož Roglič',false),(3,'Admin','Remco Evenepoel',false),
   (4,'TwentyCent','Mathieu van der Poel',false),(4,'Bernard','Mads Pedersen',false),(4,'Le Blaireau','Romain Bardet',false),(4,'Testos','Jasper Philipsen',false),(4,'Admin','Tadej Pogačar',true),
