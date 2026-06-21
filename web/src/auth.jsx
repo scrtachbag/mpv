@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [recovery, setRecovery] = useState(false)   // lien "mot de passe oublié" cliqué
 
   const loadProfile = useCallback(async (userId) => {
     if (!userId) { setProfile(null); return }
@@ -24,7 +25,8 @@ export function AuthProvider({ children }) {
       await loadProfile(data.session?.user?.id)
       setLoading(false)
     })
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === 'PASSWORD_RECOVERY') setRecovery(true)
       setSession(s)
       loadProfile(s?.user?.id)
     })
@@ -36,8 +38,10 @@ export function AuthProvider({ children }) {
     user: session?.user ?? null,
     profile,
     loading,
+    recovery,
+    clearRecovery: () => setRecovery(false),
     refreshProfile: () => loadProfile(session?.user?.id),
-    signOut: () => supabase.auth.signOut(),
+    signOut: async () => { setRecovery(false); await supabase.auth.signOut() },
   }
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
