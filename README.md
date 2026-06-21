@@ -130,6 +130,26 @@ résultats sont en base.
 En local : `npx supabase functions serve trigger-results --env-file supabase/functions/.env`
 (voir [`.env.example`](supabase/functions/.env.example)).
 
+### 6. (Optionnel) Rappels de pari par notification push
+
+Chaque joueur active les rappels depuis son **profil** (« 🔔 Rappels de pari »).
+Un workflow planifié ([`reminder.yml`](.github/workflows/reminder.yml), ~11h45 Paris)
+notifie ceux qui n'ont **pas encore parié** l'étape du jour, via Web Push.
+
+```bash
+# Générer une paire de clés VAPID :
+npx web-push generate-vapid-keys
+```
+
+- **Variable** GitHub (publique) : `VITE_VAPID_PUBLIC_KEY` (= clé publique).
+- **Secrets** GitHub : `VAPID_PRIVATE_KEY`, et `VAPID_PUBLIC_KEY` ; **Variables** :
+  `VAPID_SUBJECT` (`mailto:toi@exemple.fr`) et `MPV_SITE_URL` (URL GitHub Pages,
+  ouverte au clic sur la notif).
+
+> ⚠️ Le cron GitHub n'est pas précis à la minute : le « 15 min avant » est
+> approximatif. Les notifications nécessitent que le joueur ait autorisé le site
+> dans son navigateur (par appareil).
+
 ---
 
 ## Tester en local (100 % hors-ligne, sans rien dans le cloud)
