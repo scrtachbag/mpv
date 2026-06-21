@@ -287,5 +287,14 @@ create policy bets_delete_own on public.bets for delete using (
 -- -----------------------------------------------------------------------------
 -- Droits sur vues / fonctions
 -- -----------------------------------------------------------------------------
+-- Droits de table (la RLS restreint ensuite les LIGNES visibles/modifiables).
+grant usage on schema public to anon, authenticated;
+grant select on public.stages        to anon, authenticated;
+grant select on public.stage_riders  to anon, authenticated;
+grant select on public.stage_results to anon, authenticated;
+grant select on public.profiles      to anon, authenticated;
+grant insert, update on public.profiles to authenticated;
+grant select, insert, update, delete on public.bets to authenticated;
+
 grant select  on public.bet_scores to anon, authenticated;
 grant execute on function public.get_leaderboard() to anon, authenticated;
