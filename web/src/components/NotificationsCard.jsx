@@ -44,7 +44,7 @@ export default function NotificationsCard() {
       ) : (
         <>
           <p className="muted">
-            Reçois une notification <strong>~15 min avant la clôture</strong> si tu n’as pas
+            Reçois une notification <strong>~30 min avant la clôture</strong> si tu n’as pas
             encore parié. À activer sur chaque appareil/navigateur que tu utilises.
           </p>
           <button className="primary" style={{ width: 'auto' }} disabled={busy}

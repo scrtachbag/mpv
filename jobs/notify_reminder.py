@@ -53,7 +53,7 @@ def main() -> int:
 
     payload = json.dumps({
         "title": "🚴 Mon Petit Vélo",
-        "body": f"Plus que ~15 min pour parier sur {stage['label']} ! 🚲",
+        "body": f"Plus que ~30 min pour parier sur {stage['label']} ! 🚲",
         "url": config.SITE_URL,
         "tag": "mpv-reminder",
     })

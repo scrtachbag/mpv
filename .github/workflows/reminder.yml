@@ -1,11 +1,11 @@
 name: Rappel de pari (push)
 
 # ⏰ cron en UTC. En juillet, Paris = UTC+2 (CEST).
-#    09:45 UTC = 11h45 Paris, soit ~15 min avant la clôture de 12h00.
+#    09:30 UTC = 11h30 Paris, soit ~30 min avant la clôture de 12h00.
 #    (Le cron GitHub n'est pas précis à la minute : léger décalage possible.)
 on:
   schedule:
-    - cron: '45 9 * * *'
+    - cron: '30 9 * * *'
   workflow_dispatch:
 
 jobs:
