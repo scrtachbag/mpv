@@ -23,7 +23,7 @@ les résultats sont récupérés et le classement se met à jour automatiquement
 ```
 ┌──────────────┐    auth + données     ┌────────────────────────┐
 │  Front React │◄─────────────────────►│  Supabase               │
-│  (GitHub     │   (clé anon, RLS)     │  - Auth e-mail (lien)   │
+│  (GitHub     │   (clé anon, RLS)     │  - Auth e-mail + mdp    │
 │   Pages)     │                       │  - Postgres + RLS       │
 └──────────────┘                       │  - vue classement       │
         ▲                              └─────────▲──────────────┘
@@ -58,8 +58,9 @@ web/                 front React + Vite
 
 1. Crée un projet sur [supabase.com](https://supabase.com).
 2. **SQL Editor** → colle le contenu de [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) → *Run*.
-3. **Authentication > Providers > Email** : active *Email*. Pour la simplicité,
-   garde le « magic link » (connexion par lien, sans mot de passe).
+3. **Authentication > Providers > Email** : active *Email* avec
+   **mot de passe** (l'appli utilise e-mail + mot de passe). Décide si tu veux
+   *Confirm email* (recommandé en prod) ou non (connexion immédiate à l'inscription).
 4. **Authentication > URL Configuration** : ajoute l'URL de ton site GitHub Pages
    (`https://<user>.github.io/mon-petit-velo/`) dans *Site URL* et *Redirect URLs*.
 5. Note, dans **Project Settings > API** :
@@ -101,31 +102,80 @@ Les workflows [`odds.yml`](.github/workflows/odds.yml) et
 
 ### 4. Définir l'admin
 
-Connecte-toi une première fois (lien e-mail + pseudo), puis dans **Supabase >
-SQL Editor** :
+Crée ton compte admin dans l'appli (e-mail + mot de passe + pseudo), puis dans
+**Supabase > SQL Editor** :
 ```sql
-update public.profiles set is_admin = true where email = 'toi@exemple.fr';
+update public.profiles set is_admin = true where email = 'admin@exemple.fr';
 ```
-L'onglet **Admin** apparaît alors dans l'appli.
+Reconnecte-toi (ou rafraîchis) : l'onglet **Admin** apparaît alors dans l'appli.
 
 ---
 
-## Développement local
+## Tester en local (100 % hors-ligne, sans rien dans le cloud)
+
+Prérequis : **Docker** (en marche) + **Node**. Le CLI Supabase se lance via `npx`.
 
 ```bash
-# Front
-cd web
-cp .env.example .env.local      # renseigne VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY
-npm install
-npm run dev
+# 1. Démarrer la stack Supabase locale (Postgres + Auth + Studio).
+#    Applique les migrations ET supabase/seed.sql (étape de démo + côtes).
+npx supabase start          # 1re fois : télécharge les images Docker
+npx supabase db reset       # pour ré-appliquer migrations + seed à tout moment
 
-# Jobs (test)
-cd ../jobs
-pip install -r requirements.txt
-export SUPABASE_URL=...  SUPABASE_SERVICE_KEY=...  MPV_SEASON=2026
-python fetch_odds.py            # ou : python fetch_odds.py --stage 1
+# 2. Lancer le front (le .env.local pointe déjà vers la stack locale).
+cd web && npm install && npm run dev      # http://localhost:5173
+```
+
+`npx supabase start` affiche les **clés locales** : la clé `Publishable`
+(= clé front, déjà dans [`web/.env.local`](web/.env.local)) et la clé `Secret`
+(= service_role, pour les jobs).
+
+**S'inscrire / se connecter en local** :
+- *Créer un compte* : saisis un e-mail → le lien est capturé par **Mailpit**
+  (http://127.0.0.1:54324) → clique « Your sign-in link » → tu finalises avec
+  pseudo + mot de passe.
+- *Se connecter* : e-mail + mot de passe.
+- *Mot de passe oublié* : saisis l'e-mail → lien de réinit dans Mailpit
+  (« Reset your password ») → choisis un nouveau mot de passe.
+
+> Les e-mails par défaut sont en anglais ; tu peux les traduire dans
+> Supabase (Auth > Email Templates) ou dans `supabase/config.toml`.
+
+**Voir le scoring sans attendre une vraie étape** : place un pari sur l'étape de
+démo, puis dans **Supabase Studio** (http://127.0.0.1:54323) ou en SQL, enregistre
+un faux résultat :
+
+```sql
+-- Podium de démo (ré-exécutable : on efface puis on réinsère).
+delete from stage_results
+where stage_id = (select id from stages where season = 2099 and stage_no = 1);
+
+insert into stage_results (stage_id, position, rider_name)
+select s.id, v.position, v.rider_name
+from stages s
+join (values
+  (1, 'Tadej Pogačar'),
+  (2, 'Jonas Vingegaard'),
+  (3, 'Remco Evenepoel')
+) as v(position, rider_name) on true
+where s.season = 2099 and s.stage_no = 1;
+
+update stages set results_status = 'official' where season = 2099 and stage_no = 1;
+```
+
+Le classement et l'historique se mettent à jour immédiatement.
+
+**Tester les vrais jobs PCS en local** (réseau requis) :
+
+```bash
+cd jobs && pip install -r requirements.txt
+export SUPABASE_URL=http://127.0.0.1:54321
+export SUPABASE_SERVICE_KEY=<clé Secret affichée par supabase start>
+export MPV_SEASON=2025          # une saison déjà courue pour avoir des résultats
+python fetch_odds.py --stage 1
 python fetch_results.py --stage 1
 ```
+
+Pour tout arrêter : `npx supabase stop`.
 
 ## Réglages utiles
 
