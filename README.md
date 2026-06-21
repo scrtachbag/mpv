@@ -61,6 +61,9 @@ web/                 front React + Vite
 3. **Authentication > Providers > Email** : active *Email* avec
    **mot de passe** (l'appli utilise e-mail + mot de passe). Décide si tu veux
    *Confirm email* (recommandé en prod) ou non (connexion immédiate à l'inscription).
+   Les e-mails sont brandés MPV ([`supabase/templates`](supabase/templates/)) ;
+   en local ils s'appliquent via `config.toml`, en cloud colle-les dans
+   *Auth > Email Templates* (ou `npx supabase config push` sur le projet lié).
 4. **Authentication > URL Configuration** : ajoute l'URL de ton site GitHub Pages
    (`https://<user>.github.io/mon-petit-velo/`) dans *Site URL* et *Redirect URLs*.
 5. Note, dans **Project Settings > API** :
@@ -133,8 +136,9 @@ En local : `npx supabase functions serve trigger-results --env-file supabase/fun
 ### 6. (Optionnel) Rappels de pari par notification push
 
 Chaque joueur active les rappels depuis son **profil** (« 🔔 Rappels de pari »).
-Un workflow planifié ([`reminder.yml`](.github/workflows/reminder.yml), ~11h45 Paris)
-notifie ceux qui n'ont **pas encore parié** l'étape du jour, via Web Push.
+Un workflow planifié ([`reminder.yml`](.github/workflows/reminder.yml), ~11h30 Paris,
+soit ~30 min avant la clôture) notifie ceux qui n'ont **pas encore parié** l'étape
+du jour, via Web Push.
 
 ```bash
 # Générer une paire de clés VAPID :
@@ -146,7 +150,7 @@ npx web-push generate-vapid-keys
   `VAPID_SUBJECT` (`mailto:toi@exemple.fr`) et `MPV_SITE_URL` (URL GitHub Pages,
   ouverte au clic sur la notif).
 
-> ⚠️ Le cron GitHub n'est pas précis à la minute : le « 15 min avant » est
+> ⚠️ Le cron GitHub n'est pas précis à la minute : le « 30 min avant » est
 > approximatif. Les notifications nécessitent que le joueur ait autorisé le site
 > dans son navigateur (par appareil).
 
