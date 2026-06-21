@@ -173,6 +173,11 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
   .hl-rider, .hl-place { display: none; }
 }
 
+/* ---------------- table (admin) ---------------- */
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: .55rem .6rem; border-bottom: 1px solid var(--border); text-align: left; }
+.table th { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
+
 /* ---------------- podium / picks (today) ---------------- */
 .podium { margin: 0; padding-left: 0; list-style: none; }
 .podium li { padding: .35rem 0; border-bottom: 1px solid var(--border); }

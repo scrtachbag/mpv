@@ -109,6 +109,27 @@ update public.profiles set is_admin = true where email = 'admin@exemple.fr';
 ```
 Reconnecte-toi (ou rafraîchis) : l'onglet **Admin** apparaît alors dans l'appli.
 
+### 5. (Optionnel) Bouton admin « Récupérer les résultats »
+
+Le panneau Admin peut déclencher le workflow GitHub « Résultats du soir » d'un
+clic, via une Edge Function ([`supabase/functions/trigger-results`](supabase/functions/trigger-results/index.ts))
+qui vérifie que l'appelant est admin puis appelle l'API GitHub avec un token
+gardé **côté serveur** (jamais dans le navigateur).
+
+```bash
+# 1. Créer un PAT GitHub fine-grained (permission "Actions: write" sur le dépôt).
+# 2. Déclarer les secrets puis déployer la fonction :
+npx supabase secrets set GH_DISPATCH_TOKEN=github_pat_xxx GH_REPO=ton-user/mon-petit-velo GH_REF=main
+npx supabase functions deploy trigger-results
+```
+
+Sans cette config, le bouton renvoie « Déclencheur GitHub non configuré » ; le
+calcul des scores reste de toute façon automatique (vue live) dès que les
+résultats sont en base.
+
+En local : `npx supabase functions serve trigger-results --env-file supabase/functions/.env`
+(voir [`.env.example`](supabase/functions/.env.example)).
+
 ---
 
 ## Tester en local (100 % hors-ligne, sans rien dans le cloud)
