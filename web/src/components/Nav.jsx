@@ -4,6 +4,7 @@ import Avatar from './Avatar.jsx'
 const TABS = [
   { key: 'tour', label: '🚴 Le Tour' },
   { key: 'chat', label: '💬 Chat' },
+  { key: 'rules', label: '📖 Règles' },
 ]
 
 export default function Nav({ view, setView }) {

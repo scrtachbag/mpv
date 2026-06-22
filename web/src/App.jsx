@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard.jsx'
 import Chat from './components/Chat.jsx'
 import Admin from './components/Admin.jsx'
 import Profile from './components/Profile.jsx'
+import Rules from './components/Rules.jsx'
 
 export default function App() {
   const { session, profile, loading, recovery } = useAuth()
@@ -24,6 +25,7 @@ export default function App() {
       <main className="container">
         {view === 'tour' && <Dashboard />}
         {view === 'chat' && <Chat />}
+        {view === 'rules' && <Rules />}
         {view === 'profile' && <Profile />}
         {view === 'admin' && profile.is_admin && <Admin />}
       </main>

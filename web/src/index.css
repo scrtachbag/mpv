@@ -220,5 +220,17 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
   padding: .6rem .8rem; border-radius: 10px; font-weight: 600; margin: .2rem 0 .4rem;
 }
 
+/* ---------------- règles ---------------- */
+.rules-list { margin: .4rem 0 0; padding-left: 1.2rem; }
+.rules-list li { padding: .2rem 0; line-height: 1.45; }
+.rules .formula {
+  background: #fffae6; border: 1px dashed var(--yellow-deep); border-radius: 10px;
+  padding: .7rem 1rem; font-weight: 800; text-align: center; font-size: 1.05rem; margin: .6rem 0;
+}
+.rules .example {
+  background: #f8f9fb; border: 1px solid var(--border); border-radius: 10px;
+  padding: .7rem 1rem; margin-top: .8rem; font-size: .95rem;
+}
+
 /* ---------------- footer ---------------- */
 .footer { text-align: center; padding: 1.5rem 1rem; font-size: .82rem; }
