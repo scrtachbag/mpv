@@ -44,6 +44,9 @@ ODDS_MIN = _float("MPV_ODDS_MIN", 1.5)
 ODDS_MAX = _float("MPV_ODDS_MAX", 500.0)
 # Points plancher pour un coureur absent du classement PCS (évite côte = MAX).
 ODDS_FLOOR_POINTS = _float("MPV_ODDS_FLOOR_POINTS", 5.0)
+# Pondération : forme récente vs points dans la spécialité de l'étape.
+ODDS_FORM_WEIGHT = _float("MPV_ODDS_FORM_WEIGHT", 0.5)
+ODDS_SPEC_WEIGHT = _float("MPV_ODDS_SPEC_WEIGHT", 1.0)
 
 # Nombre de positions de résultat à enregistrer (le top 10 suffit au score).
 RESULTS_TOP_N = _int("MPV_RESULTS_TOP_N", 30)

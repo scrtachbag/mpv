@@ -5,34 +5,30 @@
     qu'il faut adapter. Tout est encapsulé derrière une petite interface stable :
 
         find_stage(season, slug, date|number) -> StageInfo | None
-        get_startlist(season, slug)           -> list[Rider]
-        get_strength_map(season)              -> dict[name -> float]
+        get_startlist(season, slug)           -> list[RiderEntry]
+        get_rider_forms(season, slug)         -> list[RiderForm]  (spécialités + forme)
         get_results(stage_url)                -> list[(position, name)]
 """
 from __future__ import annotations
-from dataclasses import dataclass
 import logging
+import time
 
-from procyclingstats import Stage, RaceStartlist, Ranking
+from procyclingstats import Stage, RaceStartlist, Rider
+
+from models import StageInfo, RiderEntry, RiderForm
 
 log = logging.getLogger("mpv.pcs")
 
 MAX_STAGES = 25  # garde-fou (le Tour compte 21 étapes)
 
-
-@dataclass
-class StageInfo:
-    stage_no: int
-    date: str          # "YYYY-MM-DD"
-    name: str | None
-    profile_type: str | None
-    url: str
-
-
-@dataclass
-class RiderEntry:
-    name: str
-    pcs_id: str | None
+# Clés de spécialité PCS -> clés canoniques utilisées par odds.py.
+_SPEC_KEYS = {
+    "sprint": "sprint",
+    "climber": "climber", "climb": "climber",
+    "gc": "gc",
+    "time_trial": "time_trial", "tt": "time_trial",
+    "one_day_races": "one_day", "one_day": "one_day", "hills": "one_day", "classic": "one_day",
+}
 
 
 def _safe(fn, default=None):
@@ -94,37 +90,59 @@ def get_startlist(season: int, slug: str) -> list[RiderEntry]:
     return out
 
 
-def get_strength_map(season: int) -> dict[str, float]:
-    """Renvoie {nom_coureur: points_PCS}. Sert de proxy de "force" pour les
-    côtes. En cas d'échec, renvoie {} (les côtes seront alors uniformes)."""
-    candidates = [
-        f"rankings/{season}/me/individual",
-        "rankings/me/individual",
-    ]
-    for url in candidates:
-        try:
-            rk = Ranking(url)
-        except Exception:  # noqa: BLE001
+def _normalize_specialties(raw: dict) -> dict:
+    out: dict[str, float] = {}
+    for k, v in (raw or {}).items():
+        key = _SPEC_KEYS.get(str(k).lower())
+        if key is None:
             continue
-        rows = (_safe(rk.individual_ranking)
-                or _safe(rk.ranking)
-                or _safe(lambda: rk.parse().get("individual_ranking"))
-                or [])
-        out: dict[str, float] = {}
-        for row in rows:
-            name = row.get("rider_name")
-            pts = row.get("points")
-            if not name:
-                continue
+        try:
+            out[key] = out.get(key, 0.0) + float(v)
+        except (TypeError, ValueError):
+            pass
+    return out
+
+
+def _season_form(rider, season: int) -> float | None:
+    """Points de la saison `season` (proxy de forme récente). best-effort."""
+    data = _safe(rider.points_per_season)
+    if isinstance(data, list):
+        for row in data:
+            if isinstance(row, dict) and str(row.get("season")) == str(season):
+                try:
+                    return float(row.get("points") or 0.0)
+                except (TypeError, ValueError):
+                    return None
+    return None
+
+
+def get_rider_forms(season: int, slug: str, *, sleep: float = 0.0,
+                    limit: int | None = None) -> list[RiderForm]:
+    """Pour chaque partant : points par spécialité + forme récente.
+
+    ⚠️ Une requête PCS par coureur (~180/jour) — politesse via `sleep`. Si la
+    forme d'un coureur est indisponible, on retombe sur la somme de ses
+    spécialités ; un coureur totalement inconnu garde une force plancher.
+    """
+    riders = get_startlist(season, slug)
+    if limit:
+        riders = riders[:limit]
+    forms: list[RiderForm] = []
+    for r in riders:
+        spec: dict[str, float] = {}
+        form = 0.0
+        if r.pcs_id:
             try:
-                out[name.strip()] = float(pts)
-            except (TypeError, ValueError):
-                continue
-        if out:
-            log.info("classement PCS : %d coureurs cotés", len(out))
-            return out
-    log.warning("classement PCS indisponible : côtes uniformes")
-    return {}
+                rd = Rider(r.pcs_id)
+                spec = _normalize_specialties(_safe(rd.points_per_speciality) or {})
+                form = float(_season_form(rd, season) or sum(spec.values()) or 0.0)
+            except Exception as exc:  # noqa: BLE001
+                log.warning("forme indisponible pour %s (%s)", r.name, exc)
+        forms.append(RiderForm(name=r.name, pcs_id=r.pcs_id, form=form, specialties=spec))
+        if sleep:
+            time.sleep(sleep)
+    log.info("forme/spécialités récupérées pour %d coureurs", len(forms))
+    return forms
 
 
 def get_results(stage_url: str, top_n: int) -> list[tuple[int, str]]:

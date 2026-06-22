@@ -1,19 +1,22 @@
-"""Job du matin : publie l'étape du jour + les côtes des partants.
-
-À lancer chaque matin (avant 12h00) pendant le Tour, via un pipeline planifié
-GitLab. Les paris se ferment à BET_HOUR (12h00 heure de Paris).
+"""Job du matin : publie l'étape du jour + les côtes (dépendantes du profil
+d'étape et de la forme des coureurs).
 
 Usage :
-    python fetch_odds.py                 # étape dont la date == aujourd'hui
-    python fetch_odds.py --stage 5       # force l'étape n°5
-    python fetch_odds.py --date 2026-07-04
+    python fetch_odds.py                      # étape du jour -> écrit en base
+    python fetch_odds.py --stage 5            # force l'étape 5
+    python fetch_odds.py --dry-run --stage 5  # calcule et AFFICHE, sans écrire
+    python fetch_odds.py --stage 5 --save-snapshot snap.json   # capture les données PCS
+    python fetch_odds.py --from-snapshot snap.json             # rejoue hors-ligne (sans PCS)
+
+Les deux derniers modes servent à tester le calcul sans dépendre de PCS :
+capture une fois depuis une machine où PCS répond, puis rejoue partout.
 """
 import argparse
+import json
 import logging
 from datetime import datetime, time
 
 import config
-import pcs
 import odds
 import supabase_client as db
 
@@ -23,55 +26,83 @@ log = logging.getLogger("mpv.odds")
 
 def _deadline_iso(date_str: str) -> str:
     d = datetime.strptime(date_str, "%Y-%m-%d").date()
-    dt = datetime.combine(d, time(hour=config.BET_HOUR), tzinfo=config.TZ)
-    return dt.isoformat()
+    return datetime.combine(d, time(hour=config.BET_HOUR), tzinfo=config.TZ).isoformat()
+
+
+def _print_favorites(rows):
+    fav = sorted(rows, key=lambda x: x["odds"])[:8]
+    log.info("%d coureurs cotés. Favoris : %s", len(rows),
+             ", ".join(f"{r['rider_name']} ({r['odds']})" for r in fav))
 
 
 def main() -> int:
-    config.require_supabase()
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", type=int, help="numéro d'étape à forcer")
-    ap.add_argument("--date", help="date d'étape YYYY-MM-DD (défaut : aujourd'hui)")
+    ap.add_argument("--stage", type=int)
+    ap.add_argument("--date")
+    ap.add_argument("--dry-run", action="store_true", help="calcule et affiche, sans écrire en base")
+    ap.add_argument("--save-snapshot", metavar="PATH", help="dump des données PCS (forme/spécialités) en JSON")
+    ap.add_argument("--from-snapshot", metavar="PATH", help="calcule à partir d'un JSON (sans PCS)")
+    ap.add_argument("--sleep", type=float, default=0.0, help="pause entre requêtes PCS (politesse)")
+    ap.add_argument("--limit", type=int, help="limiter le nombre de coureurs (debug)")
     args = ap.parse_args()
+    from models import RiderForm  # local (pas de PCS)
 
-    today = args.date or datetime.now(config.TZ).date().isoformat()
-    info = pcs.find_stage(config.SEASON, config.RACE_SLUG,
-                          date=None if args.stage else today,
-                          number=args.stage)
-    if info is None:
-        log.info("Aucune étape pour %s (jour de repos / hors Tour). Rien à faire.", today)
+    # --- Mode rejeu hors-ligne : aucune dépendance PCS ---
+    if args.from_snapshot:
+        with open(args.from_snapshot, encoding="utf-8") as f:
+            snap = json.load(f)
+        profile = snap.get("profile")
+        forms = [RiderForm.from_json(d) for d in snap["riders"]]
+        rows = odds.compute_odds(forms, profile)
+        log.info("Profil '%s' (snapshot)", profile)
+        _print_favorites(rows)
         return 0
 
-    log.info("Étape %s du %s : %s", info.stage_no, info.date, info.name or "?")
+    # --- Sinon : on interroge PCS ---
+    import pcs  # import tardif (déclenche procyclingstats)
+    today = args.date or datetime.now(config.TZ).date().isoformat()
+    info = pcs.find_stage(config.SEASON, config.RACE_SLUG,
+                          date=None if args.stage else today, number=args.stage)
+    if info is None:
+        log.info("Aucune étape pour %s. Rien à faire.", today)
+        return 0
+    log.info("Étape %s du %s : %s [profil: %s]", info.stage_no, info.date,
+             info.name or "?", info.profile_type)
 
-    stage_id = db.upsert_stage({
-        "season": config.SEASON,
-        "stage_no": info.stage_no,
-        "label": f"Étape {info.stage_no}",
-        "name": info.name,
-        "profile_type": info.profile_type,
-        "date": info.date,
-        "bet_deadline": _deadline_iso(info.date),
-        "odds_status": "pending",
-    })
-
-    startlist = pcs.get_startlist(config.SEASON, config.RACE_SLUG)
-    if not startlist:
+    forms = pcs.get_rider_forms(config.SEASON, config.RACE_SLUG, sleep=args.sleep, limit=args.limit)
+    if not forms:
         log.error("Startlist vide : impossible de coter l'étape.")
         return 1
-    strength = pcs.get_strength_map(config.SEASON)
-    rows = odds.compute_odds(startlist, strength)
+
+    if args.save_snapshot:
+        with open(args.save_snapshot, "w", encoding="utf-8") as f:
+            json.dump({"stage": {"stage_no": info.stage_no, "date": info.date,
+                                 "name": info.name, "profile_type": info.profile_type},
+                       "profile": info.profile_type,
+                       "riders": [rf.to_json() for rf in forms]}, f, ensure_ascii=False, indent=2)
+        log.info("Snapshot écrit : %s", args.save_snapshot)
+
+    rows = odds.compute_odds(forms, info.profile_type)
+    _print_favorites(rows)
+
+    if args.dry_run:
+        log.info("--dry-run : rien écrit en base.")
+        return 0
+
+    # --- Écriture en base ---
+    config.require_supabase()
+    stage_id = db.upsert_stage({
+        "season": config.SEASON, "stage_no": info.stage_no,
+        "label": f"Étape {info.stage_no}", "name": info.name,
+        "profile_type": info.profile_type, "date": info.date,
+        "bet_deadline": _deadline_iso(info.date), "odds_status": "pending",
+    })
     for r in rows:
         r["stage_id"] = stage_id
-
-    # On remplace proprement les côtes de l'étape (gère les abandons).
     db.delete("stage_riders", {"stage_id": stage_id})
     db.upsert("stage_riders", rows, on_conflict="stage_id,rider_name")
     db.update("stages", {"id": stage_id}, {"odds_status": "published"})
-
-    fav = sorted(rows, key=lambda x: x["odds"])[:5]
-    log.info("%d coureurs cotés. Favoris : %s", len(rows),
-             ", ".join(f"{r['rider_name']} ({r['odds']})" for r in fav))
+    log.info("Côtes publiées pour l'étape %s.", info.stage_no)
     return 0
 
 
