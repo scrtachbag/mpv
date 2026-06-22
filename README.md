@@ -209,26 +209,58 @@ update stages set results_status = 'official' where season = 2099 and stage_no =
 
 Le classement et l'historique se mettent à jour immédiatement.
 
-**Tester les vrais jobs PCS en local** (réseau requis) :
-
-```bash
-cd jobs && pip install -r requirements.txt
-export SUPABASE_URL=http://127.0.0.1:54321
-export SUPABASE_SERVICE_KEY=<clé Secret affichée par supabase start>
-export MPV_SEASON=2025          # une saison déjà courue pour avoir des résultats
-python fetch_odds.py --stage 1
-python fetch_results.py --stage 1
-```
-
 Pour tout arrêter : `npx supabase stop`.
+
+## Calcul des côtes & tests
+
+La côte dépend du **profil d'étape** (sprint/montagne/CLM/vallon) et de la
+**forme** du coureur. Le calcul ([`jobs/odds.py`](jobs/odds.py)) est une fonction
+**pure** : `force = FORM_WEIGHT × forme + SPEC_WEIGHT × points_dans_la_spécialité_de_l'étape`,
+puis `poids = force^ALPHA`, `proba = poids/Σ`, `côte = MARGIN/proba`. Un sprinteur
+est donc favori sur le plat, un grimpeur en montagne, etc.
+
+### Trois façons de tester (sans dépendre de PCS)
+
+1. **Tests unitaires** (déterministes, hors-ligne) — la logique étape/forme :
+   ```bash
+   cd jobs && python tests/test_odds.py     # ou : pytest jobs/tests
+   ```
+2. **Rejeu d'un instantané** capturé une fois là où PCS répond, puis rejoué partout :
+   ```bash
+   python fetch_odds.py --stage 1 --save-snapshot snap.json   # capture (réseau)
+   python fetch_odds.py --from-snapshot snap.json             # rejeu (hors-ligne)
+   ```
+3. **Dry-run** — calcule et affiche les côtes sans rien écrire en base :
+   ```bash
+   python fetch_odds.py --dry-run --stage 1
+   ```
+
+### ⚠️ Disponibilité de ProCyclingStats
+
+PCS est derrière Cloudflare : les requêtes depuis des IP « datacenter »
+(certains CI) peuvent recevoir un **403**. Depuis une machine perso (IP
+résidentielle), la lib `procyclingstats` fonctionne normalement.
+
+- **Avant le Tour**, teste un vrai run depuis ton PC :
+  ```bash
+  cd jobs && pip install -r requirements.txt
+  export MPV_SEASON=2025      # saison déjà courue
+  python fetch_odds.py --dry-run --stage 12   # étape de montagne 2025
+  python fetch_results.py --stage 12          # nécessite SUPABASE_* pour écrire
+  ```
+- **Vérifie GitHub Actions** en lançant le workflow « Côtes du matin » à la main
+  (*Run workflow*) : si tu vois des 403 dans les logs, l'IP du runner est bloquée.
+  Plan B alors : augmenter les retries, ou **saisir les côtes à la main** (admin)
+  ce jour-là — le jeu ne casse pas.
 
 ## Réglages utiles
 
-- **Côtes** (écart favoris/outsiders, marge, bornes) : variables `MPV_ODDS_*`
-  dans [`jobs/config.py`](jobs/config.py).
-- **Source des résultats / classement PCS** : tout est isolé dans
-  [`jobs/pcs.py`](jobs/pcs.py) — c'est le seul fichier à toucher si la librairie
-  `procyclingstats` change un nom de méthode.
+- **Côtes** (poids forme/spécialité, écart favoris/outsiders, marge, bornes) :
+  variables `MPV_ODDS_*` dans [`jobs/config.py`](jobs/config.py).
+- **Accès PCS** (étape, startlist, spécialités, forme, résultats) : tout est isolé
+  dans [`jobs/pcs.py`](jobs/pcs.py) — seul fichier à ajuster si `procyclingstats`
+  change un nom de méthode. Le calcul ([`jobs/odds.py`](jobs/odds.py)) en est
+  découplé et reste testable sans réseau.
 
 ## Limites assumées
 
