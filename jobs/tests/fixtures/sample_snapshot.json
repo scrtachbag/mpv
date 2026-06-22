@@ -1,0 +1,11 @@
+{
+  "stage": {"stage_no": 12, "date": "2025-07-17", "name": "Montagne", "profile_type": "mountainhard"},
+  "profile": "mountainhard",
+  "riders": [
+    {"name": "Tadej Pogačar", "pcs_id": "rider/tadej-pogacar", "form": 3500, "specialties": {"gc": 4000, "climber": 3000, "one_day": 2000, "sprint": 200}},
+    {"name": "Jonas Vingegaard", "pcs_id": "rider/jonas-vingegaard", "form": 2200, "specialties": {"gc": 3000, "climber": 2800, "sprint": 50}},
+    {"name": "Jasper Philipsen", "pcs_id": "rider/jasper-philipsen", "form": 1800, "specialties": {"sprint": 2600, "climber": 30}},
+    {"name": "Remco Evenepoel", "pcs_id": "rider/remco-evenepoel", "form": 2000, "specialties": {"gc": 2500, "time_trial": 1500, "climber": 1200}},
+    {"name": "Domestique X", "pcs_id": "rider/domestique-x", "form": 20, "specialties": {}}
+  ]
+}
