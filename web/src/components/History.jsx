@@ -17,7 +17,7 @@ export default function History() {
         supabase.from('bet_scores')
           .select('stage_id, user_id, rider_name, bonus_used, odds, position, points'),
         supabase.from('profiles').select('id, pseudo, avatar'),
-        supabase.from('stages').select('id, stage_no, label, name, date, results_status'),
+        supabase.from('stages').select('id, stage_no, label, name, date, results_status, bet_deadline'),
       ])
       const prof = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]))
 
@@ -34,8 +34,11 @@ export default function History() {
         grouped[id].sort((a, b) =>
           Number(b.points) - Number(a.points) || a.pseudo.localeCompare(b.pseudo))
       }
+      // On n'affiche une étape dans l'historique qu'une fois sa deadline passée
+      // (sinon on verrait son propre pari de l'étape du jour en cours).
+      const now = Date.now()
       const visible = (stageRows ?? [])
-        .filter((s) => grouped[s.id]?.length)
+        .filter((s) => grouped[s.id]?.length && new Date(s.bet_deadline).getTime() <= now)
         .sort((a, b) => b.stage_no - a.stage_no)
 
       setByStage(grouped)
