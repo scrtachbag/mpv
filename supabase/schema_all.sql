@@ -1,3 +1,11 @@
+-- =============================================================
+-- MPV — schéma complet (toutes les migrations concaténées).
+-- À coller dans Supabase > SQL Editor > Run (une seule fois).
+-- Source de vérité : supabase/migrations/*.sql
+-- =============================================================
+
+-- >>>>> migrations/0001_init.sql <<<<<
+
 -- =============================================================================
 -- Mon Petit Vélo (MPV) — schéma initial
 -- =============================================================================
@@ -299,3 +307,147 @@ grant select, insert, update, delete on public.bets to authenticated;
 
 grant select  on public.bet_scores to anon, authenticated;
 grant execute on function public.get_leaderboard() to anon, authenticated;
+
+-- >>>>> migrations/0002_chat_avatars.sql <<<<<
+
+-- =============================================================================
+-- MPV 0002 — avatars + chat (temps réel)
+-- =============================================================================
+
+-- --- Avatars ----------------------------------------------------------------
+alter table public.profiles
+  add column if not exists avatar text not null default 'sprinteur';
+
+-- --- Chat -------------------------------------------------------------------
+create table if not exists public.messages (
+  id         bigint generated always as identity primary key,
+  user_id    uuid   not null references public.profiles (id) on delete cascade,
+  content    text   not null check (char_length(content) between 1 and 500),
+  created_at timestamptz not null default now()
+);
+create index if not exists messages_created_idx on public.messages (created_at);
+
+alter table public.messages enable row level security;
+
+drop policy if exists messages_read       on public.messages;
+drop policy if exists messages_insert_own on public.messages;
+create policy messages_read       on public.messages for select using (true);
+create policy messages_insert_own on public.messages for insert with check (user_id = auth.uid());
+
+grant select, insert on public.messages to authenticated;
+grant select         on public.messages to anon;
+
+-- Temps réel (Supabase Realtime).
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'messages'
+  ) then
+    execute 'alter publication supabase_realtime add table public.messages';
+  end if;
+end $$;
+
+-- --- Classement : on ajoute l'avatar -----------------------------------------
+drop function if exists public.get_leaderboard();
+create function public.get_leaderboard()
+returns table (
+  user_id       uuid,
+  pseudo        text,
+  avatar        text,
+  total_points  numeric,
+  bets_count    bigint,
+  scored_stages bigint
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select
+    p.id,
+    p.pseudo,
+    p.avatar,
+    coalesce(sum(bs.points), 0)::numeric                    as total_points,
+    count(bs.bet_id)                                        as bets_count,
+    count(bs.bet_id) filter (where bs.position is not null) as scored_stages
+  from public.profiles p
+  left join public.bet_scores bs on bs.user_id = p.id
+  group by p.id, p.pseudo, p.avatar
+  order by total_points desc, p.pseudo asc;
+$$;
+grant execute on function public.get_leaderboard() to anon, authenticated;
+
+-- >>>>> migrations/0003_delete_account.sql <<<<<
+
+-- =============================================================================
+-- MPV 0003 — suppression de son propre compte
+-- =============================================================================
+-- Un utilisateur connecté supprime SON compte. La suppression de la ligne
+-- auth.users entraîne en cascade la suppression du profil, des paris et des
+-- messages (FK ... on delete cascade).
+
+create or replace function public.delete_account()
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_uid uuid := auth.uid();
+begin
+  if v_uid is null then
+    raise exception 'Non authentifié.';
+  end if;
+  delete from auth.users where id = v_uid;
+end;
+$$;
+
+revoke all on function public.delete_account() from public, anon;
+grant execute on function public.delete_account() to authenticated;
+
+-- >>>>> migrations/0004_push_subscriptions.sql <<<<<
+
+-- =============================================================================
+-- MPV 0004 — abonnements aux notifications push (Web Push)
+-- =============================================================================
+-- Chaque navigateur autorisé crée un abonnement (endpoint + clés). Le job de
+-- rappel (notify_reminder.py) lit ces abonnements via la clé service_role.
+
+create table if not exists public.push_subscriptions (
+  id         bigint generated always as identity primary key,
+  user_id    uuid not null references public.profiles (id) on delete cascade,
+  endpoint   text not null unique,
+  p256dh     text not null,
+  auth       text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists push_sub_user_idx on public.push_subscriptions (user_id);
+
+alter table public.push_subscriptions enable row level security;
+
+drop policy if exists push_select_own on public.push_subscriptions;
+drop policy if exists push_insert_own on public.push_subscriptions;
+drop policy if exists push_delete_own on public.push_subscriptions;
+create policy push_select_own on public.push_subscriptions for select using (user_id = auth.uid());
+create policy push_insert_own on public.push_subscriptions for insert with check (user_id = auth.uid());
+create policy push_delete_own on public.push_subscriptions for delete using (user_id = auth.uid());
+
+grant select, insert, delete on public.push_subscriptions to authenticated;
+
+-- >>>>> migrations/0005_service_role_grants.sql <<<<<
+
+-- =============================================================================
+-- MPV 0005 — privilèges pour le rôle service_role (utilisé par les jobs)
+-- =============================================================================
+-- En prod Supabase, service_role reçoit ces privilèges par défaut ; on les
+-- rend explicites pour que les jobs fonctionnent aussi en local. service_role
+-- contourne la RLS (BYPASSRLS) : il voit/écrit toutes les lignes.
+
+grant usage on schema public to service_role;
+grant select, insert, update, delete on all tables    in schema public to service_role;
+grant usage, select                  on all sequences in schema public to service_role;
+grant execute                        on all functions in schema public to service_role;
+
+-- Objets créés ultérieurement.
+alter default privileges in schema public grant select, insert, update, delete on tables    to service_role;
+alter default privileges in schema public grant usage, select                  on sequences to service_role;
