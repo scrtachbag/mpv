@@ -19,7 +19,7 @@ const CHARACTERS = [
 ]
 
 // Équipes engagées sur le Tour : sigle + couleur de marque + domaine du
-// sponsor (pour récupérer un logo via Clearbit ; repli sur le sigle si absent).
+// sponsor (logo récupéré via le service de favicons ; repli sur le sigle).
 const TEAMS = [
   { key: 'uae',        code: 'UAE', label: 'UAE Team Emirates',          color: '#1c1c1c', domain: 'emirates.com' },
   { key: 'visma',      code: 'VIS', label: 'Visma | Lease a Bike',       color: '#fde047', fg: '#1b1c22', domain: 'visma.com' },

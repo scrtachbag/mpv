@@ -12,7 +12,7 @@ export default function Avatar({ name, size = 36, ring = false }) {
     return (
       <span className={`avatar avatar-logo${ring ? ' ring' : ''}`} title={a.label}
         style={{ width: size, height: size }}>
-        <img src={`https://logo.clearbit.com/${a.domain}`} alt={a.label}
+        <img src={`https://www.google.com/s2/favicons?sz=128&domain=${a.domain}`} alt={a.label}
           loading="lazy" onError={() => setImgError(true)} />
       </span>
     )
