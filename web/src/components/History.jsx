@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { formatDateFr } from '../lib/time'
-import { riderName } from '../lib/format'
+import { riderName, flag } from '../lib/format'
 import Avatar from './Avatar.jsx'
+import TeamBadge from './TeamBadge.jsx'
 
 // Points qu'un coureur rapporte (hors bonus) : côte / place, ×2 si 1ᵉ, 0 hors top 10.
 function basePoints(odds, position) {
@@ -41,14 +42,16 @@ export default function History() {
       setLoadingStage(true)
       const [{ data: results }, { data: riders }, { data: bets }, { data: profiles }] = await Promise.all([
         supabase.from('stage_results').select('position, rider_name').eq('stage_id', s.id).order('position').limit(10),
-        supabase.from('stage_riders').select('rider_name, odds').eq('stage_id', s.id),
+        supabase.from('stage_riders').select('rider_name, odds, nationality, team').eq('stage_id', s.id),
         supabase.from('bets').select('user_id, rider_name, bonus_used').eq('stage_id', s.id),
         supabase.from('profiles').select('id, pseudo, avatar'),
       ])
       if (cancelled) return
       const prof = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]))
-      const oddsBy = {}
-      for (const r of riders ?? []) oddsBy[r.rider_name.toLowerCase()] = Number(r.odds)
+      const metaBy = {}
+      for (const r of riders ?? []) {
+        metaBy[r.rider_name.toLowerCase()] = { odds: Number(r.odds), nationality: r.nationality, team: r.team }
+      }
       const bettorsBy = {}
       for (const b of bets ?? []) {
         const k = (b.rider_name || '').toLowerCase()
@@ -60,10 +63,13 @@ export default function History() {
         })
       }
       const rows = (results ?? []).map((r) => {
-        const odds = oddsBy[r.rider_name.toLowerCase()] ?? null
+        const m = metaBy[r.rider_name.toLowerCase()] || {}
+        const odds = m.odds ?? null
         return {
           position: r.position,
           rider: riderName(r.rider_name),
+          nationality: m.nationality,
+          team: m.team,
           odds,
           points: basePoints(odds, r.position),
           bettors: bettorsBy[r.rider_name.toLowerCase()] ?? [],
@@ -100,6 +106,8 @@ export default function History() {
               <li key={r.position} className={r.bettors.some((b) => b.isMe) ? 'mine' : ''}>
                 <div className="res-head">
                   <span className="res-pos">{r.position}</span>
+                  <span className="rp-flag">{flag(r.nationality)}</span>
+                  <TeamBadge name={r.team} size={20} />
                   <span className="res-rider">{r.rider}</span>
                   <span className="res-odds">{r.odds ? r.odds.toFixed(2) : '—'}</span>
                   <span className="res-pts">{r.points.toFixed(2)}<small> pts</small></span>

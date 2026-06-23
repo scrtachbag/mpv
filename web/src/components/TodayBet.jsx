@@ -2,9 +2,10 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { parisToday, formatDateFr, msUntil, formatCountdown } from '../lib/time'
-import { riderName, sameRider, flag, teamKey } from '../lib/format'
+import { riderName, sameRider, flag } from '../lib/format'
 import Avatar from './Avatar.jsx'
 import Bonus from './Bonus.jsx'
+import TeamBadge from './TeamBadge.jsx'
 
 export default function TodayBet() {
   const { user } = useAuth()
@@ -138,19 +139,16 @@ export default function TodayBet() {
             <form onSubmit={submit}>
               <label>Coureur que tu vois gagner</label>
               <div className="rider-pick">
-                {riders.map((r) => {
-                  const tk = teamKey(r.team)
-                  return (
-                    <button type="button" key={r.rider_name}
-                      className={`rider-row${rider === r.rider_name ? ' selected' : ''}`}
-                      onClick={() => setRider(r.rider_name)}>
-                      <span className="rp-flag">{flag(r.nationality)}</span>
-                      {tk ? <Avatar name={tk} size={22} /> : <span className="rp-team-empty" />}
-                      <span className="rp-name">{riderName(r.rider_name)}</span>
-                      <span className="rp-odds">{Number(r.odds).toFixed(2)}</span>
-                    </button>
-                  )
-                })}
+                {riders.map((r) => (
+                  <button type="button" key={r.rider_name}
+                    className={`rider-row${rider === r.rider_name ? ' selected' : ''}`}
+                    onClick={() => setRider(r.rider_name)}>
+                    <span className="rp-flag">{flag(r.nationality)}</span>
+                    <TeamBadge name={r.team} size={22} />
+                    <span className="rp-name">{riderName(r.rider_name)}</span>
+                    <span className="rp-odds">{Number(r.odds).toFixed(2)}</span>
+                  </button>
+                ))}
               </div>
 
               <label className={`checkbox ${!canUseBonus ? 'disabled' : ''}`}>
