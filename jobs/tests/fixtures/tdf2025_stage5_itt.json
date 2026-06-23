@@ -1,0 +1,2219 @@
+{
+  "stage": {
+    "stage_no": 5,
+    "date": "2025-07-09",
+    "name": "Caen → Caen",
+    "profile_type": "itt"
+  },
+  "profile": "itt",
+  "riders": [
+    {
+      "name": "POGAČAR Tadej",
+      "pcs_id": "rider/tadej-pogacar",
+      "form": 2123.0,
+      "specialties": {
+        "one_day": 14393.0,
+        "gc": 7844.0,
+        "time_trial": 3407.0,
+        "sprint": 360.0,
+        "climber": 10122.0
+      }
+    },
+    {
+      "name": "ALMEIDA João",
+      "pcs_id": "rider/joao-almeida",
+      "form": 242.0,
+      "specialties": {
+        "one_day": 1925.0,
+        "gc": 5449.0,
+        "time_trial": 2996.0,
+        "sprint": 47.0,
+        "climber": 4868.0
+      }
+    },
+    {
+      "name": "NARVÁEZ Jhonatan",
+      "pcs_id": "rider/jhonatan-narvaez",
+      "form": 359.0,
+      "specialties": {
+        "one_day": 2934.0,
+        "gc": 1729.0,
+        "time_trial": 32.0,
+        "sprint": 308.0,
+        "climber": 1303.0
+      }
+    },
+    {
+      "name": "POLITT Nils",
+      "pcs_id": "rider/nils-politt",
+      "form": 194.0,
+      "specialties": {
+        "one_day": 3896.0,
+        "gc": 1088.0,
+        "time_trial": 1374.0,
+        "sprint": 594.0,
+        "climber": 156.0
+      }
+    },
+    {
+      "name": "SIVAKOV Pavel",
+      "pcs_id": "rider/pavel-sivakov",
+      "form": 47.0,
+      "specialties": {
+        "one_day": 2184.0,
+        "gc": 2668.0,
+        "time_trial": 506.0,
+        "sprint": 26.0,
+        "climber": 2134.0
+      }
+    },
+    {
+      "name": "SOLER Marc",
+      "pcs_id": "rider/marc-soler",
+      "form": 184.0,
+      "specialties": {
+        "one_day": 1634.0,
+        "gc": 2800.0,
+        "time_trial": 776.0,
+        "sprint": 32.0,
+        "climber": 3212.0
+      }
+    },
+    {
+      "name": "WELLENS Tim",
+      "pcs_id": "rider/tim-wellens",
+      "form": 148.0,
+      "specialties": {
+        "one_day": 7389.0,
+        "gc": 4543.0,
+        "time_trial": 1476.0,
+        "sprint": 312.0,
+        "climber": 2532.0
+      }
+    },
+    {
+      "name": "YATES Adam",
+      "pcs_id": "rider/adam-yates",
+      "form": 390.0,
+      "specialties": {
+        "one_day": 4882.0,
+        "gc": 7403.0,
+        "time_trial": 1330.0,
+        "sprint": 67.0,
+        "climber": 7690.0
+      }
+    },
+    {
+      "name": "VINGEGAARD Jonas",
+      "pcs_id": "rider/jonas-vingegaard",
+      "form": 1579.0,
+      "specialties": {
+        "one_day": 2473.0,
+        "gc": 6706.0,
+        "time_trial": 2384.0,
+        "sprint": 35.0,
+        "climber": 6142.0
+      }
+    },
+    {
+      "name": "AFFINI Edoardo",
+      "pcs_id": "rider/edoardo-affini",
+      "form": 48.0,
+      "specialties": {
+        "one_day": 317.0,
+        "gc": 314.0,
+        "time_trial": 2303.0,
+        "sprint": 212.0,
+        "climber": 15.0
+      }
+    },
+    {
+      "name": "BENOOT Tiesj",
+      "pcs_id": "rider/tiesj-benoot",
+      "form": 45.0,
+      "specialties": {
+        "one_day": 8524.0,
+        "gc": 1987.0,
+        "time_trial": 85.0,
+        "sprint": 872.0,
+        "climber": 2915.0
+      }
+    },
+    {
+      "name": "CAMPENAERTS Victor",
+      "pcs_id": "rider/victor-campenaerts",
+      "form": 65.0,
+      "specialties": {
+        "one_day": 1706.0,
+        "gc": 1062.0,
+        "time_trial": 3635.0,
+        "sprint": 223.0,
+        "climber": 496.0
+      }
+    },
+    {
+      "name": "JORGENSON Matteo",
+      "pcs_id": "rider/matteo-jorgenson",
+      "form": 590.0,
+      "specialties": {
+        "one_day": 2607.0,
+        "gc": 2592.0,
+        "time_trial": 794.0,
+        "sprint": 178.0,
+        "climber": 2195.0
+      }
+    },
+    {
+      "name": "KUSS Sepp",
+      "pcs_id": "rider/sepp-kuss",
+      "form": 268.0,
+      "specialties": {
+        "one_day": 859.0,
+        "gc": 3062.0,
+        "time_trial": 331.0,
+        "sprint": 36.0,
+        "climber": 3876.0
+      }
+    },
+    {
+      "name": "VAN AERT Wout",
+      "pcs_id": "rider/wout-van-aert",
+      "form": 829.0,
+      "specialties": {
+        "one_day": 13816.0,
+        "gc": 1283.0,
+        "time_trial": 3102.0,
+        "sprint": 2378.0,
+        "climber": 2172.0
+      }
+    },
+    {
+      "name": "YATES Simon",
+      "pcs_id": "rider/simon-yates",
+      "form": 928.0,
+      "specialties": {
+        "one_day": 3057.0,
+        "gc": 5955.0,
+        "time_trial": 1215.0,
+        "sprint": 40.0,
+        "climber": 6489.0
+      }
+    },
+    {
+      "name": "EVENEPOEL Remco",
+      "pcs_id": "rider/remco-evenepoel",
+      "form": 1230.0,
+      "specialties": {
+        "one_day": 6659.0,
+        "gc": 4704.0,
+        "time_trial": 4921.0,
+        "sprint": 120.0,
+        "climber": 4886.0
+      }
+    },
+    {
+      "name": "CATTANEO Mattia",
+      "pcs_id": "rider/mattia-cattaneo",
+      "form": 61.0,
+      "specialties": {
+        "one_day": 1532.0,
+        "gc": 1593.0,
+        "time_trial": 2263.0,
+        "sprint": 196.0,
+        "climber": 1254.0
+      }
+    },
+    {
+      "name": "EENKHOORN Pascal",
+      "pcs_id": "rider/pascal-eenkhoorn",
+      "form": 50.0,
+      "specialties": {
+        "one_day": 1270.0,
+        "gc": 523.0,
+        "time_trial": 232.0,
+        "sprint": 232.0,
+        "climber": 200.0
+      }
+    },
+    {
+      "name": "MERLIER Tim",
+      "pcs_id": "rider/tim-merlier",
+      "form": 413.0,
+      "specialties": {
+        "one_day": 5123.0,
+        "gc": 144.0,
+        "time_trial": 3.0,
+        "sprint": 6208.0,
+        "climber": 4.0
+      }
+    },
+    {
+      "name": "PARET-PEINTRE Valentin",
+      "pcs_id": "rider/valentin-paret-peintre",
+      "form": 332.0,
+      "specialties": {
+        "one_day": 432.0,
+        "gc": 745.0,
+        "time_trial": 1.0,
+        "sprint": 16.0,
+        "climber": 997.0
+      }
+    },
+    {
+      "name": "SCHACHMANN Maximilian",
+      "pcs_id": "rider/maximilian-schachmann",
+      "form": 62.0,
+      "specialties": {
+        "one_day": 3285.0,
+        "gc": 2228.0,
+        "time_trial": 1983.0,
+        "sprint": 170.0,
+        "climber": 1976.0
+      }
+    },
+    {
+      "name": "VAN LERBERGHE Bert",
+      "pcs_id": "rider/bert-van-lerberghe",
+      "form": 24.0,
+      "specialties": {
+        "one_day": 1364.0,
+        "gc": 196.0,
+        "time_trial": 48.0,
+        "sprint": 864.0,
+        "climber": 0.0
+      }
+    },
+    {
+      "name": "VAN WILDER Ilan",
+      "pcs_id": "rider/ilan-van-wilder",
+      "form": 232.0,
+      "specialties": {
+        "one_day": 1373.0,
+        "gc": 1923.0,
+        "time_trial": 1106.0,
+        "sprint": 26.0,
+        "climber": 1540.0
+      }
+    },
+    {
+      "name": "HEALY Ben",
+      "pcs_id": "rider/ben-healy",
+      "form": 158.0,
+      "specialties": {
+        "one_day": 2084.0,
+        "gc": 869.0,
+        "time_trial": 548.0,
+        "sprint": 40.0,
+        "climber": 1548.0
+      }
+    },
+    {
+      "name": "ALBANESE Vincenzo",
+      "pcs_id": "rider/vincenzo-albanese",
+      "form": 75.0,
+      "specialties": {
+        "one_day": 3044.0,
+        "gc": 506.0,
+        "time_trial": 28.0,
+        "sprint": 336.0,
+        "climber": 609.0
+      }
+    },
+    {
+      "name": "ASGREEN Kasper",
+      "pcs_id": "rider/kasper-asgreen",
+      "form": 64.0,
+      "specialties": {
+        "one_day": 3218.0,
+        "gc": 856.0,
+        "time_trial": 2474.0,
+        "sprint": 305.0,
+        "climber": 504.0
+      }
+    },
+    {
+      "name": "BAUDIN Alex",
+      "pcs_id": "rider/alex-baudin",
+      "form": 536.0,
+      "specialties": {
+        "one_day": 1230.0,
+        "gc": 725.0,
+        "time_trial": 90.0,
+        "sprint": 5.0,
+        "climber": 768.0
+      }
+    },
+    {
+      "name": "POWLESS Neilson",
+      "pcs_id": "rider/neilson-powless",
+      "form": 0.0,
+      "specialties": {
+        "one_day": 3988.0,
+        "gc": 1599.0,
+        "time_trial": 891.0,
+        "sprint": 241.0,
+        "climber": 1852.0
+      }
+    },
+    {
+      "name": "SWEENY Harry",
+      "pcs_id": "rider/harry-sweeny",
+      "form": 172.0,
+      "specialties": {
+        "one_day": 527.0,
+        "gc": 418.0,
+        "time_trial": 285.0,
+        "sprint": 71.0,
+        "climber": 214.0
+      }
+    },
+    {
+      "name": "VALGREN Michael",
+      "pcs_id": "rider/michael-valgren-andersen",
+      "form": 313.0,
+      "specialties": {
+        "one_day": 5116.0,
+        "gc": 1228.0,
+        "time_trial": 453.0,
+        "sprint": 152.0,
+        "climber": 1269.0
+      }
+    },
+    {
+      "name": "VAN DEN BERG Marijn",
+      "pcs_id": "rider/marijn-van-den-berg",
+      "form": 115.0,
+      "specialties": {
+        "one_day": 2212.0,
+        "gc": 492.0,
+        "time_trial": 121.0,
+        "sprint": 1014.0,
+        "climber": 192.0
+      }
+    },
+    {
+      "name": "GIRMAY Biniam",
+      "pcs_id": "rider/biniam-girmay",
+      "form": 417.0,
+      "specialties": {
+        "one_day": 5730.0,
+        "gc": 121.0,
+        "time_trial": 112.0,
+        "sprint": 1588.0,
+        "climber": 272.0
+      }
+    },
+    {
+      "name": "BARRÉ Louis",
+      "pcs_id": "rider/louis-barre",
+      "form": 63.0,
+      "specialties": {
+        "one_day": 1136.0,
+        "gc": 363.0,
+        "time_trial": 1.0,
+        "sprint": 4.0,
+        "climber": 318.0
+      }
+    },
+    {
+      "name": "BRAET Vito",
+      "pcs_id": "rider/vito-braet",
+      "form": 154.0,
+      "specialties": {
+        "one_day": 928.0,
+        "gc": 76.0,
+        "time_trial": 8.0,
+        "sprint": 280.0,
+        "climber": 76.0
+      }
+    },
+    {
+      "name": "PAGE Hugo",
+      "pcs_id": "rider/hugo-page",
+      "form": 72.0,
+      "specialties": {
+        "one_day": 1396.0,
+        "gc": 192.0,
+        "time_trial": 77.0,
+        "sprint": 304.0,
+        "climber": 53.0
+      }
+    },
+    {
+      "name": "REX Laurenz",
+      "pcs_id": "rider/laurenz-rex",
+      "form": 180.0,
+      "specialties": {
+        "one_day": 1235.0,
+        "gc": 100.0,
+        "time_trial": 2.0,
+        "sprint": 504.0,
+        "climber": 16.0
+      }
+    },
+    {
+      "name": "RUTSCH Jonas",
+      "pcs_id": "rider/jonas-rutsch",
+      "form": 60.0,
+      "specialties": {
+        "one_day": 758.0,
+        "gc": 359.0,
+        "time_trial": 149.0,
+        "sprint": 72.0,
+        "climber": 55.0
+      }
+    },
+    {
+      "name": "VAN SINTMAARTENSDIJK Roel",
+      "pcs_id": "rider/roel-van-sintmaartensdijk",
+      "form": 25.0,
+      "specialties": {
+        "one_day": 105.0,
+        "gc": 130.0,
+        "time_trial": 56.0,
+        "sprint": 52.0,
+        "climber": 10.0
+      }
+    },
+    {
+      "name": "ZIMMERMANN Georg",
+      "pcs_id": "rider/georg-zimmermann",
+      "form": 300.0,
+      "specialties": {
+        "one_day": 2120.0,
+        "gc": 753.0,
+        "time_trial": 0.0,
+        "sprint": 55.0,
+        "climber": 758.0
+      }
+    },
+    {
+      "name": "BUITRAGO Santiago",
+      "pcs_id": "rider/santiago-buitrago-sanchez",
+      "form": 348.0,
+      "specialties": {
+        "one_day": 1566.0,
+        "gc": 1949.0,
+        "time_trial": 226.0,
+        "sprint": 43.0,
+        "climber": 2161.0
+      }
+    },
+    {
+      "name": "BAUHAUS Phil",
+      "pcs_id": "rider/phil-bauhaus",
+      "form": 107.0,
+      "specialties": {
+        "one_day": 2774.0,
+        "gc": 291.0,
+        "time_trial": 1.0,
+        "sprint": 2782.0,
+        "climber": 0.0
+      }
+    },
+    {
+      "name": "GRADEK Kamil",
+      "pcs_id": "rider/kamil-gradek",
+      "form": 25.0,
+      "specialties": {
+        "one_day": 288.0,
+        "gc": 613.0,
+        "time_trial": 719.0,
+        "sprint": 81.0,
+        "climber": 8.0
+      }
+    },
+    {
+      "name": "HAIG Jack",
+      "pcs_id": "rider/jack-haig",
+      "form": 60.0,
+      "specialties": {
+        "one_day": 1801.0,
+        "gc": 3078.0,
+        "time_trial": 316.0,
+        "sprint": 34.0,
+        "climber": 2531.0
+      }
+    },
+    {
+      "name": "MARTINEZ Lenny",
+      "pcs_id": "rider/lenny-martinez",
+      "form": 853.0,
+      "specialties": {
+        "one_day": 1881.0,
+        "gc": 1467.0,
+        "time_trial": 293.0,
+        "sprint": 4.0,
+        "climber": 2086.0
+      }
+    },
+    {
+      "name": "MOHORIČ Matej",
+      "pcs_id": "rider/matej-mohoric",
+      "form": 167.0,
+      "specialties": {
+        "one_day": 6242.0,
+        "gc": 2366.0,
+        "time_trial": 352.0,
+        "sprint": 624.0,
+        "climber": 1644.0
+      }
+    },
+    {
+      "name": "STANNARD Robert",
+      "pcs_id": "rider/robert-stannard",
+      "form": 53.0,
+      "specialties": {
+        "one_day": 888.0,
+        "gc": 227.0,
+        "time_trial": 68.0,
+        "sprint": 178.0,
+        "climber": 343.0
+      }
+    },
+    {
+      "name": "WRIGHT Fred",
+      "pcs_id": "rider/alfred-wright",
+      "form": 185.0,
+      "specialties": {
+        "one_day": 2643.0,
+        "gc": 545.0,
+        "time_trial": 500.0,
+        "sprint": 252.0,
+        "climber": 375.0
+      }
+    },
+    {
+      "name": "THOMAS Geraint",
+      "pcs_id": "rider/geraint-thomas",
+      "form": 52.0,
+      "specialties": {
+        "one_day": 3969.0,
+        "gc": 6436.0,
+        "time_trial": 5463.0,
+        "sprint": 422.0,
+        "climber": 4434.0
+      }
+    },
+    {
+      "name": "ARENSMAN Thymen",
+      "pcs_id": "rider/thymen-arensman",
+      "form": 601.0,
+      "specialties": {
+        "one_day": 671.0,
+        "gc": 2435.0,
+        "time_trial": 1657.0,
+        "sprint": 28.0,
+        "climber": 2268.0
+      }
+    },
+    {
+      "name": "FOSS Tobias",
+      "pcs_id": "rider/tobias-foss",
+      "form": 203.0,
+      "specialties": {
+        "one_day": 504.0,
+        "gc": 944.0,
+        "time_trial": 1973.0,
+        "sprint": 29.0,
+        "climber": 544.0
+      }
+    },
+    {
+      "name": "GANNA Filippo",
+      "pcs_id": "rider/filippo-ganna",
+      "form": 439.0,
+      "specialties": {
+        "one_day": 2418.0,
+        "gc": 1106.0,
+        "time_trial": 6442.0,
+        "sprint": 308.0,
+        "climber": 312.0
+      }
+    },
+    {
+      "name": "LAURANCE Axel",
+      "pcs_id": "rider/axel-laurance",
+      "form": 242.0,
+      "specialties": {
+        "one_day": 1843.0,
+        "gc": 424.0,
+        "time_trial": 42.0,
+        "sprint": 173.0,
+        "climber": 436.0
+      }
+    },
+    {
+      "name": "RODRÍGUEZ Carlos",
+      "pcs_id": "rider/carlos-rodriguez-cano",
+      "form": 223.0,
+      "specialties": {
+        "one_day": 1101.0,
+        "gc": 2651.0,
+        "time_trial": 497.0,
+        "sprint": 14.0,
+        "climber": 2602.0
+      }
+    },
+    {
+      "name": "SWIFT Connor",
+      "pcs_id": "rider/connor-swift",
+      "form": 65.0,
+      "specialties": {
+        "one_day": 1193.0,
+        "gc": 654.0,
+        "time_trial": 364.0,
+        "sprint": 213.0,
+        "climber": 152.0
+      }
+    },
+    {
+      "name": "WATSON Samuel",
+      "pcs_id": "rider/samuel-watson",
+      "form": 158.0,
+      "specialties": {
+        "one_day": 1065.0,
+        "gc": 486.0,
+        "time_trial": 581.0,
+        "sprint": 299.0,
+        "climber": 83.0
+      }
+    },
+    {
+      "name": "ROGLIČ Primož",
+      "pcs_id": "rider/primoz-roglic",
+      "form": 401.0,
+      "specialties": {
+        "one_day": 5273.0,
+        "gc": 8598.0,
+        "time_trial": 6126.0,
+        "sprint": 168.0,
+        "climber": 8758.0
+      }
+    },
+    {
+      "name": "LIPOWITZ Florian",
+      "pcs_id": "rider/florian-lipowitz",
+      "form": 1002.0,
+      "specialties": {
+        "one_day": 505.0,
+        "gc": 2210.0,
+        "time_trial": 663.0,
+        "sprint": 4.0,
+        "climber": 1760.0
+      }
+    },
+    {
+      "name": "MEEUS Jordi",
+      "pcs_id": "rider/jordi-meeus",
+      "form": 608.0,
+      "specialties": {
+        "one_day": 4087.0,
+        "gc": 116.0,
+        "time_trial": 61.0,
+        "sprint": 2222.0,
+        "climber": 32.0
+      }
+    },
+    {
+      "name": "MOSCON Gianni",
+      "pcs_id": "rider/gianni-moscon",
+      "form": 75.0,
+      "specialties": {
+        "one_day": 2689.0,
+        "gc": 1012.0,
+        "time_trial": 606.0,
+        "sprint": 240.0,
+        "climber": 886.0
+      }
+    },
+    {
+      "name": "PITHIE Laurence",
+      "pcs_id": "rider/laurence-pithie",
+      "form": 863.0,
+      "specialties": {
+        "one_day": 2589.0,
+        "gc": 382.0,
+        "time_trial": 205.0,
+        "sprint": 662.0,
+        "climber": 124.0
+      }
+    },
+    {
+      "name": "VAN DIJKE Mick",
+      "pcs_id": "rider/mick-van-dijke",
+      "form": 172.0,
+      "specialties": {
+        "one_day": 686.0,
+        "gc": 371.0,
+        "time_trial": 259.0,
+        "sprint": 262.0,
+        "climber": 112.0
+      }
+    },
+    {
+      "name": "VAN POPPEL Danny",
+      "pcs_id": "rider/danny-van-poppel",
+      "form": 155.0,
+      "specialties": {
+        "one_day": 5454.0,
+        "gc": 848.0,
+        "time_trial": 481.0,
+        "sprint": 4126.0,
+        "climber": 198.0
+      }
+    },
+    {
+      "name": "VLASOV Aleksandr",
+      "pcs_id": "rider/aleksandr-vlasov",
+      "form": 393.0,
+      "specialties": {
+        "one_day": 3214.0,
+        "gc": 3977.0,
+        "time_trial": 1228.0,
+        "sprint": 62.0,
+        "climber": 4420.0
+      }
+    },
+    {
+      "name": "MILAN Jonathan",
+      "pcs_id": "rider/jonathan-milan",
+      "form": 544.0,
+      "specialties": {
+        "one_day": 2134.0,
+        "gc": 175.0,
+        "time_trial": 419.0,
+        "sprint": 2238.0,
+        "climber": 92.0
+      }
+    },
+    {
+      "name": "CONSONNI Simone",
+      "pcs_id": "rider/simone-consonni",
+      "form": 41.0,
+      "specialties": {
+        "one_day": 3057.0,
+        "gc": 404.0,
+        "time_trial": 32.0,
+        "sprint": 1325.0,
+        "climber": 82.0
+      }
+    },
+    {
+      "name": "NYS Thibau",
+      "pcs_id": "rider/thibau-nys",
+      "form": 37.0,
+      "specialties": {
+        "one_day": 1445.0,
+        "gc": 344.0,
+        "time_trial": 76.0,
+        "sprint": 196.0,
+        "climber": 618.0
+      }
+    },
+    {
+      "name": "SIMMONS Quinn",
+      "pcs_id": "rider/quinn-simmons",
+      "form": 175.0,
+      "specialties": {
+        "one_day": 1691.0,
+        "gc": 514.0,
+        "time_trial": 38.0,
+        "sprint": 87.0,
+        "climber": 713.0
+      }
+    },
+    {
+      "name": "SKJELMOSE Mattias",
+      "pcs_id": "rider/mattias-skjelmose-jensen",
+      "form": 623.0,
+      "specialties": {
+        "one_day": 3776.0,
+        "gc": 2640.0,
+        "time_trial": 1210.0,
+        "sprint": 132.0,
+        "climber": 2702.0
+      }
+    },
+    {
+      "name": "SKUJIŅŠ Toms",
+      "pcs_id": "rider/toms-skujins",
+      "form": 53.0,
+      "specialties": {
+        "one_day": 4418.0,
+        "gc": 1108.0,
+        "time_trial": 397.0,
+        "sprint": 646.0,
+        "climber": 1538.0
+      }
+    },
+    {
+      "name": "STUYVEN Jasper",
+      "pcs_id": "rider/jasper-stuyven",
+      "form": 564.0,
+      "specialties": {
+        "one_day": 9213.0,
+        "gc": 1429.0,
+        "time_trial": 284.0,
+        "sprint": 2279.0,
+        "climber": 766.0
+      }
+    },
+    {
+      "name": "THEUNS Edward",
+      "pcs_id": "rider/edward-theuns",
+      "form": 74.0,
+      "specialties": {
+        "one_day": 3812.0,
+        "gc": 716.0,
+        "time_trial": 131.0,
+        "sprint": 2206.0,
+        "climber": 26.0
+      }
+    },
+    {
+      "name": "MARTIN Guillaume",
+      "pcs_id": "rider/guillaume-martin",
+      "form": 225.0,
+      "specialties": {
+        "one_day": 4440.0,
+        "gc": 4187.0,
+        "time_trial": 10.0,
+        "sprint": 74.0,
+        "climber": 4233.0
+      }
+    },
+    {
+      "name": "ASKEY Lewis",
+      "pcs_id": "rider/lewis-askey",
+      "form": 341.0,
+      "specialties": {
+        "one_day": 1664.0,
+        "gc": 369.0,
+        "time_trial": 11.0,
+        "sprint": 299.0,
+        "climber": 94.0
+      }
+    },
+    {
+      "name": "BARTHE Cyril",
+      "pcs_id": "rider/cyril-barthe",
+      "form": 60.0,
+      "specialties": {
+        "one_day": 778.0,
+        "gc": 317.0,
+        "time_trial": 9.0,
+        "sprint": 286.0,
+        "climber": 106.0
+      }
+    },
+    {
+      "name": "GRÉGOIRE Romain",
+      "pcs_id": "rider/romain-gregoire",
+      "form": 764.0,
+      "specialties": {
+        "one_day": 3654.0,
+        "gc": 1021.0,
+        "time_trial": 304.0,
+        "sprint": 71.0,
+        "climber": 1426.0
+      }
+    },
+    {
+      "name": "MADOUAS Valentin",
+      "pcs_id": "rider/valentin-madouas",
+      "form": 83.0,
+      "specialties": {
+        "one_day": 5290.0,
+        "gc": 1376.0,
+        "time_trial": 93.0,
+        "sprint": 159.0,
+        "climber": 1676.0
+      }
+    },
+    {
+      "name": "PACHER Quentin",
+      "pcs_id": "rider/quentin-pacher",
+      "form": 72.0,
+      "specialties": {
+        "one_day": 2506.0,
+        "gc": 1102.0,
+        "time_trial": 122.0,
+        "sprint": 122.0,
+        "climber": 1085.0
+      }
+    },
+    {
+      "name": "PENHOËT Paul",
+      "pcs_id": "rider/paul-penhoet",
+      "form": 221.0,
+      "specialties": {
+        "one_day": 1739.0,
+        "gc": 322.0,
+        "time_trial": 6.0,
+        "sprint": 1032.0,
+        "climber": 34.0
+      }
+    },
+    {
+      "name": "RUSSO Clément",
+      "pcs_id": "rider/clement-russo",
+      "form": 59.0,
+      "specialties": {
+        "one_day": 913.0,
+        "gc": 281.0,
+        "time_trial": 68.0,
+        "sprint": 353.0,
+        "climber": 5.0
+      }
+    },
+    {
+      "name": "PHILIPSEN Jasper",
+      "pcs_id": "rider/jasper-philipsen",
+      "form": 1055.0,
+      "specialties": {
+        "one_day": 8722.0,
+        "gc": 799.0,
+        "time_trial": 155.0,
+        "sprint": 6712.0,
+        "climber": 204.0
+      }
+    },
+    {
+      "name": "DILLIER Silvan",
+      "pcs_id": "rider/silvan-dillier",
+      "form": 35.0,
+      "specialties": {
+        "one_day": 1791.0,
+        "gc": 997.0,
+        "time_trial": 526.0,
+        "sprint": 432.0,
+        "climber": 296.0
+      }
+    },
+    {
+      "name": "GROVES Kaden",
+      "pcs_id": "rider/kaden-groves",
+      "form": 7.0,
+      "specialties": {
+        "one_day": 2595.0,
+        "gc": 291.0,
+        "time_trial": 359.0,
+        "sprint": 1575.0,
+        "climber": 225.0
+      }
+    },
+    {
+      "name": "MEURISSE Xandro",
+      "pcs_id": "rider/xandro-meurisse",
+      "form": 70.0,
+      "specialties": {
+        "one_day": 2472.0,
+        "gc": 1480.0,
+        "time_trial": 148.0,
+        "sprint": 448.0,
+        "climber": 875.0
+      }
+    },
+    {
+      "name": "RICKAERT Jonas",
+      "pcs_id": "rider/jonas-rickaert",
+      "form": 25.0,
+      "specialties": {
+        "one_day": 925.0,
+        "gc": 248.0,
+        "time_trial": 128.0,
+        "sprint": 606.0,
+        "climber": 10.0
+      }
+    },
+    {
+      "name": "VAN DER POEL Mathieu",
+      "pcs_id": "rider/mathieu-van-der-poel",
+      "form": 995.0,
+      "specialties": {
+        "one_day": 13406.0,
+        "gc": 1329.0,
+        "time_trial": 1150.0,
+        "sprint": 1820.0,
+        "climber": 1165.0
+      }
+    },
+    {
+      "name": "VERMEERSCH Gianni",
+      "pcs_id": "rider/gianni-vermeersch",
+      "form": 282.0,
+      "specialties": {
+        "one_day": 3207.0,
+        "gc": 303.0,
+        "time_trial": 55.0,
+        "sprint": 810.0,
+        "climber": 334.0
+      }
+    },
+    {
+      "name": "VERSTRYNGE Emiel",
+      "pcs_id": "rider/emiel-verstrynge",
+      "form": 251.0,
+      "specialties": {
+        "one_day": 380.0,
+        "gc": 103.0,
+        "time_trial": 30.0,
+        "sprint": 22.0,
+        "climber": 292.0
+      }
+    },
+    {
+      "name": "ALAPHILIPPE Julian",
+      "pcs_id": "rider/julian-alaphilippe",
+      "form": 57.0,
+      "specialties": {
+        "one_day": 12117.0,
+        "gc": 2982.0,
+        "time_trial": 1457.0,
+        "sprint": 703.0,
+        "climber": 5618.0
+      }
+    },
+    {
+      "name": "DAINESE Alberto",
+      "pcs_id": "rider/alberto-dainese",
+      "form": 58.0,
+      "specialties": {
+        "one_day": 1693.0,
+        "gc": 264.0,
+        "time_trial": 7.0,
+        "sprint": 1960.0,
+        "climber": 10.0
+      }
+    },
+    {
+      "name": "HALLER Marco",
+      "pcs_id": "rider/marco-haller",
+      "form": 53.0,
+      "specialties": {
+        "one_day": 1999.0,
+        "gc": 746.0,
+        "time_trial": 139.0,
+        "sprint": 499.0,
+        "climber": 88.0
+      }
+    },
+    {
+      "name": "HIRSCHI Marc",
+      "pcs_id": "rider/marc-hirschi",
+      "form": 95.0,
+      "specialties": {
+        "one_day": 7920.0,
+        "gc": 1559.0,
+        "time_trial": 341.0,
+        "sprint": 77.0,
+        "climber": 2376.0
+      }
+    },
+    {
+      "name": "LIENHARD Fabian",
+      "pcs_id": "rider/fabian-lienhard",
+      "form": 25.0,
+      "specialties": {
+        "one_day": 1175.0,
+        "gc": 228.0,
+        "time_trial": 27.0,
+        "sprint": 325.0,
+        "climber": 20.0
+      }
+    },
+    {
+      "name": "MAYRHOFER Marius",
+      "pcs_id": "rider/marius-mayrhofer",
+      "form": 35.0,
+      "specialties": {
+        "one_day": 1266.0,
+        "gc": 140.0,
+        "time_trial": 99.0,
+        "sprint": 199.0,
+        "climber": 45.0
+      }
+    },
+    {
+      "name": "STORER Michael",
+      "pcs_id": "rider/michael-storer",
+      "form": 443.0,
+      "specialties": {
+        "one_day": 1577.0,
+        "gc": 2217.0,
+        "time_trial": 169.0,
+        "sprint": 0.0,
+        "climber": 2448.0
+      }
+    },
+    {
+      "name": "TRENTIN Matteo",
+      "pcs_id": "rider/matteo-trentin",
+      "form": 295.0,
+      "specialties": {
+        "one_day": 10427.0,
+        "gc": 1054.0,
+        "time_trial": 334.0,
+        "sprint": 2686.0,
+        "climber": 1090.0
+      }
+    },
+    {
+      "name": "O'CONNOR Ben",
+      "pcs_id": "rider/ben-o-connor",
+      "form": 314.0,
+      "specialties": {
+        "one_day": 1821.0,
+        "gc": 3987.0,
+        "time_trial": 730.0,
+        "sprint": 40.0,
+        "climber": 3660.0
+      }
+    },
+    {
+      "name": "DUNBAR Eddie",
+      "pcs_id": "rider/edward-irl-dunbar",
+      "form": 18.0,
+      "specialties": {
+        "one_day": 963.0,
+        "gc": 1553.0,
+        "time_trial": 301.0,
+        "sprint": 24.0,
+        "climber": 1186.0
+      }
+    },
+    {
+      "name": "DURBRIDGE Luke",
+      "pcs_id": "rider/luke-durbridge",
+      "form": 30.0,
+      "specialties": {
+        "one_day": 1257.0,
+        "gc": 1351.0,
+        "time_trial": 2405.0,
+        "sprint": 166.0,
+        "climber": 102.0
+      }
+    },
+    {
+      "name": "GROENEWEGEN Dylan",
+      "pcs_id": "rider/dylan-groenewegen",
+      "form": 692.0,
+      "specialties": {
+        "one_day": 5939.0,
+        "gc": 435.0,
+        "time_trial": 15.0,
+        "sprint": 7935.0,
+        "climber": 38.0
+      }
+    },
+    {
+      "name": "MEZGEC Luka",
+      "pcs_id": "rider/luka-mezgec",
+      "form": 31.0,
+      "specialties": {
+        "one_day": 3855.0,
+        "gc": 675.0,
+        "time_trial": 33.0,
+        "sprint": 1723.0,
+        "climber": 238.0
+      }
+    },
+    {
+      "name": "PLAPP Luke",
+      "pcs_id": "rider/luke-plapp",
+      "form": 530.0,
+      "specialties": {
+        "one_day": 713.0,
+        "gc": 1090.0,
+        "time_trial": 897.0,
+        "sprint": 23.0,
+        "climber": 888.0
+      }
+    },
+    {
+      "name": "REINDERS Elmar",
+      "pcs_id": "rider/elmar-reinders",
+      "form": 91.0,
+      "specialties": {
+        "one_day": 661.0,
+        "gc": 221.0,
+        "time_trial": 131.0,
+        "sprint": 411.0,
+        "climber": 22.0
+      }
+    },
+    {
+      "name": "SCHMID Mauro",
+      "pcs_id": "rider/mauro-schmid",
+      "form": 1063.0,
+      "specialties": {
+        "one_day": 2729.0,
+        "gc": 1311.0,
+        "time_trial": 820.0,
+        "sprint": 8.0,
+        "climber": 1282.0
+      }
+    },
+    {
+      "name": "VAUQUELIN Kévin",
+      "pcs_id": "rider/kevin-vauquelin",
+      "form": 473.0,
+      "specialties": {
+        "one_day": 1979.0,
+        "gc": 1877.0,
+        "time_trial": 1217.0,
+        "sprint": 91.0,
+        "climber": 1272.0
+      }
+    },
+    {
+      "name": "CAPIOT Amaury",
+      "pcs_id": "rider/amaury-capiot",
+      "form": 58.0,
+      "specialties": {
+        "one_day": 3014.0,
+        "gc": 306.0,
+        "time_trial": 58.0,
+        "sprint": 1424.0,
+        "climber": 128.0
+      }
+    },
+    {
+      "name": "COSTIOU Ewen",
+      "pcs_id": "rider/ewen-costiou",
+      "form": 224.0,
+      "specialties": {
+        "one_day": 733.0,
+        "gc": 620.0,
+        "time_trial": 172.0,
+        "sprint": 24.0,
+        "climber": 300.0
+      }
+    },
+    {
+      "name": "DÉMARE Arnaud",
+      "pcs_id": "rider/arnaud-demare",
+      "form": 0.0,
+      "specialties": {
+        "one_day": 9527.0,
+        "gc": 1561.0,
+        "time_trial": 483.0,
+        "sprint": 6482.0,
+        "climber": 206.0
+      }
+    },
+    {
+      "name": "GARCÍA PIERNA Raúl",
+      "pcs_id": "rider/raul-garcia-pierna",
+      "form": 186.0,
+      "specialties": {
+        "one_day": 520.0,
+        "gc": 473.0,
+        "time_trial": 431.0,
+        "sprint": 8.0,
+        "climber": 428.0
+      }
+    },
+    {
+      "name": "LE BERRE Mathis",
+      "pcs_id": "rider/mathis-le-berre",
+      "form": 60.0,
+      "specialties": {
+        "one_day": 499.0,
+        "gc": 173.0,
+        "time_trial": 0.0,
+        "sprint": 46.0,
+        "climber": 101.0
+      }
+    },
+    {
+      "name": "RODRÍGUEZ Cristián",
+      "pcs_id": "rider/cristian-rodriguez",
+      "form": 265.0,
+      "specialties": {
+        "one_day": 935.0,
+        "gc": 1684.0,
+        "time_trial": 110.0,
+        "sprint": 0.0,
+        "climber": 1355.0
+      }
+    },
+    {
+      "name": "VENTURINI Clément",
+      "pcs_id": "rider/clement-venturini",
+      "form": 477.0,
+      "specialties": {
+        "one_day": 4115.0,
+        "gc": 721.0,
+        "time_trial": 94.0,
+        "sprint": 1059.0,
+        "climber": 446.0
+      }
+    },
+    {
+      "name": "MAS Enric",
+      "pcs_id": "rider/enric-mas",
+      "form": 176.0,
+      "specialties": {
+        "one_day": 2505.0,
+        "gc": 5082.0,
+        "time_trial": 696.0,
+        "sprint": 68.0,
+        "climber": 5948.0
+      }
+    },
+    {
+      "name": "BARTA Will",
+      "pcs_id": "rider/william-barta",
+      "form": 58.0,
+      "specialties": {
+        "one_day": 454.0,
+        "gc": 639.0,
+        "time_trial": 789.0,
+        "sprint": 0.0,
+        "climber": 308.0
+      }
+    },
+    {
+      "name": "CASTRILLO Pablo",
+      "pcs_id": "rider/pablo-castrillo-zapater",
+      "form": 129.0,
+      "specialties": {
+        "one_day": 358.0,
+        "gc": 685.0,
+        "time_trial": 299.0,
+        "sprint": 0.0,
+        "climber": 792.0
+      }
+    },
+    {
+      "name": "OLIVEIRA Nelson",
+      "pcs_id": "rider/nelson-oliveira",
+      "form": 71.0,
+      "specialties": {
+        "one_day": 1519.0,
+        "gc": 1271.0,
+        "time_trial": 3919.0,
+        "sprint": 102.0,
+        "climber": 594.0
+      }
+    },
+    {
+      "name": "GARCÍA CORTINA Iván",
+      "pcs_id": "rider/ivan-garcia-cortina",
+      "form": 167.0,
+      "specialties": {
+        "one_day": 3571.0,
+        "gc": 383.0,
+        "time_trial": 110.0,
+        "sprint": 1070.0,
+        "climber": 309.0
+      }
+    },
+    {
+      "name": "MÜHLBERGER Gregor",
+      "pcs_id": "rider/gregor-muhlberger",
+      "form": 123.0,
+      "specialties": {
+        "one_day": 1356.0,
+        "gc": 1112.0,
+        "time_trial": 214.0,
+        "sprint": 74.0,
+        "climber": 1162.0
+      }
+    },
+    {
+      "name": "ROMEO Iván",
+      "pcs_id": "rider/ivan-romeo",
+      "form": 392.0,
+      "specialties": {
+        "one_day": 577.0,
+        "gc": 587.0,
+        "time_trial": 584.0,
+        "sprint": 55.0,
+        "climber": 298.0
+      }
+    },
+    {
+      "name": "RUBIO Einer",
+      "pcs_id": "rider/einer-rubio",
+      "form": 103.0,
+      "specialties": {
+        "one_day": 592.0,
+        "gc": 1638.0,
+        "time_trial": 64.0,
+        "sprint": 6.0,
+        "climber": 1927.0
+      }
+    },
+    {
+      "name": "GALL Felix",
+      "pcs_id": "rider/felix-gall",
+      "form": 857.0,
+      "specialties": {
+        "one_day": 838.0,
+        "gc": 2305.0,
+        "time_trial": 259.0,
+        "sprint": 2.0,
+        "climber": 3348.0
+      }
+    },
+    {
+      "name": "ARMIRAIL Bruno",
+      "pcs_id": "rider/bruno-armirail",
+      "form": 69.0,
+      "specialties": {
+        "one_day": 391.0,
+        "gc": 818.0,
+        "time_trial": 2076.0,
+        "sprint": 5.0,
+        "climber": 459.0
+      }
+    },
+    {
+      "name": "BERTHET Clément",
+      "pcs_id": "rider/clement-berthet",
+      "form": 92.0,
+      "specialties": {
+        "one_day": 1046.0,
+        "gc": 741.0,
+        "time_trial": 66.0,
+        "sprint": 2.0,
+        "climber": 808.0
+      }
+    },
+    {
+      "name": "BISSEGGER Stefan",
+      "pcs_id": "rider/stefan-bissegger",
+      "form": 104.0,
+      "specialties": {
+        "one_day": 993.0,
+        "gc": 262.0,
+        "time_trial": 2539.0,
+        "sprint": 228.0,
+        "climber": 18.0
+      }
+    },
+    {
+      "name": "NAESEN Oliver",
+      "pcs_id": "rider/oliver-naesen",
+      "form": 107.0,
+      "specialties": {
+        "one_day": 6834.0,
+        "gc": 1557.0,
+        "time_trial": 49.0,
+        "sprint": 880.0,
+        "climber": 421.0
+      }
+    },
+    {
+      "name": "PARET-PEINTRE Aurélien",
+      "pcs_id": "rider/aurelien-paret-peintre",
+      "form": 52.0,
+      "specialties": {
+        "one_day": 1804.0,
+        "gc": 1734.0,
+        "time_trial": 263.0,
+        "sprint": 25.0,
+        "climber": 1578.0
+      }
+    },
+    {
+      "name": "SCOTSON Callum",
+      "pcs_id": "rider/callum-scotson",
+      "form": 52.0,
+      "specialties": {
+        "one_day": 146.0,
+        "gc": 508.0,
+        "time_trial": 127.0,
+        "sprint": 48.0,
+        "climber": 208.0
+      }
+    },
+    {
+      "name": "TRONCHON Bastien",
+      "pcs_id": "rider/bastien-tronchon",
+      "form": 87.0,
+      "specialties": {
+        "one_day": 896.0,
+        "gc": 296.0,
+        "time_trial": 14.0,
+        "sprint": 119.0,
+        "climber": 173.0
+      }
+    },
+    {
+      "name": "BUCHMANN Emanuel",
+      "pcs_id": "rider/emanuel-buchmann",
+      "form": 0.0,
+      "specialties": {
+        "one_day": 1675.0,
+        "gc": 3324.0,
+        "time_trial": 233.0,
+        "sprint": 13.0,
+        "climber": 2966.0
+      }
+    },
+    {
+      "name": "ARANBURU Alex",
+      "pcs_id": "rider/alex-aranburu",
+      "form": 530.0,
+      "specialties": {
+        "one_day": 5672.0,
+        "gc": 1103.0,
+        "time_trial": 301.0,
+        "sprint": 414.0,
+        "climber": 2035.0
+      }
+    },
+    {
+      "name": "COQUARD Bryan",
+      "pcs_id": "rider/bryan-coquard",
+      "form": 317.0,
+      "specialties": {
+        "one_day": 6220.0,
+        "gc": 1305.0,
+        "time_trial": 289.0,
+        "sprint": 4537.0,
+        "climber": 238.0
+      }
+    },
+    {
+      "name": "IZAGIRRE Ion",
+      "pcs_id": "rider/ion-izagirre",
+      "form": 707.0,
+      "specialties": {
+        "one_day": 5035.0,
+        "gc": 5761.0,
+        "time_trial": 3035.0,
+        "sprint": 154.0,
+        "climber": 5119.0
+      }
+    },
+    {
+      "name": "RENARD Alexis",
+      "pcs_id": "rider/alexis-renard",
+      "form": 284.0,
+      "specialties": {
+        "one_day": 1300.0,
+        "gc": 267.0,
+        "time_trial": 40.0,
+        "sprint": 608.0,
+        "climber": 32.0
+      }
+    },
+    {
+      "name": "TEUNS Dylan",
+      "pcs_id": "rider/dylan-teuns",
+      "form": 74.0,
+      "specialties": {
+        "one_day": 4555.0,
+        "gc": 2860.0,
+        "time_trial": 601.0,
+        "sprint": 140.0,
+        "climber": 2848.0
+      }
+    },
+    {
+      "name": "THOMAS Benjamin",
+      "pcs_id": "rider/benjamin-thomas-2",
+      "form": 84.0,
+      "specialties": {
+        "one_day": 1650.0,
+        "gc": 970.0,
+        "time_trial": 1173.0,
+        "sprint": 258.0,
+        "climber": 264.0
+      }
+    },
+    {
+      "name": "TOUZÉ Damien",
+      "pcs_id": "rider/damien-touze",
+      "form": 0.0,
+      "specialties": {
+        "one_day": 1136.0,
+        "gc": 382.0,
+        "time_trial": 89.0,
+        "sprint": 304.0,
+        "climber": 40.0
+      }
+    },
+    {
+      "name": "TEJADA Harold",
+      "pcs_id": "rider/harold-tejada",
+      "form": 370.0,
+      "specialties": {
+        "one_day": 1022.0,
+        "gc": 1175.0,
+        "time_trial": 366.0,
+        "sprint": 8.0,
+        "climber": 1190.0
+      }
+    },
+    {
+      "name": "BALLERINI Davide",
+      "pcs_id": "rider/davide-ballerini",
+      "form": 196.0,
+      "specialties": {
+        "one_day": 3533.0,
+        "gc": 290.0,
+        "time_trial": 133.0,
+        "sprint": 968.0,
+        "climber": 276.0
+      }
+    },
+    {
+      "name": "BOL Cees",
+      "pcs_id": "rider/cees-bol",
+      "form": 136.0,
+      "specialties": {
+        "one_day": 1945.0,
+        "gc": 592.0,
+        "time_trial": 316.0,
+        "sprint": 1500.0,
+        "climber": 39.0
+      }
+    },
+    {
+      "name": "CHAMPOUSSIN Clément",
+      "pcs_id": "rider/clement-champoussin",
+      "form": 365.0,
+      "specialties": {
+        "one_day": 2627.0,
+        "gc": 1092.0,
+        "time_trial": 87.0,
+        "sprint": 30.0,
+        "climber": 1805.0
+      }
+    },
+    {
+      "name": "FEDOROV Yevgeniy",
+      "pcs_id": "rider/yevgeniy-fedorov",
+      "form": 290.0,
+      "specialties": {
+        "one_day": 1160.0,
+        "gc": 213.0,
+        "time_trial": 535.0,
+        "sprint": 322.0,
+        "climber": 38.0
+      }
+    },
+    {
+      "name": "HIGUITA Sergio",
+      "pcs_id": "rider/sergio-higuita",
+      "form": 297.0,
+      "specialties": {
+        "one_day": 2611.0,
+        "gc": 2605.0,
+        "time_trial": 130.0,
+        "sprint": 70.0,
+        "climber": 2670.0
+      }
+    },
+    {
+      "name": "TEUNISSEN Mike",
+      "pcs_id": "rider/mike-teunissen",
+      "form": 203.0,
+      "specialties": {
+        "one_day": 4252.0,
+        "gc": 1509.0,
+        "time_trial": 338.0,
+        "sprint": 1853.0,
+        "climber": 210.0
+      }
+    },
+    {
+      "name": "VELASCO Simone",
+      "pcs_id": "rider/simone-velasco",
+      "form": 65.0,
+      "specialties": {
+        "one_day": 3807.0,
+        "gc": 558.0,
+        "time_trial": 55.0,
+        "sprint": 52.0,
+        "climber": 1112.0
+      }
+    },
+    {
+      "name": "CRAS Steff",
+      "pcs_id": "rider/steff-cras",
+      "form": 46.0,
+      "specialties": {
+        "one_day": 801.0,
+        "gc": 1081.0,
+        "time_trial": 82.0,
+        "sprint": 6.0,
+        "climber": 982.0
+      }
+    },
+    {
+      "name": "BURGAUDEAU Mathieu",
+      "pcs_id": "rider/mathieu-burgaudeau",
+      "form": 35.0,
+      "specialties": {
+        "one_day": 1683.0,
+        "gc": 543.0,
+        "time_trial": 28.0,
+        "sprint": 20.0,
+        "climber": 598.0
+      }
+    },
+    {
+      "name": "DELETTRE Alexandre",
+      "pcs_id": "rider/alexandre-delettre",
+      "form": 253.0,
+      "specialties": {
+        "one_day": 1515.0,
+        "gc": 651.0,
+        "time_trial": 14.0,
+        "sprint": 64.0,
+        "climber": 236.0
+      }
+    },
+    {
+      "name": "GACHIGNARD Thomas",
+      "pcs_id": "rider/thomas-gachignard",
+      "form": 33.0,
+      "specialties": {
+        "one_day": 352.0,
+        "gc": 244.0,
+        "time_trial": 111.0,
+        "sprint": 96.0,
+        "climber": 46.0
+      }
+    },
+    {
+      "name": "JEANNIÈRE Emilien",
+      "pcs_id": "rider/emilien-jeanniere",
+      "form": 278.0,
+      "specialties": {
+        "one_day": 2238.0,
+        "gc": 366.0,
+        "time_trial": 51.0,
+        "sprint": 832.0,
+        "climber": 142.0
+      }
+    },
+    {
+      "name": "JEGAT Jordan",
+      "pcs_id": "rider/jordan-jegat",
+      "form": 241.0,
+      "specialties": {
+        "one_day": 1147.0,
+        "gc": 750.0,
+        "time_trial": 17.0,
+        "sprint": 3.0,
+        "climber": 882.0
+      }
+    },
+    {
+      "name": "TURGIS Anthony",
+      "pcs_id": "rider/anthony-turgis",
+      "form": 312.0,
+      "specialties": {
+        "one_day": 4016.0,
+        "gc": 844.0,
+        "time_trial": 191.0,
+        "sprint": 1102.0,
+        "climber": 222.0
+      }
+    },
+    {
+      "name": "VERCHER Mattéo",
+      "pcs_id": "rider/matheo-vercher",
+      "form": 163.0,
+      "specialties": {
+        "one_day": 677.0,
+        "gc": 186.0,
+        "time_trial": 1.0,
+        "sprint": 2.0,
+        "climber": 231.0
+      }
+    },
+    {
+      "name": "ONLEY Oscar",
+      "pcs_id": "rider/oscar-onley",
+      "form": 199.0,
+      "specialties": {
+        "one_day": 1463.0,
+        "gc": 2046.0,
+        "time_trial": 321.0,
+        "sprint": 8.0,
+        "climber": 1770.0
+      }
+    },
+    {
+      "name": "BARGUIL Warren",
+      "pcs_id": "rider/warren-barguil",
+      "form": 33.0,
+      "specialties": {
+        "one_day": 4736.0,
+        "gc": 3141.0,
+        "time_trial": 100.0,
+        "sprint": 104.0,
+        "climber": 4021.0
+      }
+    },
+    {
+      "name": "BITTNER Pavel",
+      "pcs_id": "rider/pavel-bittner",
+      "form": 248.0,
+      "specialties": {
+        "one_day": 1525.0,
+        "gc": 219.0,
+        "time_trial": 52.0,
+        "sprint": 829.0,
+        "climber": 44.0
+      }
+    },
+    {
+      "name": "FLYNN Sean",
+      "pcs_id": "rider/sean-flynn",
+      "form": 16.0,
+      "specialties": {
+        "one_day": 375.0,
+        "gc": 252.0,
+        "time_trial": 20.0,
+        "sprint": 154.0,
+        "climber": 76.0
+      }
+    },
+    {
+      "name": "ANDRESEN Tobias Lund",
+      "pcs_id": "rider/tobias-lund-andresen",
+      "form": 1069.0,
+      "specialties": {
+        "one_day": 2675.0,
+        "gc": 350.0,
+        "time_trial": 14.0,
+        "sprint": 1121.0,
+        "climber": 190.0
+      }
+    },
+    {
+      "name": "MÄRKL Niklas",
+      "pcs_id": "rider/niklas-markl",
+      "form": 40.0,
+      "specialties": {
+        "one_day": 386.0,
+        "gc": 146.0,
+        "time_trial": 45.0,
+        "sprint": 246.0,
+        "climber": 26.0
+      }
+    },
+    {
+      "name": "NABERMAN Tim",
+      "pcs_id": "rider/tim-naberman",
+      "form": 40.0,
+      "specialties": {
+        "one_day": 35.0,
+        "gc": 105.0,
+        "time_trial": 0.0,
+        "sprint": 0.0,
+        "climber": 0.0
+      }
+    },
+    {
+      "name": "VAN DEN BROEK Frank",
+      "pcs_id": "rider/frank-van-den-broek",
+      "form": 85.0,
+      "specialties": {
+        "one_day": 525.0,
+        "gc": 468.0,
+        "time_trial": 74.0,
+        "sprint": 26.0,
+        "climber": 401.0
+      }
+    },
+    {
+      "name": "WOODS Michael",
+      "pcs_id": "rider/michael-woods",
+      "form": 0.0,
+      "specialties": {
+        "one_day": 5052.0,
+        "gc": 2320.0,
+        "time_trial": 40.0,
+        "sprint": 38.0,
+        "climber": 4530.0
+      }
+    },
+    {
+      "name": "ACKERMANN Pascal",
+      "pcs_id": "rider/pascal-ackermann",
+      "form": 172.0,
+      "specialties": {
+        "one_day": 5760.0,
+        "gc": 380.0,
+        "time_trial": 68.0,
+        "sprint": 3922.0,
+        "climber": 134.0
+      }
+    },
+    {
+      "name": "BLACKMORE Joseph",
+      "pcs_id": "rider/joseph-blackmore",
+      "form": 271.0,
+      "specialties": {
+        "one_day": 674.0,
+        "gc": 515.0,
+        "time_trial": 91.0,
+        "sprint": 20.0,
+        "climber": 378.0
+      }
+    },
+    {
+      "name": "BOIVIN Guillaume",
+      "pcs_id": "rider/guillaume-boivin",
+      "form": 10.0,
+      "specialties": {
+        "one_day": 1870.0,
+        "gc": 487.0,
+        "time_trial": 153.0,
+        "sprint": 1390.0,
+        "climber": 66.0
+      }
+    },
+    {
+      "name": "LOUVEL Matis",
+      "pcs_id": "rider/matis-louvel",
+      "form": 49.0,
+      "specialties": {
+        "one_day": 1801.0,
+        "gc": 169.0,
+        "time_trial": 67.0,
+        "sprint": 118.0,
+        "climber": 70.0
+      }
+    },
+    {
+      "name": "LUTSENKO Alexey",
+      "pcs_id": "rider/aleksey-lutsenko",
+      "form": 0.0,
+      "specialties": {
+        "one_day": 4093.0,
+        "gc": 3241.0,
+        "time_trial": 1121.0,
+        "sprint": 350.0,
+        "climber": 2750.0
+      }
+    },
+    {
+      "name": "NEILANDS Krists",
+      "pcs_id": "rider/krists-neilands",
+      "form": 106.0,
+      "specialties": {
+        "one_day": 1558.0,
+        "gc": 826.0,
+        "time_trial": 275.0,
+        "sprint": 262.0,
+        "climber": 453.0
+      }
+    },
+    {
+      "name": "STEWART Jake",
+      "pcs_id": "rider/jake-stewart",
+      "form": 18.0,
+      "specialties": {
+        "one_day": 1464.0,
+        "gc": 472.0,
+        "time_trial": 28.0,
+        "sprint": 542.0,
+        "climber": 148.0
+      }
+    },
+    {
+      "name": "DE LIE Arnaud",
+      "pcs_id": "rider/arnaud-de-lie",
+      "form": 393.0,
+      "specialties": {
+        "one_day": 6961.0,
+        "gc": 651.0,
+        "time_trial": 1.0,
+        "sprint": 2050.0,
+        "climber": 192.0
+      }
+    },
+    {
+      "name": "BERCKMOES Jenno",
+      "pcs_id": "rider/jenno-berckmoes",
+      "form": 376.0,
+      "specialties": {
+        "one_day": 1415.0,
+        "gc": 618.0,
+        "time_trial": 58.0,
+        "sprint": 208.0,
+        "climber": 156.0
+      }
+    },
+    {
+      "name": "DE BUYST Jasper",
+      "pcs_id": "rider/jasper-de-buyst",
+      "form": 5.0,
+      "specialties": {
+        "one_day": 2570.0,
+        "gc": 710.0,
+        "time_trial": 128.0,
+        "sprint": 1102.0,
+        "climber": 164.0
+      }
+    },
+    {
+      "name": "DRIZNERS Jarrad",
+      "pcs_id": "rider/jarrad-drizners",
+      "form": 20.0,
+      "specialties": {
+        "one_day": 127.0,
+        "gc": 147.0,
+        "time_trial": 7.0,
+        "sprint": 48.0,
+        "climber": 0.0
+      }
+    },
+    {
+      "name": "GRIGNARD Sébastien",
+      "pcs_id": "rider/sebastien-grignard",
+      "form": 35.0,
+      "specialties": {
+        "one_day": 199.0,
+        "gc": 100.0,
+        "time_trial": 9.0,
+        "sprint": 0.0,
+        "climber": 2.0
+      }
+    },
+    {
+      "name": "SEPÚLVEDA Eduardo",
+      "pcs_id": "rider/eduardo-sepulveda",
+      "form": 117.0,
+      "specialties": {
+        "one_day": 863.0,
+        "gc": 1728.0,
+        "time_trial": 420.0,
+        "sprint": 37.0,
+        "climber": 798.0
+      }
+    },
+    {
+      "name": "VAN EETVELT Lennert",
+      "pcs_id": "rider/lennert-van-eetvelt",
+      "form": 209.0,
+      "specialties": {
+        "one_day": 1199.0,
+        "gc": 1104.0,
+        "time_trial": 103.0,
+        "sprint": 12.0,
+        "climber": 1264.0
+      }
+    },
+    {
+      "name": "VAN MOER Brent",
+      "pcs_id": "rider/brent-van-moer",
+      "form": 180.0,
+      "specialties": {
+        "one_day": 1156.0,
+        "gc": 521.0,
+        "time_trial": 279.0,
+        "sprint": 154.0,
+        "climber": 64.0
+      }
+    },
+    {
+      "name": "JOHANNESSEN Tobias Halland",
+      "pcs_id": "rider/tobias-halland-johannessen",
+      "form": 867.0,
+      "specialties": {
+        "one_day": 2116.0,
+        "gc": 1883.0,
+        "time_trial": 105.0,
+        "sprint": 28.0,
+        "climber": 2021.0
+      }
+    },
+    {
+      "name": "ABRAHAMSEN Jonas",
+      "pcs_id": "rider/jonas-abrahamsen",
+      "form": 260.0,
+      "specialties": {
+        "one_day": 1901.0,
+        "gc": 224.0,
+        "time_trial": 11.0,
+        "sprint": 361.0,
+        "climber": 142.0
+      }
+    },
+    {
+      "name": "CORT Magnus",
+      "pcs_id": "rider/magnus-cort-nielsen",
+      "form": 144.0,
+      "specialties": {
+        "one_day": 4550.0,
+        "gc": 1493.0,
+        "time_trial": 825.0,
+        "sprint": 1932.0,
+        "climber": 1228.0
+      }
+    },
+    {
+      "name": "FREDHEIM Stian",
+      "pcs_id": "rider/stian-fredheim",
+      "form": 7.0,
+      "specialties": {
+        "one_day": 589.0,
+        "gc": 50.0,
+        "time_trial": 1.0,
+        "sprint": 458.0,
+        "climber": 4.0
+      }
+    },
+    {
+      "name": "HOELGAARD Markus",
+      "pcs_id": "rider/markus-hoelgaard",
+      "form": 57.0,
+      "specialties": {
+        "one_day": 1826.0,
+        "gc": 819.0,
+        "time_trial": 24.0,
+        "sprint": 164.0,
+        "climber": 368.0
+      }
+    },
+    {
+      "name": "JOHANNESSEN Anders Halland",
+      "pcs_id": "rider/anders-halland-johannessen",
+      "form": 66.0,
+      "specialties": {
+        "one_day": 337.0,
+        "gc": 520.0,
+        "time_trial": 31.0,
+        "sprint": 28.0,
+        "climber": 315.0
+      }
+    },
+    {
+      "name": "LEKNESSUND Andreas",
+      "pcs_id": "rider/andreas-leknessund",
+      "form": 392.0,
+      "specialties": {
+        "one_day": 895.0,
+        "gc": 1245.0,
+        "time_trial": 678.0,
+        "sprint": 4.0,
+        "climber": 914.0
+      }
+    },
+    {
+      "name": "WÆRENSKJOLD Søren",
+      "pcs_id": "rider/soren-waerenskjold",
+      "form": 270.0,
+      "specialties": {
+        "one_day": 1583.0,
+        "gc": 780.0,
+        "time_trial": 998.0,
+        "sprint": 1001.0,
+        "climber": 42.0
+      }
+    }
+  ]
+}
