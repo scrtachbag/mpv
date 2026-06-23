@@ -1,6 +1,5 @@
 import TodayBet from './TodayBet.jsx'
 import Leaderboard from './Leaderboard.jsx'
-import History from './History.jsx'
 
 export default function Dashboard() {
   return (
@@ -28,11 +27,6 @@ export default function Dashboard() {
             <Leaderboard />
           </div>
         </aside>
-      </div>
-
-      <div className="card">
-        <h2>📅 Historique des étapes</h2>
-        <History />
       </div>
     </div>
   )

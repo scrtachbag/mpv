@@ -3,6 +3,7 @@ import Avatar from './Avatar.jsx'
 
 const TABS = [
   { key: 'tour', label: '🚴 Le Tour' },
+  { key: 'history', label: '📅 Historique' },
   { key: 'chat', label: '💬 Chat' },
   { key: 'rules', label: '📖 Règles' },
 ]

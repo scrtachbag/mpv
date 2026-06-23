@@ -5,6 +5,7 @@ import Onboarding from './components/Onboarding.jsx'
 import ResetPassword from './components/ResetPassword.jsx'
 import Nav from './components/Nav.jsx'
 import Dashboard from './components/Dashboard.jsx'
+import History from './components/History.jsx'
 import Chat from './components/Chat.jsx'
 import Admin from './components/Admin.jsx'
 import Profile from './components/Profile.jsx'
@@ -24,6 +25,9 @@ export default function App() {
       <Nav view={view} setView={setView} />
       <main className="container">
         {view === 'tour' && <Dashboard />}
+        {view === 'history' && (
+          <div className="card"><h2>📅 Historique des étapes</h2><History /></div>
+        )}
         {view === 'chat' && <Chat />}
         {view === 'rules' && <Rules />}
         {view === 'profile' && <Profile />}
