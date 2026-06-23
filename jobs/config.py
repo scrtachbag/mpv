@@ -45,7 +45,11 @@ ODDS_MAX = _float("MPV_ODDS_MAX", 500.0)
 # Points plancher pour un coureur absent du classement PCS (évite côte = MAX).
 ODDS_FLOOR_POINTS = _float("MPV_ODDS_FLOOR_POINTS", 5.0)
 # Pondération : forme récente vs points dans la spécialité de l'étape.
-ODDS_FORM_WEIGHT = _float("MPV_ODDS_FORM_WEIGHT", 0.5)
+# FORM_WEIGHT=0 par défaut : `season_results` donne un total quasi-carrière
+# (biaisé par la longévité), inutilisable comme "forme récente". On s'appuie
+# sur les points de spécialité (justes par discipline) en attendant une vraie
+# métrique de forme. À réactiver (>0) quand `form` sera fiable.
+ODDS_FORM_WEIGHT = _float("MPV_ODDS_FORM_WEIGHT", 0.0)
 ODDS_SPEC_WEIGHT = _float("MPV_ODDS_SPEC_WEIGHT", 1.0)
 
 # Nombre de positions de résultat à enregistrer (le top 10 suffit au score).
