@@ -30,6 +30,21 @@ _SPEC_KEYS = {
     "one_day_races": "one_day", "one_day": "one_day", "hills": "one_day", "classic": "one_day",
 }
 
+# Codes profil PCS (profile_icon) -> profil canonique (mots compris par odds.py).
+_PROFILE_ICON = {"p1": "flat", "p2": "hilly", "p3": "hilly", "p4": "mountain", "p5": "mountain"}
+
+
+def _normalize_profile(icon, stype) -> str | None:
+    """Combine profile_icon (p1..p5) et stage_type pour donner un profil
+    canonique : 'itt' / 'flat' / 'hilly' / 'mountain'."""
+    s = str(stype or "").lower()
+    if any(k in s for k in ("itt", "ttt", "time trial", "chrono", " tt", "tt ")):
+        return "itt"
+    key = str(icon or "").lower().strip()
+    if key in _PROFILE_ICON:
+        return _PROFILE_ICON[key]
+    return s or (str(icon) if icon else None)
+
 
 def _safe(fn, default=None):
     try:
@@ -55,7 +70,7 @@ def _load_stage(slug: str, season: int, n: int) -> StageInfo | None:
     dep = _safe(st.departure)
     arr = _safe(st.arrival)
     name = f"{dep} → {arr}" if dep and arr else None
-    profile = _safe(st.profile_icon) or _safe(st.stage_type)
+    profile = _normalize_profile(_safe(st.profile_icon), _safe(st.stage_type))
     return StageInfo(stage_no=n, date=str(date)[:10], name=name,
                      profile_type=profile, url=url)
 
@@ -104,17 +119,21 @@ def _normalize_specialties(raw: dict) -> dict:
     return out
 
 
-def _season_form(rider, season: int) -> float | None:
-    """Points de la saison `season` (proxy de forme récente). best-effort."""
-    data = _safe(rider.points_per_season)
-    if isinstance(data, list):
-        for row in data:
-            if isinstance(row, dict) and str(row.get("season")) == str(season):
-                try:
-                    return float(row.get("points") or 0.0)
-                except (TypeError, ValueError):
-                    return None
-    return None
+def _season_form(rider) -> float:
+    """Proxy de forme récente : somme des points des résultats de la saison
+    courante (season_results). best-effort, 0.0 si indisponible/forme inconnue."""
+    rows = _safe(rider.season_results)
+    total = 0.0
+    if isinstance(rows, list):
+        for r in rows:
+            if not isinstance(r, dict):
+                continue
+            for key in ("pcs_points", "points", "pcs_point", "uci_points"):
+                v = r.get(key)
+                if isinstance(v, (int, float)):
+                    total += float(v)
+                    break
+    return total
 
 
 def get_rider_forms(season: int, slug: str, *, sleep: float = 0.0,
@@ -136,7 +155,7 @@ def get_rider_forms(season: int, slug: str, *, sleep: float = 0.0,
             try:
                 rd = Rider(r.pcs_id)
                 spec = _normalize_specialties(_safe(rd.points_per_speciality) or {})
-                form = float(_season_form(rd, season) or sum(spec.values()) or 0.0)
+                form = float(_season_form(rd) or sum(spec.values()) or 0.0)
             except Exception as exc:  # noqa: BLE001
                 log.warning("forme indisponible pour %s (%s)", r.name, exc)
         forms.append(RiderForm(name=r.name, pcs_id=r.pcs_id, form=form, specialties=spec))
