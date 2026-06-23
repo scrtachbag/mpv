@@ -105,7 +105,12 @@ def get_startlist(season: int, slug: str) -> list[RiderEntry]:
         name = r.get("rider_name")
         if not name:
             continue
-        out.append(RiderEntry(name=name.strip(), pcs_id=r.get("rider_url")))
+        nat = r.get("nationality") or r.get("rider_nationality") or r.get("flag")
+        out.append(RiderEntry(
+            name=name.strip(), pcs_id=r.get("rider_url"),
+            nationality=(str(nat).strip().lower() if nat else None),
+            team=(r.get("team_name") or r.get("team") or None),
+        ))
     return out
 
 
@@ -175,7 +180,8 @@ def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
                 form = _season_form(rd, ref_date)   # forme pondérée par la récence
             except Exception as exc:  # noqa: BLE001
                 log.warning("forme indisponible pour %s (%s)", r.name, exc)
-        forms.append(RiderForm(name=r.name, pcs_id=r.pcs_id, form=form, specialties=spec))
+        forms.append(RiderForm(name=r.name, pcs_id=r.pcs_id, form=form, specialties=spec,
+                               nationality=r.nationality, team=r.team))
         if sleep:
             time.sleep(sleep)
     log.info("forme/spécialités récupérées pour %d coureurs", len(forms))

@@ -73,5 +73,6 @@ def compute_odds(riders: list[RiderForm], profile: str | None,
         p = w / total
         odds = config.ODDS_MARGIN / p if p > 0 else config.ODDS_MAX
         odds = max(config.ODDS_MIN, min(config.ODDS_MAX, odds))
-        out.append({"rider_name": r.name, "rider_pcs_id": r.pcs_id, "odds": round(odds, 2)})
+        out.append({"rider_name": r.name, "rider_pcs_id": r.pcs_id, "odds": round(odds, 2),
+                    "nationality": r.nationality, "team": r.team})
     return out

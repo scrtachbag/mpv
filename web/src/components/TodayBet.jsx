@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { parisToday, formatDateFr, msUntil, formatCountdown } from '../lib/time'
-import { riderName, sameRider } from '../lib/format'
+import { riderName, sameRider, flag, teamKey } from '../lib/format'
 import Avatar from './Avatar.jsx'
 import Bonus from './Bonus.jsx'
 
@@ -33,7 +33,7 @@ export default function TodayBet() {
 
     if (st) {
       const [{ data: rs }, { data: bet }, { data: res }] = await Promise.all([
-        supabase.from('stage_riders').select('rider_name, odds')
+        supabase.from('stage_riders').select('rider_name, odds, nationality, team')
           .eq('stage_id', st.id).order('odds', { ascending: true }),
         supabase.from('bets').select('*').eq('stage_id', st.id)
           .eq('user_id', user.id).maybeSingle(),
@@ -136,15 +136,22 @@ export default function TodayBet() {
             </p>
           ) : (
             <form onSubmit={submit}>
-              <label htmlFor="rider">Coureur que tu vois gagner</label>
-              <select id="rider" required value={rider} onChange={(e) => setRider(e.target.value)}>
-                <option value="" disabled>— choisir un coureur —</option>
-                {riders.map((r) => (
-                  <option key={r.rider_name} value={r.rider_name}>
-                    {riderName(r.rider_name)} — côte {Number(r.odds).toFixed(2)}
-                  </option>
-                ))}
-              </select>
+              <label>Coureur que tu vois gagner</label>
+              <div className="rider-pick">
+                {riders.map((r) => {
+                  const tk = teamKey(r.team)
+                  return (
+                    <button type="button" key={r.rider_name}
+                      className={`rider-row${rider === r.rider_name ? ' selected' : ''}`}
+                      onClick={() => setRider(r.rider_name)}>
+                      <span className="rp-flag">{flag(r.nationality)}</span>
+                      {tk ? <Avatar name={tk} size={22} /> : <span className="rp-team-empty" />}
+                      <span className="rp-name">{riderName(r.rider_name)}</span>
+                      <span className="rp-odds">{Number(r.odds).toFixed(2)}</span>
+                    </button>
+                  )
+                })}
+              </div>
 
               <label className={`checkbox ${!canUseBonus ? 'disabled' : ''}`}>
                 <input type="checkbox" checked={bonus} disabled={!canUseBonus}

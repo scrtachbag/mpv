@@ -524,3 +524,11 @@ as $$
   order by total_points desc, p.pseudo asc;
 $$;
 grant execute on function public.get_leaderboard() to anon, authenticated;
+
+-- >>>>> migrations/0008_rider_meta.sql <<<<<
+
+-- =============================================================================
+-- MPV 0008 — métadonnées coureur sur les partants (drapeau + équipe)
+-- =============================================================================
+alter table public.stage_riders add column if not exists nationality text;  -- code ISO2 (fr, be, sl…)
+alter table public.stage_riders add column if not exists team text;         -- nom d'équipe PCS
