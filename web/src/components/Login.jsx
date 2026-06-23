@@ -13,6 +13,21 @@ function traduire(error) {
 // URL de retour après clic sur un lien e-mail (création de compte / réinit).
 const redirectTo = window.location.origin + window.location.pathname
 
+// Lit une erreur éventuelle renvoyée par un lien e-mail (ex. lien expiré),
+// présente dans le hash (#error=...) ou la query (?error=...).
+function readLinkError() {
+  const raw = (window.location.hash.replace(/^#/, '') || window.location.search.replace(/^\?/, ''))
+  if (!raw) return null
+  const p = new URLSearchParams(raw)
+  const code = p.get('error_code') || ''
+  const desc = p.get('error_description') || ''
+  if (!p.get('error') && !code && !desc) return null
+  if (/expired|invalid|otp/i.test(`${code} ${desc}`)) {
+    return 'Ce lien a expiré ou a déjà été utilisé. Redemande un lien ci-dessous, et clique le plus récent rapidement.'
+  }
+  return decodeURIComponent(desc.replace(/\+/g, ' ')) || 'Lien invalide.'
+}
+
 export default function Login() {
   const [mode, setMode] = useState('login')   // 'login' | 'signup' | 'forgot'
   const [email, setEmail] = useState('')
@@ -24,7 +39,15 @@ export default function Login() {
   // Avis transmis depuis l'appli (ex. compte supprimé) : affiché une fois.
   const { notice, setNotice } = useAuth()
   const [banner] = useState(notice)
-  useEffect(() => { if (notice) setNotice(null) }, [])  // eslint-disable-line react-hooks/exhaustive-deps
+  // Erreur d'un lien e-mail (expiré, etc.) capturée depuis l'URL.
+  const [linkError] = useState(readLinkError)
+  useEffect(() => {
+    if (notice) setNotice(null)
+    if (linkError) {
+      setMode('signup')  // bouton « Recevoir le lien de création » à portée
+      window.history.replaceState(null, '', window.location.pathname)  // nettoie l'URL
+    }
+  }, [])  // eslint-disable-line react-hooks/exhaustive-deps
 
   function go(next) { setMode(next); setError(null); setInfo(null) }
 
@@ -60,6 +83,7 @@ export default function Login() {
       <p className="muted">Paris entre amis sur le Tour de France — sans argent, pour la gloire.</p>
 
       {banner && <p className="banner-notice">{banner}</p>}
+      {linkError && <p className="error">{linkError}</p>}
 
       <form onSubmit={submit}>
         <label htmlFor="email">E-mail</label>

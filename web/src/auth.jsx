@@ -21,11 +21,13 @@ export function AuthProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      setSession(data.session)
-      await loadProfile(data.session?.user?.id)
-      setLoading(false)
-    })
+    supabase.auth.getSession()
+      .then(async ({ data }) => {
+        setSession(data.session)
+        await loadProfile(data.session?.user?.id)
+      })
+      .catch((e) => console.error('getSession', e))
+      .finally(() => setLoading(false))
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       if (event === 'PASSWORD_RECOVERY') setRecovery(true)
       setSession(s)
