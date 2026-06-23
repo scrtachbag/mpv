@@ -110,6 +110,8 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
   box-shadow: inset 0 0 0 2px rgba(255,255,255,.65), 0 1px 3px rgba(0,0,0,.18);
 }
 .avatar.ring { box-shadow: 0 0 0 3px var(--yellow); }
+.avatar-logo { background: #fff; overflow: hidden; }
+.avatar-logo img { width: 80%; height: 80%; object-fit: contain; }
 .avatar-grid { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: .4rem; max-height: 240px; overflow-y: auto; padding: 3px; }
 .avatar-choice {
   padding: 3px; border: 2.5px solid transparent; border-radius: 50%;
