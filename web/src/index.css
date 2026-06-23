@@ -227,7 +227,8 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 .podium li.mine { font-weight: 800; color: var(--yellow-deep); }
 .podium .pos { display: inline-block; width: 1.8rem; font-weight: 800; color: var(--muted); }
 .picks { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: .4rem; }
-.picks li { display: flex; align-items: center; gap: .5rem; }
+.picks li { display: flex; align-items: center; gap: .5rem; padding: .15rem .4rem; border-radius: 8px; }
+.picks li.mine { background: #fffae6; outline: 1px solid var(--yellow); font-weight: 600; }
 
 /* ---------------- chat ---------------- */
 .chat { display: flex; flex-direction: column; height: calc(100vh - 190px); min-height: 360px; }

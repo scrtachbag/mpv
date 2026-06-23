@@ -126,16 +126,9 @@ export default function TodayBet() {
 
       {stage.odds_status !== 'published' ? (
         <div className="card"><p className="muted">Les côtes du jour ne sont pas encore publiées. Reviens un peu plus tard ce matin.</p></div>
-      ) : (
+      ) : !closed ? (
         <div className="card">
           <h3>Ton pronostic</h3>
-          {closed ? (
-            <p className="muted">
-              {myBet
-                ? <>Tu avais misé sur <strong>{riderName(myBet.rider_name)}</strong>{myBet.bonus_used ? ' (bonus ×2)' : ''}.</>
-                : 'Tu n’as pas parié sur cette étape.'}
-            </p>
-          ) : (
             <form onSubmit={submit}>
               <label>Coureur que tu vois gagner</label>
               <div className="rider-pick">
@@ -164,9 +157,8 @@ export default function TodayBet() {
               </button>
               {msg && <p className={msg.type}>{msg.text}</p>}
             </form>
-          )}
         </div>
-      )}
+      ) : null}
 
       {resultsOfficial && (
         <div className="card">
@@ -192,10 +184,9 @@ export default function TodayBet() {
           <h3>Pronostics du jour</h3>
           <ul className="picks">
             {othersBets.map((b) => (
-              <li key={b.user_id}>
+              <li key={b.user_id} className={b.user_id === user.id ? 'mine' : ''}>
                 <Avatar name={b.profiles?.avatar} size={26} />
-                <strong>{b.profiles?.pseudo ?? '?'}</strong>
-                {b.user_id === user.id ? ' (toi)' : ''} → {riderName(b.rider_name)}
+                <strong>{b.profiles?.pseudo ?? '?'}</strong> → {riderName(b.rider_name)}
                 {b.bonus_used ? ' ⚡️' : ''}
               </li>
             ))}
