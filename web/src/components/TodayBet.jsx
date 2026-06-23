@@ -2,10 +2,11 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { parisToday, formatDateFr, msUntil, formatCountdown } from '../lib/time'
-import { riderName, sameRider, flag } from '../lib/format'
+import { riderName, flag } from '../lib/format'
 import Avatar from './Avatar.jsx'
 import Bonus from './Bonus.jsx'
 import TeamBadge from './TeamBadge.jsx'
+import StageResults from './StageResults.jsx'
 
 export default function TodayBet() {
   const { user } = useAuth()
@@ -13,7 +14,6 @@ export default function TodayBet() {
   const [riders, setRiders] = useState([])
   const [myBet, setMyBet] = useState(null)
   const [bonusCount, setBonusCount] = useState(0)
-  const [results, setResults] = useState([])
   const [othersBets, setOthersBets] = useState([])
   const [loading, setLoading] = useState(true)
   const [now, setNow] = useState(Date.now())
@@ -33,19 +33,16 @@ export default function TodayBet() {
     setStage(st ?? null)
 
     if (st) {
-      const [{ data: rs }, { data: bet }, { data: res }] = await Promise.all([
+      const [{ data: rs }, { data: bet }] = await Promise.all([
         supabase.from('stage_riders').select('rider_name, odds, nationality, team')
           .eq('stage_id', st.id).order('odds', { ascending: true }),
         supabase.from('bets').select('*').eq('stage_id', st.id)
           .eq('user_id', user.id).maybeSingle(),
-        supabase.from('stage_results').select('position, rider_name')
-          .eq('stage_id', st.id).order('position', { ascending: true }),
       ])
       setRiders(rs ?? [])
       setMyBet(bet ?? null)
       setRider(bet?.rider_name ?? '')
       setBonus(bet?.bonus_used ?? false)
-      setResults(res ?? [])
 
       // Pronostics des autres : visibles seulement après la deadline (RLS).
       if (msUntil(st.bet_deadline) <= 0) {
@@ -85,13 +82,6 @@ export default function TodayBet() {
   const bonusLeft = 2 - bonusCount
   const canUseBonus = bonusLeft > 0 || myBet?.bonus_used
   const resultsOfficial = stage.results_status === 'official'
-
-  // Score de mon pari une fois les résultats connus.
-  let myOutcome = null
-  if (resultsOfficial && myBet) {
-    const r = results.find((x) => sameRider(x.rider_name, myBet.rider_name))
-    myOutcome = r ? r.position : null
-  }
 
   async function submit(e) {
     e.preventDefault()
@@ -163,19 +153,7 @@ export default function TodayBet() {
       {resultsOfficial && (
         <div className="card">
           <h3>Résultat de l’étape</h3>
-          <ol className="podium">
-            {results.slice(0, 10).map((r) => (
-              <li key={r.position} className={myBet && sameRider(myBet.rider_name, r.rider_name) ? 'mine' : ''}>
-                <span className="pos">{r.position}</span> {riderName(r.rider_name)}
-              </li>
-            ))}
-          </ol>
-          {myBet && (
-            <p className="muted">
-              Ton coureur ({riderName(myBet.rider_name)}) :{' '}
-              {myOutcome ? `${myOutcome}ᵉ` : 'hors du top 10'}.
-            </p>
-          )}
+          <StageResults stageId={stage.id} />
         </div>
       )}
 
