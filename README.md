@@ -268,6 +268,22 @@ résidentielle), la lib `procyclingstats` fonctionne normalement.
   change un nom de méthode. Le calcul ([`jobs/odds.py`](jobs/odds.py)) en est
   découplé et reste testable sans réseau.
 
+## Mode bêta (essais avec de vraies étapes 2025)
+
+Pour tester avec des amis avant le vrai Tour, on rejoue de **vraies étapes
+passées** (vraies côtes + vrais résultats), pilotées en 1 clic via
+**Actions → « Bêta (étapes 2025) » → Run workflow** :
+
+| Action | Effet |
+|--------|-------|
+| `open` (+ `stage`) | Calcule les vraies côtes 2025 de l'étape, l'affiche comme **étape du jour**, paris ouverts `hours` heures. |
+| `close` (+ `stage`) | Charge les **vrais résultats 2025** + verrouille les paris → scoring + classement. |
+| `reset` | Repart d'une base propre : efface étapes, côtes, paris, résultats, messages. **Garde les comptes.** |
+
+Déroulé d'un essai : `open --stage 1` → les amis parient → `close --stage 1`
+(le classement bouge) → `open --stage 2` → … Avant le vrai Tour : `reset`.
+Script : [`jobs/beta.py`](jobs/beta.py).
+
 ## Limites assumées
 
 - Les côtes ne sont **pas** celles de Winamax (aucune API gratuite ne les expose) :

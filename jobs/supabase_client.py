@@ -55,6 +55,12 @@ def delete(table: str, match: dict) -> None:
     r.raise_for_status()
 
 
+def delete_all(table: str) -> None:
+    """Vide entièrement une table (PostgREST exige un filtre : id>=0 matche tout)."""
+    r = requests.delete(_url(table), headers=_headers(), params={"id": "gte.0"}, timeout=60)
+    r.raise_for_status()
+
+
 def upsert_stage(stage: dict[str, Any]) -> int:
     """Insère/maj une étape (clé season+stage_no) et renvoie son id."""
     rows = upsert("stages", [stage], on_conflict="season,stage_no")

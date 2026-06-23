@@ -1,0 +1,49 @@
+name: Bêta (étapes 2025)
+
+# Piloter des essais avec de vraies étapes passées (ex. Tour 2025) :
+#   - open  : ouvre une étape (vraies côtes), affichée comme "étape du jour"
+#   - close : charge les vrais résultats + verrouille les paris (scoring)
+#   - reset : repart d'une base propre (garde les comptes)
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Action"
+        type: choice
+        options: [open, close, reset]
+        required: true
+      stage:
+        description: "N° d'étape (pour open / close)"
+        required: false
+        default: ''
+      season:
+        description: "Saison des données réelles"
+        required: false
+        default: '2025'
+      hours:
+        description: "Durée d'ouverture des paris en heures (open)"
+        required: false
+        default: '48'
+
+jobs:
+  beta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --no-cache-dir -r jobs/requirements.txt
+      - name: Pilotage bêta
+        working-directory: jobs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          MPV_RACE_SLUG: ${{ vars.MPV_RACE_SLUG }}
+        run: |
+          case "${{ github.event.inputs.action }}" in
+            open)  python beta.py open  --season ${{ github.event.inputs.season }} --stage ${{ github.event.inputs.stage }} --hours ${{ github.event.inputs.hours }} ;;
+            close) python beta.py close --season ${{ github.event.inputs.season }} --stage ${{ github.event.inputs.stage }} ;;
+            reset) python beta.py reset ;;
+            *) echo "Action inconnue"; exit 1 ;;
+          esac
