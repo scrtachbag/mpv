@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { AVATARS, randomAvatarKey } from '../lib/avatars'
+import Avatar from './Avatar.jsx'
 
 // Finalisation du compte : pseudo, mot de passe et choix de l'avatar.
 export default function Onboarding() {
@@ -52,7 +53,7 @@ export default function Onboarding() {
             <button type="button" key={a.key}
               className={`avatar-choice${avatar === a.key ? ' selected' : ''}`}
               onClick={() => setAvatar(a.key)} title={a.label}>
-              <span className="avatar" style={{ background: a.color }}>{a.emoji}</span>
+              <Avatar name={a.key} size={44} />
             </button>
           ))}
         </div>

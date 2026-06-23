@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { AVATARS } from '../lib/avatars'
+import Avatar from './Avatar.jsx'
 import NotificationsCard from './NotificationsCard.jsx'
 
 export default function Profile() {
@@ -73,7 +74,7 @@ export default function Profile() {
               <button type="button" key={a.key}
                 className={`avatar-choice${avatar === a.key ? ' selected' : ''}`}
                 onClick={() => setAvatar(a.key)} title={a.label}>
-                <span className="avatar" style={{ background: a.color }}>{a.emoji}</span>
+                <Avatar name={a.key} size={44} />
               </button>
             ))}
           </div>
