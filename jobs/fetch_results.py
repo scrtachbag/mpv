@@ -29,26 +29,33 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", type=int, help="numéro d'étape à forcer")
     ap.add_argument("--date", help="date d'étape YYYY-MM-DD (défaut : aujourd'hui)")
+    ap.add_argument("--season", type=int, help=f"saison (défaut: {config.SEASON})")
+    ap.add_argument("--slug", help=f"course PCS (défaut: {config.RACE_SLUG})")
     args = ap.parse_args()
+    season = args.season or config.SEASON
+    slug = args.slug or config.RACE_SLUG
 
     today = args.date or datetime.now(config.TZ).date().isoformat()
-    info = pcs.find_stage(config.SEASON, config.RACE_SLUG,
+    info = pcs.find_stage(season, slug,
                           date=None if args.stage else today,
                           number=args.stage)
     if info is None:
-        log.info("Aucune étape pour %s. Rien à faire.", today)
+        if args.stage:
+            log.warning("Étape %s introuvable pour %s %s.", args.stage, slug, season)
+        else:
+            log.info("Aucune étape datée du %s pour %s %s. Rien à faire.", today, slug, season)
         return 0
 
     # L'étape doit déjà exister (créée par le job du matin).
     found = db.select("stages", {
-        "season": f"eq.{config.SEASON}",
+        "season": f"eq.{season}",
         "stage_no": f"eq.{info.stage_no}",
         "select": "id",
     })
     if not found:
         log.warning("Étape %s absente en base (job du matin non passé ?).", info.stage_no)
         stage_id = db.upsert_stage({
-            "season": config.SEASON, "stage_no": info.stage_no,
+            "season": season, "stage_no": info.stage_no,
             "label": f"Étape {info.stage_no}", "name": info.name,
             "profile_type": info.profile_type, "date": info.date,
             "bet_deadline": f"{info.date}T12:00:00+02:00",

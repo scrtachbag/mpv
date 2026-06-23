@@ -39,6 +39,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", type=int)
     ap.add_argument("--date")
+    ap.add_argument("--season", type=int, help=f"saison (défaut: {config.SEASON})")
+    ap.add_argument("--slug", help=f"course PCS (défaut: {config.RACE_SLUG})")
     ap.add_argument("--dry-run", action="store_true", help="calcule et affiche, sans écrire en base")
     ap.add_argument("--save-snapshot", metavar="PATH", help="dump des données PCS (forme/spécialités) en JSON")
     ap.add_argument("--from-snapshot", metavar="PATH", help="calcule à partir d'un JSON (sans PCS)")
@@ -60,16 +62,22 @@ def main() -> int:
 
     # --- Sinon : on interroge PCS ---
     import pcs  # import tardif (déclenche procyclingstats)
+    season = args.season or config.SEASON
+    slug = args.slug or config.RACE_SLUG
     today = args.date or datetime.now(config.TZ).date().isoformat()
-    info = pcs.find_stage(config.SEASON, config.RACE_SLUG,
+    info = pcs.find_stage(season, slug,
                           date=None if args.stage else today, number=args.stage)
     if info is None:
-        log.info("Aucune étape pour %s. Rien à faire.", today)
+        if args.stage:
+            log.warning("Étape %s introuvable pour %s %s (mauvaise saison, étape "
+                        "pas encore en ligne, ou PCS injoignable ?).", args.stage, slug, season)
+        else:
+            log.info("Aucune étape datée du %s pour %s %s. Rien à faire.", today, slug, season)
         return 0
     log.info("Étape %s du %s : %s [profil: %s]", info.stage_no, info.date,
              info.name or "?", info.profile_type)
 
-    forms = pcs.get_rider_forms(config.SEASON, config.RACE_SLUG, sleep=args.sleep, limit=args.limit)
+    forms = pcs.get_rider_forms(season, slug, sleep=args.sleep, limit=args.limit)
     if not forms:
         log.error("Startlist vide : impossible de coter l'étape.")
         return 1
@@ -92,7 +100,7 @@ def main() -> int:
     # --- Écriture en base ---
     config.require_supabase()
     stage_id = db.upsert_stage({
-        "season": config.SEASON, "stage_no": info.stage_no,
+        "season": season, "stage_no": info.stage_no,
         "label": f"Étape {info.stage_no}", "name": info.name,
         "profile_type": info.profile_type, "date": info.date,
         "bet_deadline": _deadline_iso(info.date), "odds_status": "pending",

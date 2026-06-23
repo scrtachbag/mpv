@@ -47,7 +47,8 @@ def _load_stage(slug: str, season: int, n: int) -> StageInfo | None:
     try:
         st = Stage(url)
         date = _safe(st.date)
-    except Exception:  # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
+        log.debug("chargement étape %s échoué (%s)", url, exc)
         return None
     if not date:
         return None

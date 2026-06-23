@@ -241,12 +241,12 @@ PCS est derrière Cloudflare : les requêtes depuis des IP « datacenter »
 (certains CI) peuvent recevoir un **403**. Depuis une machine perso (IP
 résidentielle), la lib `procyclingstats` fonctionne normalement.
 
-- **Avant le Tour**, teste un vrai run depuis ton PC :
+- **Avant le Tour**, teste un vrai run depuis ton PC (l'option `--season` évite
+  de jongler avec les variables d'environnement, pratique sous PowerShell) :
   ```bash
   cd jobs && pip install -r requirements.txt
-  export MPV_SEASON=2025      # saison déjà courue
-  python fetch_odds.py --dry-run --stage 12   # étape de montagne 2025
-  python fetch_results.py --stage 12          # nécessite SUPABASE_* pour écrire
+  python fetch_odds.py --dry-run --season 2025 --stage 12    # étape de montagne 2025
+  python fetch_odds.py --season 2025 --stage 12 --save-snapshot snap.json
   ```
 - **Vérifie GitHub Actions** en lançant le workflow « Côtes du matin » à la main
   (*Run workflow*) : si tu vois des 403 dans les logs, l'IP du runner est bloquée.
