@@ -178,6 +178,19 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 .table th, .table td { padding: .55rem .6rem; border-bottom: 1px solid var(--border); text-align: left; }
 .table th { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
 
+/* ---------------- historique : résultats par coureur ---------------- */
+.res-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .4rem; }
+.res-list li { border: 1px solid var(--border); border-radius: 12px; padding: .5rem .7rem; background: #fafbfc; }
+.res-list li.mine { background: #fffae6; outline: 1px solid var(--yellow); }
+.res-head { display: flex; align-items: center; gap: .6rem; }
+.res-pos { width: 1.7rem; text-align: center; font-weight: 800; color: var(--muted); }
+.res-rider { flex: 1; font-weight: 700; }
+.res-odds { color: var(--muted); font-variant-numeric: tabular-nums; }
+.res-pts { font-weight: 800; color: var(--yellow-deep); font-variant-numeric: tabular-nums; min-width: 4.2rem; text-align: right; }
+.res-bettors { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; padding-left: 2.3rem; }
+.bettor { display: inline-flex; align-items: center; gap: .25rem; font-size: .82rem; background: #eef1f5; border-radius: 999px; padding: .1rem .5rem .1rem .15rem; }
+.bettor.me { background: var(--yellow); font-weight: 700; }
+
 /* ---------------- podium / picks (today) ---------------- */
 .podium { margin: 0; padding-left: 0; list-style: none; }
 .podium li { padding: .35rem 0; border-bottom: 1px solid var(--border); }
@@ -219,6 +232,11 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
   background: #e8f7ee; border: 1px solid #b6e2c6; color: #166534;
   padding: .6rem .8rem; border-radius: 10px; font-weight: 600; margin: .2rem 0 .4rem;
 }
+
+/* ---------------- bonus (éclairs) ---------------- */
+.bonus { display: inline-flex; gap: 1px; line-height: 1; white-space: nowrap; }
+.bonus-dot { filter: grayscale(1); opacity: .3; font-size: .95em; }
+.bonus-dot.on { filter: none; opacity: 1; text-shadow: 0 0 4px rgba(255,210,31,.7); }
 
 /* ---------------- règles ---------------- */
 .rules-list { margin: .4rem 0 0; padding-left: 1.2rem; }

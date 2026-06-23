@@ -4,6 +4,7 @@ import { useAuth } from '../auth.jsx'
 import { parisToday, formatDateFr, msUntil, formatCountdown } from '../lib/time'
 import { riderName, sameRider } from '../lib/format'
 import Avatar from './Avatar.jsx'
+import Bonus from './Bonus.jsx'
 
 export default function TodayBet() {
   const { user } = useAuth()
@@ -146,7 +147,9 @@ export default function TodayBet() {
               <label className={`checkbox ${!canUseBonus ? 'disabled' : ''}`}>
                 <input type="checkbox" checked={bonus} disabled={!canUseBonus}
                   onChange={(e) => setBonus(e.target.checked)} />
-                Utiliser un bonus ×2 ({bonusLeft} restant{bonusLeft > 1 ? 's' : ''} sur 2)
+                Utiliser un bonus ×2
+                <Bonus remaining={bonusLeft} />
+                <span className="muted">({bonusLeft}/2 restants)</span>
               </label>
 
               <button className="primary" disabled={saving || !rider}>
