@@ -44,13 +44,11 @@ ODDS_MIN = _float("MPV_ODDS_MIN", 1.5)
 ODDS_MAX = _float("MPV_ODDS_MAX", 500.0)
 # Points plancher pour un coureur absent du classement PCS (évite côte = MAX).
 ODDS_FLOOR_POINTS = _float("MPV_ODDS_FLOOR_POINTS", 5.0)
-# Pondération : forme récente vs points dans la spécialité de l'étape.
-# FORM_WEIGHT=0 par défaut : `season_results` donne un total quasi-carrière
-# (biaisé par la longévité), inutilisable comme "forme récente". On s'appuie
-# sur les points de spécialité (justes par discipline) en attendant une vraie
-# métrique de forme. À réactiver (>0) quand `form` sera fiable.
-ODDS_FORM_WEIGHT = _float("MPV_ODDS_FORM_WEIGHT", 0.0)
-ODDS_SPEC_WEIGHT = _float("MPV_ODDS_SPEC_WEIGHT", 1.0)
+# Modèle : force = points_spécialité_du_profil × (1 + FORM_BONUS × forme_normalisée).
+# La spécialité (discipline) prime ; la forme récente (points PCS de la saison
+# en cours) module : un coureur en forme remonte au-dessus des vétérans moins
+# actifs. FORM_BONUS = bonus max (0.6 => +60% pour le coureur le plus en forme).
+ODDS_FORM_BONUS = _float("MPV_ODDS_FORM_BONUS", 0.6)
 
 # Nombre de positions de résultat à enregistrer (le top 10 suffit au score).
 RESULTS_TOP_N = _int("MPV_RESULTS_TOP_N", 30)

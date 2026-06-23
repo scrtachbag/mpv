@@ -46,6 +46,8 @@ def main() -> int:
     ap.add_argument("--from-snapshot", metavar="PATH", help="calcule à partir d'un JSON (sans PCS)")
     ap.add_argument("--sleep", type=float, default=0.0, help="pause entre requêtes PCS (politesse)")
     ap.add_argument("--limit", type=int, help="limiter le nombre de coureurs (debug)")
+    ap.add_argument("--alpha", type=float, help="surcharge ALPHA (concentration des favoris)")
+    ap.add_argument("--form-bonus", type=float, help="surcharge FORM_BONUS (poids de la forme)")
     args = ap.parse_args()
     from models import RiderForm  # local (pas de PCS)
 
@@ -55,7 +57,7 @@ def main() -> int:
             snap = json.load(f)
         profile = snap.get("profile")
         forms = [RiderForm.from_json(d) for d in snap["riders"]]
-        rows = odds.compute_odds(forms, profile)
+        rows = odds.compute_odds(forms, profile, alpha=args.alpha, form_bonus=args.form_bonus)
         log.info("Profil '%s' (snapshot)", profile)
         _print_favorites(rows)
         return 0
@@ -90,7 +92,7 @@ def main() -> int:
                        "riders": [rf.to_json() for rf in forms]}, f, ensure_ascii=False, indent=2)
         log.info("Snapshot écrit : %s", args.save_snapshot)
 
-    rows = odds.compute_odds(forms, info.profile_type)
+    rows = odds.compute_odds(forms, info.profile_type, alpha=args.alpha, form_bonus=args.form_bonus)
     _print_favorites(rows)
 
     if args.dry_run:

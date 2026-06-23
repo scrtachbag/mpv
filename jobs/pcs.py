@@ -155,7 +155,7 @@ def get_rider_forms(season: int, slug: str, *, sleep: float = 0.0,
             try:
                 rd = Rider(r.pcs_id)
                 spec = _normalize_specialties(_safe(rd.points_per_speciality) or {})
-                form = float(_season_form(rd) or sum(spec.values()) or 0.0)
+                form = _season_form(rd)   # points PCS de la saison en cours (0 si inactif)
             except Exception as exc:  # noqa: BLE001
                 log.warning("forme indisponible pour %s (%s)", r.name, exc)
         forms.append(RiderForm(name=r.name, pcs_id=r.pcs_id, form=form, specialties=spec))

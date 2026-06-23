@@ -39,22 +39,34 @@ def specialty_for_profile(profile: str | None) -> str | None:
     return None
 
 
-def rider_strength(rider: RiderForm, profile: str | None) -> float:
+def spec_points(rider: RiderForm, profile: str | None) -> float:
+    """Points du coureur dans la spécialité pertinente pour le profil d'étape."""
     spec = specialty_for_profile(profile)
     if spec is not None:
-        spec_points = float(rider.specialties.get(spec, 0.0))
-    else:
-        # Profil inconnu : on prend la meilleure spécialité du coureur.
-        spec_points = max(rider.specialties.values(), default=0.0)
-    strength = config.ODDS_FORM_WEIGHT * float(rider.form) + config.ODDS_SPEC_WEIGHT * spec_points
-    return max(strength, config.ODDS_FLOOR_POINTS)
+        return float(rider.specialties.get(spec, 0.0))
+    return max(rider.specialties.values(), default=0.0)  # profil inconnu : meilleure spé
 
 
-def compute_odds(riders: list[RiderForm], profile: str | None) -> list[dict]:
-    """Renvoie [{rider_name, rider_pcs_id, odds}] pour chaque coureur."""
+def compute_odds(riders: list[RiderForm], profile: str | None,
+                 *, alpha: float | None = None, form_bonus: float | None = None) -> list[dict]:
+    """Renvoie [{rider_name, rider_pcs_id, odds}] pour chaque coureur.
+
+    force = points_spécialité × (1 + form_bonus × forme/forme_max)
+    poids = force ** alpha ; côte = MARGIN / (poids/Σ), bornée.
+    """
     if not riders:
         return []
-    weights = [rider_strength(r, profile) ** config.ODDS_ALPHA for r in riders]
+    alpha = config.ODDS_ALPHA if alpha is None else alpha
+    form_bonus = config.ODDS_FORM_BONUS if form_bonus is None else form_bonus
+    max_form = max((float(r.form) for r in riders), default=0.0)
+
+    weights = []
+    for r in riders:
+        base = max(spec_points(r, profile), config.ODDS_FLOOR_POINTS)
+        fnorm = (float(r.form) / max_form) if max_form > 0 else 0.0
+        strength = base * (1.0 + form_bonus * fnorm)
+        weights.append(strength ** alpha)
+
     total = sum(weights) or 1.0
     out: list[dict] = []
     for r, w in zip(riders, weights):
