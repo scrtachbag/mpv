@@ -1,4 +1,5 @@
 procyclingstats>=0.1.10
 requests>=2.31
+brotli>=1.1.0          # PCS répond en Brotli ; sans ça, requests reçoit du binaire illisible
 python-dateutil>=2.8.2
 pywebpush>=1.14.1
