@@ -11,10 +11,13 @@
 """
 from __future__ import annotations
 import logging
+import math
 import time
+from datetime import date as _date
 
 from procyclingstats import Stage, RaceStartlist, Rider
 
+import config
 from models import StageInfo, RiderEntry, RiderForm
 
 log = logging.getLogger("mpv.pcs")
@@ -119,31 +122,45 @@ def _normalize_specialties(raw: dict) -> dict:
     return out
 
 
-def _season_form(rider) -> float:
-    """Proxy de forme récente : somme des points des résultats de la saison
-    courante (season_results). best-effort, 0.0 si indisponible/forme inconnue."""
+def _season_form(rider, ref_date: _date) -> float:
+    """Forme récente pondérée par la récence : Σ pcs_points × exp(-jours/TAU),
+    avec jours = nb de jours entre la course et `ref_date` (date de l'étape).
+    Les résultats récents (Tour de Suisse, étapes du Tour déjà courues) pèsent
+    donc beaucoup plus que les courses de début de saison. 0.0 si inactif."""
     rows = _safe(rider.season_results)
+    if not isinstance(rows, list):
+        return 0.0
+    tau = config.ODDS_FORM_TAU_DAYS or 30.0
     total = 0.0
-    if isinstance(rows, list):
-        for r in rows:
-            if not isinstance(r, dict):
-                continue
-            for key in ("pcs_points", "points", "pcs_point", "uci_points"):
-                v = r.get(key)
-                if isinstance(v, (int, float)):
-                    total += float(v)
-                    break
+    for r in rows:
+        if not isinstance(r, dict):
+            continue
+        pts = r.get("pcs_points") or r.get("points")
+        if not isinstance(pts, (int, float)) or pts <= 0:
+            continue
+        raw = r.get("date")
+        weight = config.ODDS_FORM_UNDATED_WEIGHT
+        if raw:
+            try:
+                d = _date.fromisoformat(str(raw)[:10])
+                days = max((ref_date - d).days, 0)
+                weight = math.exp(-days / tau)
+            except ValueError:
+                pass
+        total += float(pts) * weight
     return total
 
 
-def get_rider_forms(season: int, slug: str, *, sleep: float = 0.0,
-                    limit: int | None = None) -> list[RiderForm]:
-    """Pour chaque partant : points par spécialité + forme récente.
+def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
+                    sleep: float = 0.0, limit: int | None = None) -> list[RiderForm]:
+    """Pour chaque partant : points par spécialité + forme récente pondérée.
 
-    ⚠️ Une requête PCS par coureur (~180/jour) — politesse via `sleep`. Si la
-    forme d'un coureur est indisponible, on retombe sur la somme de ses
-    spécialités ; un coureur totalement inconnu garde une force plancher.
+    `ref_date` = date de l'étape (la récence est mesurée par rapport à elle).
+    ⚠️ Une requête PCS par coureur (~180/jour) — politesse via `sleep`.
     """
+    if ref_date is None:
+        from datetime import datetime
+        ref_date = datetime.now(config.TZ).date()
     riders = get_startlist(season, slug)
     if limit:
         riders = riders[:limit]
@@ -155,7 +172,7 @@ def get_rider_forms(season: int, slug: str, *, sleep: float = 0.0,
             try:
                 rd = Rider(r.pcs_id)
                 spec = _normalize_specialties(_safe(rd.points_per_speciality) or {})
-                form = _season_form(rd)   # points PCS de la saison en cours (0 si inactif)
+                form = _season_form(rd, ref_date)   # forme pondérée par la récence
             except Exception as exc:  # noqa: BLE001
                 log.warning("forme indisponible pour %s (%s)", r.name, exc)
         forms.append(RiderForm(name=r.name, pcs_id=r.pcs_id, form=form, specialties=spec))

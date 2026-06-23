@@ -31,7 +31,7 @@ les résultats sont récupérés et le classement se met à jour automatiquement
 ┌───────┴───────────────────────────────────────┴────────────────┐
 │  GitHub Actions                                                  │
 │  - deploy.yml   : build Vite + GitHub Pages (à chaque push main) │
-│  - odds.yml     : 07h30 → calcule les côtes (ProCyclingStats)    │
+│  - odds.yml     : 20h (veille) → cote l'étape du lendemain (PCS) │
 │  - results.yml  : soir  → récupère les résultats + scoring       │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -97,8 +97,14 @@ Les workflows [`odds.yml`](.github/workflows/odds.yml) et
 
 | Workflow | Heure Paris | cron (UTC) |
 |----------|-------------|------------|
-| Côtes du matin | 07h30 | `30 5 * * *` |
+| Côtes (veille au soir, `--offset-days 1`) | 20h00 | `0 18 * * *` |
 | Résultats du soir | 19h30 et 22h00 | `30 17 * * *`, `0 20 * * *` |
+| Rappel de pari (push) | 11h30 | `30 9 * * *` |
+
+Les côtes sont calculées **la veille au soir** : la forme récente (Tour de
+Suisse, mais surtout les **étapes du Tour déjà courues**) pèse alors fortement
+— ex. un sprinteur qui vient de gagner reste favori le lendemain. La deadline
+de pari reste midi le jour de l'étape.
 
 > ⚠️ En dehors de l'été (hors DST), décale d'une heure. Tu peux aussi lancer
 > chaque workflow à la main via **Actions > Run workflow**.
@@ -248,7 +254,7 @@ résidentielle), la lib `procyclingstats` fonctionne normalement.
   python fetch_odds.py --dry-run --season 2025 --stage 12    # étape de montagne 2025
   python fetch_odds.py --season 2025 --stage 12 --save-snapshot snap.json
   ```
-- **Vérifie GitHub Actions** en lançant le workflow « Côtes du matin » à la main
+- **Vérifie GitHub Actions** en lançant le workflow « Côtes (veille au soir) » à la main
   (*Run workflow*) : si tu vois des 403 dans les logs, l'IP du runner est bloquée.
   Plan B alors : augmenter les retries, ou **saisir les côtes à la main** (admin)
   ce jour-là — le jeu ne casse pas.

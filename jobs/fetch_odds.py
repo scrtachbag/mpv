@@ -46,6 +46,8 @@ def main() -> int:
     ap.add_argument("--from-snapshot", metavar="PATH", help="calcule à partir d'un JSON (sans PCS)")
     ap.add_argument("--sleep", type=float, default=0.0, help="pause entre requêtes PCS (politesse)")
     ap.add_argument("--limit", type=int, help="limiter le nombre de coureurs (debug)")
+    ap.add_argument("--offset-days", type=int, default=0,
+                    help="décalage de date (1 = étape de DEMAIN, pour un calcul la veille au soir)")
     ap.add_argument("--alpha", type=float, help="surcharge ALPHA (concentration des favoris)")
     ap.add_argument("--form-bonus", type=float, help="surcharge FORM_BONUS (poids de la forme)")
     args = ap.parse_args()
@@ -66,20 +68,29 @@ def main() -> int:
     import pcs  # import tardif (déclenche procyclingstats)
     season = args.season or config.SEASON
     slug = args.slug or config.RACE_SLUG
-    today = args.date or datetime.now(config.TZ).date().isoformat()
+    from datetime import timedelta
+    target = (datetime.now(config.TZ).date() + timedelta(days=args.offset_days)).isoformat()
+    target = args.date or target
     info = pcs.find_stage(season, slug,
-                          date=None if args.stage else today, number=args.stage)
+                          date=None if args.stage else target, number=args.stage)
     if info is None:
         if args.stage:
             log.warning("Étape %s introuvable pour %s %s (mauvaise saison, étape "
                         "pas encore en ligne, ou PCS injoignable ?).", args.stage, slug, season)
         else:
-            log.info("Aucune étape datée du %s pour %s %s. Rien à faire.", today, slug, season)
+            log.info("Aucune étape datée du %s pour %s %s. Rien à faire.", target, slug, season)
         return 0
     log.info("Étape %s du %s : %s [profil: %s]", info.stage_no, info.date,
              info.name or "?", info.profile_type)
 
-    forms = pcs.get_rider_forms(season, slug, sleep=args.sleep, limit=args.limit)
+    # Récence mesurée par rapport à la date de l'étape (les résultats des étapes
+    # déjà courues du Tour comptent fortement le soir de la veille).
+    from datetime import date as _date
+    try:
+        ref_date = _date.fromisoformat(info.date)
+    except (TypeError, ValueError):
+        ref_date = None
+    forms = pcs.get_rider_forms(season, slug, ref_date=ref_date, sleep=args.sleep, limit=args.limit)
     if not forms:
         log.error("Startlist vide : impossible de coter l'étape.")
         return 1
