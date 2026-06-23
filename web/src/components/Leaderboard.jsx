@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import Avatar from './Avatar.jsx'
-import Bonus from './Bonus.jsx'
 
 const MEDALS = ['🟡', '🥈', '🥉']  // maillot jaune pour le leader
 
@@ -29,7 +28,9 @@ export default function Leaderboard() {
           <span className="lb-rank">{MEDALS[i] ?? i + 1}</span>
           <Avatar name={r.avatar} size={34} />
           <span className="lb-name">{r.pseudo}</span>
-          <Bonus remaining={2 - Number(r.bonus_used || 0)} />
+          <span className="lb-bonus" title={`${Number(r.bonus_used || 0)} bonus utilisé(s) sur 2`}>
+            {'⚡'.repeat(Number(r.bonus_used || 0))}
+          </span>
           <span className="lb-pts">{Number(r.total_points).toFixed(2)}<small> pts</small></span>
         </li>
       ))}

@@ -106,7 +106,7 @@ export default function History() {
                 </div>
                 <div className="res-bettors">
                   {r.bettors.length === 0
-                    ? <span className="muted">personne</span>
+                    ? null
                     : r.bettors.map((b, i) => (
                       <span key={i} className={`bettor${b.isMe ? ' me' : ''}`}>
                         <Avatar name={b.avatar} size={20} />
