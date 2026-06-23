@@ -36,9 +36,11 @@ SEASON = _int("MPV_SEASON", datetime.now(TZ).year)
 BET_HOUR = _int("MPV_BET_HOUR", 12)
 
 # --- Paramètres de calcul des côtes "maison" -------------------------------
-# Probabilité d'un coureur ∝ (points PCS) ** ALPHA, puis côte = MARGIN / p,
-# bornée entre ODDS_MIN et ODDS_MAX. ALPHA pilote l'écart favoris/outsiders.
-ODDS_ALPHA = _float("MPV_ODDS_ALPHA", 1.8)
+# poids = force ** ALPHA (force = spécialité × bonus de forme, cf. odds.py),
+# proba = poids/Σ, côte = MARGIN/proba (bornée [ODDS_MIN, ODDS_MAX]).
+# ALPHA pilote la concentration : ~3 => favori ~2-3 sur un sommet ; plus haut
+# = favoris très écrasants, plus bas = côtes plus resserrées.
+ODDS_ALPHA = _float("MPV_ODDS_ALPHA", 3.0)
 ODDS_MARGIN = _float("MPV_ODDS_MARGIN", 1.15)
 ODDS_MIN = _float("MPV_ODDS_MIN", 1.5)
 ODDS_MAX = _float("MPV_ODDS_MAX", 500.0)
@@ -47,8 +49,8 @@ ODDS_FLOOR_POINTS = _float("MPV_ODDS_FLOOR_POINTS", 5.0)
 # Modèle : force = points_spécialité_du_profil × (1 + FORM_BONUS × forme_normalisée).
 # La spécialité (discipline) prime ; la forme récente (points PCS de la saison
 # en cours) module : un coureur en forme remonte au-dessus des vétérans moins
-# actifs. FORM_BONUS = bonus max (0.6 => +60% pour le coureur le plus en forme).
-ODDS_FORM_BONUS = _float("MPV_ODDS_FORM_BONUS", 0.6)
+# actifs. FORM_BONUS = bonus max (1.0 => +100% pour le coureur le plus en forme).
+ODDS_FORM_BONUS = _float("MPV_ODDS_FORM_BONUS", 1.0)
 
 # Nombre de positions de résultat à enregistrer (le top 10 suffit au score).
 RESULTS_TOP_N = _int("MPV_RESULTS_TOP_N", 30)
