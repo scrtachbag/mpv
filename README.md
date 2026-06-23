@@ -274,14 +274,15 @@ Pour tester avec des amis avant le vrai Tour, on rejoue de **vraies étapes
 passées** (vraies côtes + vrais résultats), pilotées en 1 clic via
 **Actions → « Bêta (étapes 2025) » → Run workflow** :
 
-| Action | Effet |
-|--------|-------|
-| `open` (+ `stage`) | Calcule les vraies côtes 2025 de l'étape, l'affiche comme **étape du jour**, paris ouverts `hours` heures. |
-| `close` (+ `stage`) | Charge les **vrais résultats 2025** + verrouille les paris → scoring + classement. |
-| `reset` | Repart d'une base propre : efface étapes, côtes, paris, résultats, messages. **Garde les comptes.** |
+| Action | État | Effet |
+|--------|------|-------|
+| `open` (+ `stage`) | 1️⃣ Paris ouverts | Vraies côtes 2025, étape affichée comme **étape du jour** (`hours` h). |
+| `close` (+ `stage`) | 2️⃣ Paris fermés, course en cours | Verrouille les paris, **sans** résultats (badge « 🏁 Course en cours »). |
+| `results` (+ `stage`) | 3️⃣ Classement sorti | Charge les **vrais résultats 2025** → scoring (badge « ✅ Classement publié »). |
+| `reset` | — | Repart d'une base propre (étapes/côtes/paris/résultats/messages). **Garde les comptes.** |
 
-Déroulé d'un essai : `open --stage 1` → les amis parient → `close --stage 1`
-(le classement bouge) → `open --stage 2` → … Avant le vrai Tour : `reset`.
+Déroulé d'un essai : `open 1` → les amis parient → `close 1` (course en cours)
+→ `results 1` (le classement tombe) → `open 2` → … Avant le vrai Tour : `reset`.
 Script : [`jobs/beta.py`](jobs/beta.py).
 
 ## Limites assumées

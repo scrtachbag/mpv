@@ -1,15 +1,19 @@
-"""Mode BÊTA : rejouer de vraies étapes (ex. Tour 2025) « comme aujourd'hui »
-pour tester l'appli avec des amis, puis repartir d'une base propre.
+"""Mode BÊTA : rejouer de vraies étapes (ex. Tour 2025) « comme aujourd'hui »,
+en passant par les 3 états d'une étape.
 
-  python beta.py open  --stage 12 [--season 2025] [--hours 48]
-      -> calcule les VRAIES côtes 2025 de l'étape, l'affiche comme "étape du
-         jour", paris ouverts pendant `hours` heures.
+  python beta.py open    --stage 12 [--season 2025] [--hours 48]
+      1) PARIS OUVERTS : vraies côtes 2025, étape affichée comme "du jour".
 
-  python beta.py close --stage 12 [--season 2025]
-      -> charge les VRAIS résultats 2025 + verrouille les paris -> scoring.
+  python beta.py close   --stage 12
+      2) PARIS FERMÉS, COURSE EN COURS : verrouille les paris (deadline passée),
+         sans encore de résultats.
+
+  python beta.py results --stage 12 [--season 2025]
+      3) CLASSEMENT SORTI : charge les vrais résultats 2025 -> scoring.
 
   python beta.py reset
-      -> efface étapes / côtes / paris / résultats / messages (GARDE les comptes).
+      Repart d'une base propre (efface étapes/côtes/paris/résultats/messages,
+      GARDE les comptes).
 
 Pilotable en 1 clic via le workflow GitHub « Bêta (étapes 2025) ».
 """
@@ -29,14 +33,20 @@ def _now():
     return datetime.now(config.TZ)
 
 
+def _stage_id(season, stage_no):
+    found = db.select("stages", {"season": f"eq.{season}", "stage_no": f"eq.{stage_no}",
+                                 "select": "id"})
+    return found[0]["id"] if found else None
+
+
+# --- État 1 : paris ouverts ---------------------------------------------------
 def cmd_open(season, slug, stage_no, hours):
     import pcs
     info = pcs.find_stage(season, slug, number=stage_no)
     if info is None:
         log.error("Étape %s introuvable pour %s %s.", stage_no, slug, season)
         return 1
-
-    forms = pcs.get_rider_forms(season, slug)   # forme = saison en cours (réelle)
+    forms = pcs.get_rider_forms(season, slug)
     rows = odds.compute_odds(forms, info.profile_type)
     if not rows:
         log.error("Impossible de coter (startlist vide ?).")
@@ -52,7 +62,7 @@ def cmd_open(season, slug, stage_no, hours):
     })
     for r in rows:
         r["stage_id"] = stage_id
-    db.delete("stage_results", {"stage_id": stage_id})   # repart propre si ré-ouverture
+    db.delete("stage_results", {"stage_id": stage_id})
     db.delete("stage_riders", {"stage_id": stage_id})
     db.upsert("stage_riders", rows, on_conflict="stage_id,rider_name")
     db.update("stages", {"id": stage_id},
@@ -60,19 +70,31 @@ def cmd_open(season, slug, stage_no, hours):
                "odds_status": "published", "results_status": "pending"})
 
     fav = sorted(rows, key=lambda x: x["odds"])[:5]
-    log.info("Étape %s ouverte (béta) — paris jusqu'à %s. Favoris : %s",
+    log.info("[1/3] Étape %s — PARIS OUVERTS jusqu'à %s. Favoris : %s",
              stage_no, deadline, ", ".join(f"{r['rider_name']} ({r['odds']})" for r in fav))
     return 0
 
 
+# --- État 2 : paris fermés, course en cours -----------------------------------
 def cmd_close(season, slug, stage_no):
-    import pcs
-    found = db.select("stages", {"season": f"eq.{season}", "stage_no": f"eq.{stage_no}",
-                                 "select": "id"})
-    if not found:
+    stage_id = _stage_id(season, stage_no)
+    if stage_id is None:
         log.error("Étape %s non ouverte en base.", stage_no)
         return 1
-    stage_id = found[0]["id"]
+    past = (_now() - timedelta(minutes=1)).isoformat()
+    db.update("stages", {"id": stage_id},
+              {"bet_deadline": past, "results_status": "pending"})
+    log.info("[2/3] Étape %s — PARIS FERMÉS (course en cours, résultats à venir).", stage_no)
+    return 0
+
+
+# --- État 3 : classement sorti ------------------------------------------------
+def cmd_results(season, slug, stage_no):
+    import pcs
+    stage_id = _stage_id(season, stage_no)
+    if stage_id is None:
+        log.error("Étape %s non ouverte en base.", stage_no)
+        return 1
     info = pcs.find_stage(season, slug, number=stage_no)
     results = pcs.get_results(info.url, config.RESULTS_TOP_N)
     if not results:
@@ -87,7 +109,7 @@ def cmd_close(season, slug, stage_no):
               {"results_status": "official", "bet_deadline": past})
 
     podium = ", ".join(f"{p}. {n}" for p, n in results[:3])
-    log.info("Étape %s clôturée + résultats (%d positions). Podium : %s",
+    log.info("[3/3] Étape %s — CLASSEMENT SORTI (%d positions). Podium : %s",
              stage_no, len(rows), podium)
     return 0
 
@@ -95,8 +117,7 @@ def cmd_close(season, slug, stage_no):
 def cmd_reset():
     db.delete_all("messages")
     db.delete_all("stages")   # cascade -> stage_riders, stage_results, bets
-    log.info("Base de jeu remise à zéro (étapes, côtes, paris, résultats, messages). "
-             "Les comptes sont conservés.")
+    log.info("Base de jeu remise à zéro (comptes conservés).")
     return 0
 
 
@@ -105,17 +126,13 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="action", required=True)
 
-    p_open = sub.add_parser("open")
-    p_open.add_argument("--stage", type=int, required=True)
-    p_open.add_argument("--season", type=int, default=2025)
-    p_open.add_argument("--slug", default=config.RACE_SLUG)
-    p_open.add_argument("--hours", type=float, default=48.0)
-
-    p_close = sub.add_parser("close")
-    p_close.add_argument("--stage", type=int, required=True)
-    p_close.add_argument("--season", type=int, default=2025)
-    p_close.add_argument("--slug", default=config.RACE_SLUG)
-
+    for name in ("open", "close", "results"):
+        p = sub.add_parser(name)
+        p.add_argument("--stage", type=int, required=True)
+        p.add_argument("--season", type=int, default=2025)
+        p.add_argument("--slug", default=config.RACE_SLUG)
+        if name == "open":
+            p.add_argument("--hours", type=float, default=48.0)
     sub.add_parser("reset")
 
     args = ap.parse_args()
@@ -123,6 +140,8 @@ def main() -> int:
         return cmd_open(args.season, args.slug, args.stage, args.hours)
     if args.action == "close":
         return cmd_close(args.season, args.slug, args.stage)
+    if args.action == "results":
+        return cmd_results(args.season, args.slug, args.stage)
     if args.action == "reset":
         return cmd_reset()
     return 1

@@ -115,8 +115,10 @@ export default function TodayBet() {
             <h2>{stage.label}{stage.name ? ` — ${stage.name}` : ''}</h2>
             <p className="muted">{formatDateFr(stage.date)}</p>
           </div>
-          <div className={closed ? 'deadline closed' : 'deadline open'}>
-            {closed ? 'Paris clôturés' : `⏳ ${formatCountdown(ms)} avant 12h00`}
+          <div className={`deadline ${!closed ? 'open' : resultsOfficial ? 'done' : 'running'}`}>
+            {!closed ? `⏳ ${formatCountdown(ms)} avant 12h00`
+              : resultsOfficial ? '✅ Classement publié'
+              : '🏁 Course en cours…'}
           </div>
         </div>
       </div>

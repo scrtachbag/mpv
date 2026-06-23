@@ -100,7 +100,8 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 /* deadline badge */
 .deadline { padding: .4rem .8rem; border-radius: 999px; font-weight: 800; font-size: .85rem; white-space: nowrap; }
 .deadline.open { background: #fff3c4; color: var(--yellow-deep); }
-.deadline.closed { background: #fde2e1; color: var(--red); }
+.deadline.closed, .deadline.running { background: #fde2e1; color: var(--red); }
+.deadline.done { background: #e8f7ee; color: var(--green); }
 
 /* ---------------- avatars ---------------- */
 .avatar {
