@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { formatDateFr } from '../lib/time'
+import { riderName } from '../lib/format'
 import Avatar from './Avatar.jsx'
 
 export default function History() {
@@ -72,7 +73,7 @@ export default function History() {
           <li key={b.user_id} className={b.isMe ? 'me' : ''}>
             <Avatar name={b.avatar} size={30} />
             <span className="hl-name">{b.pseudo}{b.isMe ? ' (toi)' : ''}</span>
-            <span className="hl-rider">{b.rider_name}{b.bonus_used ? ' ⚡️' : ''}</span>
+            <span className="hl-rider">{riderName(b.rider_name)}{b.bonus_used ? ' ⚡️' : ''}</span>
             <span className="hl-place muted">{b.position ? `${b.position}ᵉ` : '—'}</span>
             <span className="hl-pts">{Number(b.points).toFixed(2)}</span>
           </li>

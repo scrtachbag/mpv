@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import { parisToday, formatDateFr, msUntil, formatCountdown } from '../lib/time'
+import { riderName, sameRider } from '../lib/format'
 import Avatar from './Avatar.jsx'
 
 export default function TodayBet() {
@@ -86,7 +87,7 @@ export default function TodayBet() {
   // Score de mon pari une fois les résultats connus.
   let myOutcome = null
   if (resultsOfficial && myBet) {
-    const r = results.find((x) => x.rider_name === myBet.rider_name)
+    const r = results.find((x) => sameRider(x.rider_name, myBet.rider_name))
     myOutcome = r ? r.position : null
   }
 
@@ -127,7 +128,7 @@ export default function TodayBet() {
           {closed ? (
             <p className="muted">
               {myBet
-                ? <>Tu avais misé sur <strong>{myBet.rider_name}</strong>{myBet.bonus_used ? ' (bonus ×2)' : ''}.</>
+                ? <>Tu avais misé sur <strong>{riderName(myBet.rider_name)}</strong>{myBet.bonus_used ? ' (bonus ×2)' : ''}.</>
                 : 'Tu n’as pas parié sur cette étape.'}
             </p>
           ) : (
@@ -137,7 +138,7 @@ export default function TodayBet() {
                 <option value="" disabled>— choisir un coureur —</option>
                 {riders.map((r) => (
                   <option key={r.rider_name} value={r.rider_name}>
-                    {r.rider_name} — côte {Number(r.odds).toFixed(2)}
+                    {riderName(r.rider_name)} — côte {Number(r.odds).toFixed(2)}
                   </option>
                 ))}
               </select>
@@ -162,15 +163,15 @@ export default function TodayBet() {
           <h3>Résultat de l’étape</h3>
           <ol className="podium">
             {results.slice(0, 10).map((r) => (
-              <li key={r.position} className={myBet?.rider_name === r.rider_name ? 'mine' : ''}>
-                <span className="pos">{r.position}</span> {r.rider_name}
+              <li key={r.position} className={myBet && sameRider(myBet.rider_name, r.rider_name) ? 'mine' : ''}>
+                <span className="pos">{r.position}</span> {riderName(r.rider_name)}
               </li>
             ))}
           </ol>
           {myBet && (
             <p className="muted">
-              Ton coureur ({myBet.rider_name}) :{' '}
-              {myOutcome ? `${myOutcome}ᵉ` : 'hors classement enregistré'}.
+              Ton coureur ({riderName(myBet.rider_name)}) :{' '}
+              {myOutcome ? `${myOutcome}ᵉ` : 'hors du top 10'}.
             </p>
           )}
         </div>
@@ -184,7 +185,7 @@ export default function TodayBet() {
               <li key={b.user_id}>
                 <Avatar name={b.profiles?.avatar} size={26} />
                 <strong>{b.profiles?.pseudo ?? '?'}</strong>
-                {b.user_id === user.id ? ' (toi)' : ''} → {b.rider_name}
+                {b.user_id === user.id ? ' (toi)' : ''} → {riderName(b.rider_name)}
                 {b.bonus_used ? ' ⚡️' : ''}
               </li>
             ))}
