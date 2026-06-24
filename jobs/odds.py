@@ -16,6 +16,8 @@ MARGIN > 1 simule la marge bookmaker ; ALPHA règle l'écart favoris/outsiders.
 """
 from __future__ import annotations
 
+import math
+
 import config
 from models import RiderForm
 
@@ -52,12 +54,19 @@ def compute_odds(riders: list[RiderForm], profile: str | None,
     """Renvoie [{rider_name, rider_pcs_id, odds}] pour chaque coureur.
 
     force = points_spécialité × (1 + form_bonus × forme/forme_max)
-    poids = force ** alpha ; côte = MARGIN / (poids/Σ), bornée.
+    poids = force ** alpha ; côte_brute = MARGIN / (poids/Σ).
+
+    Les côtes brutes sont ensuite **compressées** (pas coupées) vers le plafond
+    ODDS_MAX : on garde le favori comme ancre et on tasse la longue traîne des
+    outsiders via une mise à l'échelle logarithmique (favori → favori,
+    côte la plus haute → ODDS_MAX). L'écart entre coureurs est donc réduit de
+    façon homogène, le 1er/2e inclus.
     """
     if not riders:
         return []
     alpha = config.ODDS_ALPHA if alpha is None else alpha
     form_bonus = config.ODDS_FORM_BONUS if form_bonus is None else form_bonus
+    floor, cap = config.ODDS_MIN, config.ODDS_MAX
     max_form = max((float(r.form) for r in riders), default=0.0)
 
     weights = []
@@ -68,11 +77,17 @@ def compute_odds(riders: list[RiderForm], profile: str | None,
         weights.append(strength ** alpha)
 
     total = sum(weights) or 1.0
-    out: list[dict] = []
-    for r, w in zip(riders, weights):
-        p = w / total
-        odds = config.ODDS_MARGIN / p if p > 0 else config.ODDS_MAX
-        odds = max(config.ODDS_MIN, min(config.ODDS_MAX, odds))
-        out.append({"rider_name": r.name, "rider_pcs_id": r.pcs_id, "odds": round(odds, 2),
-                    "nationality": r.nationality, "team": r.team})
-    return out
+    raw = [max(config.ODDS_MARGIN / (w / total), floor) for w in weights]
+
+    lo, hi = min(raw), max(raw)
+    if hi > cap and hi > lo:
+        # tasse [lo, hi] -> [lo, cap] en conservant l'ordre et les écarts relatifs
+        k = math.log(cap / lo) / math.log(hi / lo)
+        comp = [lo * (o / lo) ** k for o in raw]
+    else:
+        comp = raw
+
+    return [{"rider_name": r.name, "rider_pcs_id": r.pcs_id,
+             "odds": round(min(o, cap), 2),
+             "nationality": r.nationality, "team": r.team}
+            for r, o in zip(riders, comp)]
