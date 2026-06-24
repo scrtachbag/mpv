@@ -98,7 +98,7 @@ Les workflows [`odds.yml`](.github/workflows/odds.yml) et
 | Workflow | Heure Paris | cron (UTC) |
 |----------|-------------|------------|
 | Côtes (veille au soir, `--offset-days 1`) | 20h00 | `0 18 * * *` |
-| Résultats du soir | 19h30 et 22h00 | `30 17 * * *`, `0 20 * * *` |
+| Résultats (polling) | toutes les 10 min de 17h à 18h + 19h30 & 22h00 | `*/10 15 * * *`, `0 16 * * *`, `30 17 * * *`, `0 20 * * *` |
 | Rappel de pari (push) | 11h30 | `30 9 * * *` |
 
 Les côtes sont calculées **la veille au soir** : la forme récente (Tour de
