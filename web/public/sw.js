@@ -1,4 +1,9 @@
-/* Service worker MPV — notifications push (rappel de pari). */
+/* Service worker MPV — notifications push (rappel de pari) + PWA. */
+
+// Gestionnaire fetch minimal (passe-plat). Requis pour l'installabilité PWA.
+// Volontairement SANS cache : on ne veut pas servir une version périmée du
+// site après un déploiement (le contenu reste toujours celui du réseau).
+self.addEventListener('fetch', () => {})
 
 self.addEventListener('push', (event) => {
   let data = {}
@@ -6,8 +11,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || '🚴 Mon Petit Vélo'
   const options = {
     body: data.body || 'N’oublie pas ton pari du jour !',
-    icon: data.icon || undefined,
-    badge: data.badge || undefined,
+    icon: data.icon || '/icon-192.png',
+    badge: data.badge || '/icon-192.png',
     tag: data.tag || 'mpv-reminder',   // remplace la précédente du même type
     data: { url: data.url || '/' },
   }
