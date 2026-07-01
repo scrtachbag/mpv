@@ -283,3 +283,46 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 
 /* ---------------- footer ---------------- */
 .footer { text-align: center; padding: 1.5rem 1rem; font-size: .82rem; }
+
+/* ---------------- mobile (téléphones) ---------------- */
+/* Zones sûres iPhone (encoche / barre gestuelle) sur la nav sticky et le footer. */
+.nav { padding-left: max(1.2rem, env(safe-area-inset-left)); padding-right: max(1.2rem, env(safe-area-inset-right)); }
+.footer { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+
+@media (max-width: 640px) {
+  .container { padding: .8rem; }
+
+  /* Nav : marque + profil sur une ligne, onglets sur une bande défilable en dessous. */
+  .nav { padding: .5rem .7rem; gap: .45rem .5rem; }
+  .nav .brand { order: 1; font-size: 1.02rem; }
+  .nav .user { order: 2; margin-left: auto; gap: .4rem; }
+  .nav nav {
+    order: 3; flex-basis: 100%; flex-wrap: nowrap; overflow-x: auto;
+    gap: .3rem; padding-bottom: 3px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .nav nav::-webkit-scrollbar { display: none; }
+  .tab { flex: none; white-space: nowrap; padding: .45rem .75rem; font-size: .9rem; }
+  .nav .pseudo { max-width: 7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Titres / hero un peu plus compacts. */
+  .dash-hero { padding: 1.1rem 1.2rem; }
+  .dash-hero h1 { font-size: 1.35rem; }
+  .hero-jerseys { font-size: 1.5rem; }
+  h2 { font-size: 1.15rem; }
+
+  /* Listes défilables : plafonds adaptés à un petit écran. */
+  .rider-pick { max-height: 300px; }
+  .avatar-grid { max-height: 200px; }
+
+  /* Chat : hauteur basée sur la hauteur visible réelle (barre d'adresse mobile). */
+  .chat { height: calc(100dvh - 230px); }
+
+  /* Tableau admin : défilement horizontal plutôt que débordement. */
+  .table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+/* Très petits écrans : on resserre encore. */
+@media (max-width: 380px) {
+  .nav .pseudo { max-width: 4.5rem; }
+  .tab { padding: .4rem .6rem; font-size: .85rem; }
+}
