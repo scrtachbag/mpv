@@ -90,7 +90,10 @@ export default function Login() {
 
   return (
     <div className="card narrow">
-      <h1>🚴 Mon Petit Vélo</h1>
+      <h1 style={{ display: 'flex', alignItems: 'center', gap: '.55rem' }}>
+        <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width="44" height="44" />
+        Mon Petit Vélo
+      </h1>
       <p className="muted">Paris entre amis sur le Tour de France — sans argent, pour la gloire.</p>
 
       {banner && <p className="banner-notice">{banner}</p>}

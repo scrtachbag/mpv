@@ -31,14 +31,11 @@ export default function Leaderboard() {
       {rows.map((r, i) => (
         <li key={r.user_id}
           className={`lb-row${r.pseudo === profile?.pseudo ? ' me' : ''}${i === 0 ? ' leader' : ''}`}>
-          <span className="lb-rank">{MEDALS[i] ?? i + 1}</span>
-          <Avatar name={r.avatar} size={34} />
-          <span className="lb-name">
-            {r.pseudo}
-            {i === lastIdx && hasSpread && (
-              <span title="Lanterne rouge 💩" style={{ marginLeft: '.35rem' }}>💩</span>
-            )}
+          <span className="lb-rank" title={i === lastIdx && hasSpread ? 'Lanterne rouge' : undefined}>
+            {i === lastIdx && hasSpread ? '💩' : (MEDALS[i] ?? i + 1)}
           </span>
+          <Avatar name={r.avatar} size={34} />
+          <span className="lb-name">{r.pseudo}</span>
           <span className="lb-bonus" title={`${Number(r.bonus_used || 0)} bonus utilisé(s) sur 2`}>
             {'⚡'.repeat(Number(r.bonus_used || 0))}
           </span>

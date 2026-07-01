@@ -14,7 +14,10 @@ export default function Nav({ view, setView }) {
 
   return (
     <header className="nav">
-      <div className="brand">🚵 Mon Petit Vélo</div>
+      <div className="brand" style={{ display: 'inline-flex', alignItems: 'center', gap: '.4rem' }}>
+        <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width="26" height="26" />
+        Mon Petit Vélo
+      </div>
       <nav>
         {tabs.map((t) => (
           <button key={t.key}
