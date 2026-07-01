@@ -1,0 +1,51 @@
+name: Diag PCS (FlareSolverr)
+
+# Teste si un vrai navigateur headless (FlareSolverr, gratuit, tournant DANS le
+# job) franchit le "managed challenge" Cloudflare de PCS depuis l'IP du runner.
+# Si oui -> solution gratuite/automatique sans matériel ni PC.
+on:
+  workflow_dispatch:
+
+jobs:
+  flaresolverr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Démarrer FlareSolverr (Docker)
+        run: |
+          docker run -d --name flaresolverr -p 8191:8191 \
+            -e LOG_LEVEL=info ghcr.io/flaresolverr/flaresolverr:latest
+      - name: Attendre que FlareSolverr soit prêt
+        run: |
+          for i in $(seq 1 40); do
+            if curl -s http://localhost:8191/ | grep -qi "FlareSolverr is ready"; then
+              echo "prêt après ${i} tentatives"; exit 0
+            fi
+            sleep 3
+          done
+          echo "FlareSolverr n'a pas démarré"; docker logs flaresolverr; exit 1
+      - name: Résoudre une page PCS via FlareSolverr
+        run: |
+          curl -sS -X POST http://localhost:8191/v1 \
+            -H "Content-Type: application/json" \
+            -d '{"cmd":"request.get","url":"https://www.procyclingstats.com/race/tour-de-france/2025/stage-7","maxTimeout":90000}' \
+            -o resp.json || true
+          python3 - <<'PY'
+          import json, re
+          try:
+              d = json.load(open("resp.json"))
+          except Exception as e:
+              print("réponse illisible :", e); raise SystemExit(1)
+          print("status FlareSolverr :", d.get("status"), "|", d.get("message"))
+          sol = d.get("solution") or {}
+          html = sol.get("response") or ""
+          print("HTTP status résolu :", sol.get("status"))
+          print("longueur HTML :", len(html))
+          m = re.search(r"<title>([^<]*)</title>", html, re.I)
+          print("title :", m.group(1) if m else "(aucun)")
+          print("'Just a moment' présent :", "Just a moment" in html)
+          ok = sol.get("status") == 200 and "Just a moment" not in html and len(html) > 100000
+          print("=> VERDICT :", "✅ DÉFI FRANCHI" if ok else "❌ ENCORE BLOQUÉ")
+          PY
+      - name: Logs FlareSolverr (si besoin)
+        if: always()
+        run: docker logs flaresolverr | tail -30
