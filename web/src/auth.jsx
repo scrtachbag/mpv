@@ -7,17 +7,23 @@ export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [profileLoading, setProfileLoading] = useState(false)  // fetch du profil en cours
   const [recovery, setRecovery] = useState(false)   // lien "mot de passe oublié" cliqué
   const [notice, setNotice] = useState(null)        // message à afficher sur l'écran de connexion
 
   const loadProfile = useCallback(async (userId) => {
-    if (!userId) { setProfile(null); return }
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, email, pseudo, avatar, is_admin')
-      .eq('id', userId)
-      .maybeSingle()
-    setProfile(data ?? null)
+    if (!userId) { setProfile(null); setProfileLoading(false); return }
+    setProfileLoading(true)
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, email, pseudo, avatar, is_admin')
+        .eq('id', userId)
+        .maybeSingle()
+      setProfile(data ?? null)
+    } finally {
+      setProfileLoading(false)
+    }
   }, [])
 
   useEffect(() => {
@@ -41,6 +47,7 @@ export function AuthProvider({ children }) {
     user: session?.user ?? null,
     profile,
     loading,
+    profileLoading,
     recovery,
     clearRecovery: () => setRecovery(false),
     notice,

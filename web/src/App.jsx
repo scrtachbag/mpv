@@ -12,12 +12,15 @@ import Profile from './components/Profile.jsx'
 import Rules from './components/Rules.jsx'
 
 export default function App() {
-  const { session, profile, loading, recovery } = useAuth()
+  const { session, profile, loading, profileLoading, recovery } = useAuth()
   const [view, setView] = useState('tour')
 
   if (loading) return <div className="centered">Chargement…</div>
   if (recovery) return <div className="centered"><ResetPassword /></div>
   if (!session) return <div className="centered"><Login /></div>
+  // Profil en cours de chargement (juste après connexion) : on attend plutôt
+  // que d'afficher fugacement l'Onboarding « créer un compte ».
+  if (!profile && profileLoading) return <div className="centered">Chargement…</div>
   if (!profile) return <div className="centered"><Onboarding /></div>
 
   return (
