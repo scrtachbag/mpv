@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from './auth.jsx'
 import Login from './components/Login.jsx'
 import Onboarding from './components/Onboarding.jsx'
@@ -13,7 +13,12 @@ import Rules from './components/Rules.jsx'
 
 export default function App() {
   const { session, profile, loading, profileLoading, recovery } = useAuth()
-  const [view, setView] = useState('tour')
+  // Première venue dans l'appli (sur ce navigateur) : on ouvre les Règles.
+  const [view, setView] = useState(() =>
+    localStorage.getItem('mpv_seen_app') ? 'tour' : 'rules')
+  useEffect(() => {
+    if (session && profile) localStorage.setItem('mpv_seen_app', '1')
+  }, [session, profile])
 
   if (loading) return <div className="centered">Chargement…</div>
   if (recovery) return <div className="centered"><ResetPassword /></div>
