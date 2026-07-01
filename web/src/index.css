@@ -117,6 +117,15 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 .rp-name { flex: 1; font-weight: 600; }
 .rp-odds { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--yellow-deep); }
 
+/* récap du coureur choisi, à côté de « Ton pronostic » */
+.pick-chip {
+  display: inline-flex; align-items: center; gap: .4rem;
+  background: #fffae6; border: 1px solid var(--yellow); border-radius: 999px;
+  padding: .25rem .7rem; font-size: .95rem; white-space: nowrap;
+  max-width: 100%; overflow: hidden;
+}
+.pick-chip strong { text-overflow: ellipsis; overflow: hidden; }
+
 /* deadline badge */
 .deadline { padding: .4rem .8rem; border-radius: 999px; font-weight: 800; font-size: .85rem; white-space: nowrap; }
 .deadline.open { background: #fff3c4; color: var(--yellow-deep); }

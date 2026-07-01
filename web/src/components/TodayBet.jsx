@@ -92,6 +92,7 @@ export default function TodayBet() {
   const bonusLeft = 2 - bonusCount
   const canUseBonus = bonusLeft > 0 || myBet?.bonus_used
   const resultsOfficial = stage.results_status === 'official'
+  const picked = riders.find((r) => r.rider_name === rider)  // coureur choisi
 
   async function submit(e) {
     e.preventDefault()
@@ -128,7 +129,17 @@ export default function TodayBet() {
         <div className="card"><p className="muted">Les côtes du jour ne sont pas encore publiées. Reviens un peu plus tard ce matin.</p></div>
       ) : !closed ? (
         <div className="card">
-          <h3>Ton pronostic</h3>
+          <div className="row spread" style={{ alignItems: 'center', gap: '.6rem' }}>
+            <h3 style={{ margin: 0 }}>Ton pronostic</h3>
+            {picked && (
+              <span className="pick-chip">
+                <span className="rp-flag">{flag(picked.nationality)}</span>
+                <TeamBadge name={picked.team} size={20} />
+                <strong>{riderName(picked.rider_name)}</strong>
+                <span className="rp-odds">{Number(picked.odds).toFixed(2)}</span>
+              </span>
+            )}
+          </div>
             <form onSubmit={submit}>
               <label>Coureur que tu vois gagner</label>
               <div className="rider-pick">
