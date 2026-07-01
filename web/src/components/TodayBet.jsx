@@ -92,7 +92,8 @@ export default function TodayBet() {
   const bonusLeft = 2 - bonusCount
   const canUseBonus = bonusLeft > 0 || myBet?.bonus_used
   const resultsOfficial = stage.results_status === 'official'
-  const picked = riders.find((r) => r.rider_name === rider)  // coureur choisi
+  // Récap basé sur le pari VALIDÉ (myBet), pas sur la sélection en cours.
+  const picked = myBet ? riders.find((r) => r.rider_name === myBet.rider_name) : null
 
   async function submit(e) {
     e.preventDefault()
@@ -137,6 +138,7 @@ export default function TodayBet() {
                 <TeamBadge name={picked.team} size={20} />
                 <strong>{riderName(picked.rider_name)}</strong>
                 <span className="rp-odds">{Number(picked.odds).toFixed(2)}</span>
+                {myBet?.bonus_used && <span title="Bonus ×2 activé">⚡️</span>}
               </span>
             )}
           </div>
