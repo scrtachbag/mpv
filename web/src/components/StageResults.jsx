@@ -5,10 +5,11 @@ import { riderName, flag } from '../lib/format'
 import Avatar from './Avatar.jsx'
 import TeamBadge from './TeamBadge.jsx'
 
-// Points qu'un coureur rapporte (hors bonus) : côte / place, ×2 si 1ᵉ, 0 hors top 10.
+// Points qu'un coureur rapporte (hors bonus) : (côte / place) × 10, ×2 si 1ᵉ,
+// 0 hors top 10. Le ×10 aligne l'affichage sur la vue bet_scores (0010).
 function basePoints(odds, position) {
   if (!odds || !position || position > 10) return 0
-  return Math.round((odds / position) * (position === 1 ? 2 : 1) * 100) / 100
+  return Math.round((odds / position) * (position === 1 ? 2 : 1) * 10 * 100) / 100
 }
 
 // Top 10 d'une étape : place, drapeau, équipe, côte, points rapportés, parieurs.

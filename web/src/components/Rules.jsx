@@ -30,7 +30,7 @@ export default function Rules() {
       <div className="card">
         <h2>🧮 Les points</h2>
         <p>À la fin de l’étape :</p>
-        <p className="formula">points = côte du coureur ÷ sa place</p>
+        <p className="formula">points = (côte du coureur ÷ sa place) × 10</p>
         <ul className="rules-list">
           <li><strong>× 2</strong> si ton coureur <strong>gagne l’étape</strong> (1ᵉ).</li>
           <li><strong>0 point</strong> s’il finit <strong>hors du top 10</strong>.</li>
@@ -38,9 +38,9 @@ export default function Rules() {
         <div className="example">
           <strong>Exemples</strong> — côte de 8.0 :
           <ul className="rules-list">
-            <li>il finit 4ᵉ → 8 ÷ 4 = <strong>2 pts</strong></li>
-            <li>il finit 2ᵉ → 8 ÷ 2 = <strong>4 pts</strong></li>
-            <li>il <strong>gagne</strong> → 8 ÷ 1 × 2 = <strong>16 pts</strong></li>
+            <li>il finit 4ᵉ → 8 ÷ 4 × 10 = <strong>20 pts</strong></li>
+            <li>il finit 2ᵉ → 8 ÷ 2 × 10 = <strong>40 pts</strong></li>
+            <li>il <strong>gagne</strong> → 8 ÷ 1 × 2 × 10 = <strong>160 pts</strong></li>
             <li>il finit 12ᵉ → <strong>0 pt</strong></li>
           </ul>
           Miser sur un outsider (grosse côte) qui marche fort rapporte donc beaucoup !
@@ -54,7 +54,7 @@ export default function Rules() {
           <li>Un bonus <strong>double tes points</strong> sur l’étape choisie (cumulable avec le ×2 victoire).</li>
           <li>À activer <strong>au moment du pari, avant midi</strong>. Une fois utilisés, ils sont consommés.</li>
         </ul>
-        <p className="muted">Exemple : ton coureur (côte 8.0) gagne avec un bonus → 8 ÷ 1 × 2 (victoire) × 2 (bonus) = <strong>32 pts</strong>.</p>
+        <p className="muted">Exemple : ton coureur (côte 8.0) gagne avec un bonus → 8 ÷ 1 × 2 (victoire) × 2 (bonus) × 10 = <strong>320 pts</strong>.</p>
       </div>
 
       <div className="card">
