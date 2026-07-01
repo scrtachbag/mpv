@@ -32,6 +32,7 @@ export default function Login() {
   const [mode, setMode] = useState('login')   // 'login' | 'signup' | 'forgot'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [accessCode, setAccessCode] = useState('')
   const [error, setError] = useState(null)
   const [info, setInfo] = useState(null)
   const [busy, setBusy] = useState(false)
@@ -61,6 +62,16 @@ export default function Login() {
       if (error) setError(traduire(error))
       // succès : onAuthStateChange (auth.jsx) prend le relais.
     } else if (mode === 'signup') {
+      // Cercle maîtrisé : un code d'accès partagé est requis pour s'inscrire.
+      // Vérifié côté serveur (le code n'est pas dans le bundle JS).
+      const { data: ok, error: codeErr } = await supabase.rpc('check_access_code', {
+        p_code: accessCode,
+      })
+      if (codeErr || !ok) {
+        setError("Code d'accès invalide. Demande-le à la personne qui t'a invité·e.")
+        setBusy(false)
+        return
+      }
       // Envoi d'un lien : en cliquant, l'utilisateur revient finaliser son
       // compte (pseudo + mot de passe) sur la page Onboarding.
       const { error } = await supabase.auth.signInWithOtp({
@@ -96,6 +107,15 @@ export default function Login() {
             <input id="password" type="password" required minLength={6} value={password}
               autoComplete="current-password"
               onChange={(e) => setPassword(e.target.value)} placeholder="••••••" />
+          </>
+        )}
+
+        {mode === 'signup' && (
+          <>
+            <label htmlFor="access-code">Code d'accès</label>
+            <input id="access-code" type="text" required value={accessCode}
+              autoComplete="off" autoCapitalize="characters" spellCheck={false}
+              onChange={(e) => setAccessCode(e.target.value)} placeholder="Code partagé entre amis" />
           </>
         )}
 

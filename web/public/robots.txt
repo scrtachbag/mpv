@@ -1,0 +1,3 @@
+## Cercle maîtrisé : on demande aux moteurs de ne pas indexer le site.
+User-agent: *
+Disallow: /
