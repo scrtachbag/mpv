@@ -94,6 +94,9 @@ export default function TodayBet() {
   const resultsOfficial = stage.results_status === 'official'
   // Récap basé sur le pari VALIDÉ (myBet), pas sur la sélection en cours.
   const picked = myBet ? riders.find((r) => r.rider_name === myBet.rider_name) : null
+  // Méta (drapeau/équipe/côte) par coureur, pour l'affichage des pronostics.
+  const ridersByName = {}
+  for (const r of riders) ridersByName[r.rider_name.toLowerCase()] = r
 
   async function submit(e) {
     e.preventDefault()
@@ -184,20 +187,27 @@ export default function TodayBet() {
         <div className="card">
           <h3>Pronostics du jour</h3>
           <ul className="picks">
-            {othersBets.map((b) => (
-              <li key={b.user_id} className={b.user_id === user.id ? 'mine' : ''}>
-                <Avatar name={b.profiles?.avatar} size={26} />
-                <strong>{b.profiles?.pseudo ?? '?'}</strong> → {riderName(b.rider_name)}
-                {b.bonus_used ? ' ⚡️' : ''}
-                {resultsOfficial && (
-                  <span className="muted">
-                    {resultPos[(b.rider_name || '').toLowerCase()]
-                      ? ` — ${resultPos[(b.rider_name || '').toLowerCase()]}ᵉ`
-                      : ' — non classé'}
-                  </span>
-                )}
-              </li>
-            ))}
+            {othersBets.map((b) => {
+              const meta = ridersByName[(b.rider_name || '').toLowerCase()]
+              const pos = resultPos[(b.rider_name || '').toLowerCase()]
+              return (
+                <li key={b.user_id} className={b.user_id === user.id ? 'mine' : ''}>
+                  <Avatar name={b.profiles?.avatar} size={26} />
+                  <strong>{b.profiles?.pseudo ?? '?'}</strong>
+                  <span className="muted">→</span>
+                  <span className="rp-flag">{flag(meta?.nationality)}</span>
+                  <TeamBadge name={meta?.team} size={18} />
+                  <span>{riderName(b.rider_name)}</span>
+                  {meta?.odds != null && (
+                    <span className="rp-odds">{Number(meta.odds).toFixed(2)}</span>
+                  )}
+                  {b.bonus_used && <span title="Bonus ×2 activé">⚡️</span>}
+                  {resultsOfficial && (
+                    <span className="muted">{pos ? `— ${pos}ᵉ` : '— non classé'}</span>
+                  )}
+                </li>
+              )
+            })}
           </ul>
         </div>
       )}
