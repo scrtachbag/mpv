@@ -33,7 +33,7 @@ export default function NotificationsCard() {
     try {
       await enablePush(user.id)
       setSubscribed(true); setPerm(permissionState())
-      setMsg({ type: 'success', text: 'Notifications activées sur cet appareil ✅' })
+      setMsg(null)   // la ligne « ✅ Activées sur cet appareil » suffit (pas de doublon)
     } catch (e) { setMsg({ type: 'error', text: e.message }) }
     setBusy(false)
   }
