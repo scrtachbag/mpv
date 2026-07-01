@@ -62,12 +62,22 @@ def _stage_url(slug: str, season: int, n: int) -> str:
 
 def _load_stage(slug: str, season: int, n: int) -> StageInfo | None:
     url = _stage_url(slug, season, n)
-    try:
-        st = Stage(url)
-        date = _safe(st.date)
-    except Exception as exc:  # noqa: BLE001
-        log.debug("chargement étape %s échoué (%s)", url, exc)
+    st = None
+    last_exc = None
+    for attempt in range(3):  # PCS/Cloudflare renvoie parfois 403/timeout : on réessaie
+        try:
+            st = Stage(url)
+            break
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            if attempt < 2:
+                time.sleep(2 * (attempt + 1))
+    if st is None:
+        # WARNING (pas DEBUG) : sinon la vraie cause (ex. 403 Cloudflare depuis
+        # un runner CI) reste invisible et on ne voit que « introuvable ».
+        log.warning("chargement étape %s échoué (%s)", url, last_exc)
         return None
+    date = _safe(st.date)
     if not date:
         return None
     dep = _safe(st.departure)
