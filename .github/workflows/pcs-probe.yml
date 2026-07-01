@@ -1,0 +1,55 @@
+name: Diag PCS (sonde Cloudflare)
+
+# Diagnostic ponctuel : que reçoit un runner GitHub quand il interroge PCS ?
+# Objectif : prouver (ou infirmer) que l'IP datacenter GitHub est servie par
+# un défi Cloudflare, alors que la même requête depuis une IP résidentielle
+# renvoie la page normale.
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: IP publique du runner
+        run: |
+          echo "IP publique du runner : $(curl -s https://api.ipify.org)"
+
+      - name: En-têtes HTTP de PCS
+        run: |
+          URL="https://www.procyclingstats.com/race/tour-de-france/2025/stage-7"
+          echo "== HEAD $URL =="
+          curl -sS -D - -o /dev/null \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            "$URL" || true
+
+      - name: Corps de la réponse (marqueurs de défi)
+        run: |
+          URL="https://www.procyclingstats.com/race/tour-de-france/2025/stage-7"
+          code=$(curl -sS -o body.html -w "%{http_code}" \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+            "$URL" || true)
+          echo "HTTP status = $code"
+          echo "Taille du corps = $(wc -c < body.html) octets"
+          echo "== <title> =="
+          grep -io '<title>[^<]*</title>' body.html | head -1 || echo "(pas de <title>)"
+          echo "== marqueurs Cloudflare/défi =="
+          grep -io -E 'just a moment|cf-mitigated|challenge-platform|cloudflare|turnstile|cf_chl|attention required' body.html | sort | uniq -c || echo "(aucun marqueur)"
+
+      - name: Verdict Python (comme procyclingstats)
+        run: |
+          pip install --no-cache-dir requests brotli >/dev/null
+          python - <<'PY'
+          import requests
+          url = "https://www.procyclingstats.com/race/tour-de-france/2025/stage-7"
+          h = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                             "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+          r = requests.get(url, headers=h, timeout=30)
+          txt = r.text or ""
+          print("status =", r.status_code)
+          print("server =", r.headers.get("server"))
+          print("cf-ray =", r.headers.get("cf-ray"))
+          print("cf-mitigated =", r.headers.get("cf-mitigated"))
+          print("'Just a moment' présent :", "Just a moment" in txt)
+          print("longueur corps :", len(txt))
+          PY
