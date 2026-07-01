@@ -54,18 +54,31 @@ def _fs_session() -> str | None:
     return _fs_session_id
 
 
+def _fs_reset_session() -> None:
+    """Détruit la session courante (navigateur probablement planté) pour en
+    recréer une propre au prochain appel — sans fuiter d'instances (OOM)."""
+    global _fs_session_id
+    if _fs_session_id:
+        try:
+            _fs_post("sessions.destroy", session=_fs_session_id)
+        except Exception:  # noqa: BLE001
+            pass
+    _fs_session_id = None
+
+
 def _abs(url: str) -> str:
     return url if url.startswith("http") else _PCS_BASE + url.lstrip("/")
 
 
 def _fetch_html(url: str) -> str | None:
-    """HTML d'une page PCS via FlareSolverr (None si échec). 2 tentatives."""
-    extra = {"url": _abs(url), "maxTimeout": 90000}
-    sid = _fs_session()
-    if sid:
-        extra["session"] = sid
-    for attempt in range(2):
+    """HTML d'une page PCS via FlareSolverr (None si échec). La session est
+    auto-réparée en cas d'erreur (500 = navigateur planté)."""
+    for attempt in range(3):
         try:
+            extra = {"url": _abs(url), "maxTimeout": 90000}
+            sid = _fs_session()
+            if sid:
+                extra["session"] = sid
             sol = _fs_post("request.get", **extra).get("solution") or {}
             html = sol.get("response") or ""
             if sol.get("status") == 200 and "Just a moment" not in html:
@@ -74,7 +87,8 @@ def _fetch_html(url: str) -> str | None:
                         url, sol.get("status"))
         except Exception as exc:  # noqa: BLE001
             log.warning("FlareSolverr : échec requête %s (%s)", url, exc)
-        if attempt == 0:
+            _fs_reset_session()  # session vraisemblablement morte : on la recrée
+        if attempt < 2:
             time.sleep(3)
     return None
 
@@ -238,6 +252,8 @@ def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
     riders = get_startlist(season, slug)
     if limit:
         riders = riders[:limit]
+    if sleep == 0.0 and _FS_URL:
+        sleep = 0.4  # via FlareSolverr : petite pause pour ménager le navigateur
     total = len(riders)
     log.info("récupération forme/spécialités pour %d coureurs "
              "(1 page PCS/coureur ; via FlareSolverr, plusieurs minutes)…", total)
