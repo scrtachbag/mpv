@@ -20,6 +20,12 @@ export default function Leaderboard() {
   if (loading) return <p className="muted">Chargement…</p>
   if (rows.length === 0) return <p className="muted">Aucun point marqué pour l’instant.</p>
 
+  // Lanterne rouge : le dernier, seulement s'il y a un écart réel (pas si tout
+  // le monde est à égalité / à 0).
+  const lastIdx = rows.length - 1
+  const hasSpread = rows.length > 1 &&
+    Number(rows[lastIdx].total_points) < Number(rows[0].total_points)
+
   return (
     <ol className="lb">
       {rows.map((r, i) => (
@@ -27,7 +33,12 @@ export default function Leaderboard() {
           className={`lb-row${r.pseudo === profile?.pseudo ? ' me' : ''}${i === 0 ? ' leader' : ''}`}>
           <span className="lb-rank">{MEDALS[i] ?? i + 1}</span>
           <Avatar name={r.avatar} size={34} />
-          <span className="lb-name">{r.pseudo}</span>
+          <span className="lb-name">
+            {r.pseudo}
+            {i === lastIdx && hasSpread && (
+              <span title="Lanterne rouge 💩" style={{ marginLeft: '.35rem' }}>💩</span>
+            )}
+          </span>
           <span className="lb-bonus" title={`${Number(r.bonus_used || 0)} bonus utilisé(s) sur 2`}>
             {'⚡'.repeat(Number(r.bonus_used || 0))}
           </span>
