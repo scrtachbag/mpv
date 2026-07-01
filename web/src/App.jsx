@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { supabase } from './supabaseClient'
 import { useAuth } from './auth.jsx'
 import Login from './components/Login.jsx'
 import Onboarding from './components/Onboarding.jsx'
@@ -13,12 +14,18 @@ import Rules from './components/Rules.jsx'
 
 export default function App() {
   const { session, profile, loading, profileLoading, recovery } = useAuth()
-  // Première venue dans l'appli (sur ce navigateur) : on ouvre les Règles.
-  const [view, setView] = useState(() =>
-    localStorage.getItem('mpv_seen_app') ? 'tour' : 'rules')
+  const [view, setView] = useState('tour')  // par défaut : Le Tour
+  // Toute première connexion du compte : on ouvre les Règles, une seule fois.
+  const introDone = useRef(false)
   useEffect(() => {
-    if (session && profile) localStorage.setItem('mpv_seen_app', '1')
-  }, [session, profile])
+    if (profile && !introDone.current) {
+      introDone.current = true
+      if (!profile.seen_intro) {
+        setView('rules')
+        supabase.from('profiles').update({ seen_intro: true }).eq('id', profile.id)
+      }
+    }
+  }, [profile])
 
   if (loading) return <div className="centered">Chargement…</div>
   if (recovery) return <div className="centered"><ResetPassword /></div>

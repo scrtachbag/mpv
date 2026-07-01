@@ -27,6 +27,19 @@ def _subs() -> list[dict]:
     return db.select("push_subscriptions", {"select": "endpoint,p256dh,auth,user_id"})
 
 
+def _targets_for(event: str, subs: list[dict]) -> list[dict]:
+    """Garde les abonnements des utilisateurs qui VEULENT ce type de notif
+    (notify_enabled ET notify_<event>). Par défaut tout est activé."""
+    prefs = {p["id"]: p for p in db.select("profiles", {
+        "select": "id,notify_enabled,notify_open,notify_reminder,notify_close,notify_results"})}
+
+    def wants(uid: str) -> bool:
+        p = prefs.get(uid, {})
+        return p.get("notify_enabled", True) and p.get(f"notify_{event}", True)
+
+    return [s for s in subs if wants(s["user_id"])]
+
+
 def _send(targets: list[dict], title: str, body: str, tag: str, ttl: int = 86400) -> int:
     if not targets:
         log.info("Aucun destinataire pour « %s ».", tag)
@@ -65,7 +78,7 @@ def notify_event(event: str) -> int:
         return 0
     now = datetime.now(config.TZ)
     today = now.date().isoformat()
-    subs = _subs()
+    subs = _targets_for(event, _subs())  # respecte les préférences de chacun
 
     if event == "reminder":
         stages = db.select("stages", {"date": f"eq.{today}", "odds_status": "eq.published",
