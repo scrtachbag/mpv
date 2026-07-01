@@ -59,8 +59,19 @@ export default function Chat() {
     const content = text.trim()
     if (!content) return
     setText('')
-    const { error } = await supabase.from('messages').insert({ user_id: user.id, content })
-    if (error) setText(content)  // on restaure en cas d'échec
+    // On récupère la ligne insérée pour l'afficher tout de suite, sans dépendre
+    // du temps réel (qui peut manquer un événement). Le handler Realtime déduplique
+    // par id, donc aucun doublon si l'événement finit par arriver.
+    const { data, error } = await supabase.from('messages')
+      .insert({ user_id: user.id, content })
+      .select('id, content, created_at, user_id').single()
+    if (error) { setText(content); return }  // on restaure en cas d'échec
+    if (data) {
+      setMessages((prev) => prev.some((x) => x.id === data.id) ? prev : [...prev, {
+        ...data, pseudo: profile?.pseudo ?? '?', avatar: profile?.avatar,
+      }])
+      setTimeout(scrollDown, 50)
+    }
   }
 
   return (
