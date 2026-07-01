@@ -50,6 +50,11 @@ jobs:
           MPV_ODDS_MAX: ${{ vars.MPV_ODDS_MAX }}
           MPV_ODDS_ALPHA: ${{ vars.MPV_ODDS_ALPHA }}
           MPV_FLARESOLVERR_URL: http://localhost:8191/v1
+          # Notifications push déclenchées par beta.py (open/close/results).
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ vars.VAPID_SUBJECT }}
+          MPV_SITE_URL: ${{ vars.MPV_SITE_URL }}
         run: |
           S="--season ${{ github.event.inputs.season }} --stage ${{ github.event.inputs.stage }}"
           case "${{ github.event.inputs.action }}" in

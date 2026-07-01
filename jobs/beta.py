@@ -33,6 +33,15 @@ def _now():
     return datetime.now(config.TZ)
 
 
+def _notify(event: str) -> None:
+    """Déclenche la notification correspondante (sans faire échouer la bêta)."""
+    try:
+        import notify
+        notify.notify_event(event)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Notification '%s' non envoyée (%s)", event, exc)
+
+
 def _stage_id(season, stage_no):
     found = db.select("stages", {"season": f"eq.{season}", "stage_no": f"eq.{stage_no}",
                                  "select": "id"})
@@ -67,11 +76,14 @@ def cmd_open(season, slug, stage_no, hours):
     db.upsert("stage_riders", rows, on_conflict="stage_id,rider_name")
     db.update("stages", {"id": stage_id},
               {"date": today, "bet_deadline": deadline,
-               "odds_status": "published", "results_status": "pending"})
+               "odds_status": "published", "results_status": "pending",
+               # ré-arme les notifications pour ce cycle bêta
+               "notified_open": False, "notified_close": False, "notified_results": False})
 
     fav = sorted(rows, key=lambda x: x["odds"])[:5]
     log.info("[1/3] Étape %s — PARIS OUVERTS jusqu'à %s. Favoris : %s",
              stage_no, deadline, ", ".join(f"{r['rider_name']} ({r['odds']})" for r in fav))
+    _notify("open")
     return 0
 
 
@@ -85,6 +97,7 @@ def cmd_close(season, slug, stage_no):
     db.update("stages", {"id": stage_id},
               {"bet_deadline": past, "results_status": "pending"})
     log.info("[2/3] Étape %s — PARIS FERMÉS (course en cours, résultats à venir).", stage_no)
+    _notify("close")
     return 0
 
 
@@ -111,6 +124,7 @@ def cmd_results(season, slug, stage_no):
     podium = ", ".join(f"{p}. {n}" for p, n in results[:3])
     log.info("[3/3] Étape %s — CLASSEMENT SORTI (%d positions). Podium : %s",
              stage_no, len(rows), podium)
+    _notify("results")
     return 0
 
 
