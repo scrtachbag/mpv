@@ -35,6 +35,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install --no-cache-dir -r jobs/requirements.txt
+      - name: Démarrer FlareSolverr (contournement Cloudflare PCS)
+        run: |
+          docker run -d --name flaresolverr -p 8191:8191 ghcr.io/flaresolverr/flaresolverr:latest
+          for i in $(seq 1 40); do
+            curl -s http://localhost:8191/ | grep -qi "ready" && { echo "FlareSolverr prêt"; break; } || sleep 3
+          done
       - name: Pilotage bêta
         working-directory: jobs
         env:
@@ -43,6 +49,7 @@ jobs:
           MPV_RACE_SLUG: ${{ vars.MPV_RACE_SLUG }}
           MPV_ODDS_MAX: ${{ vars.MPV_ODDS_MAX }}
           MPV_ODDS_ALPHA: ${{ vars.MPV_ODDS_ALPHA }}
+          MPV_FLARESOLVERR_URL: http://localhost:8191/v1
         run: |
           S="--season ${{ github.event.inputs.season }} --stage ${{ github.event.inputs.stage }}"
           case "${{ github.event.inputs.action }}" in

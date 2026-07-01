@@ -12,15 +12,82 @@
 from __future__ import annotations
 import logging
 import math
+import os
 import time
 from datetime import date as _date
 
+import requests
 from procyclingstats import Stage, RaceStartlist, Rider
 
 import config
 from models import StageInfo, RiderEntry, RiderForm
 
 log = logging.getLogger("mpv.pcs")
+
+# --- Accès HTTP à PCS (contournement Cloudflare) ----------------------------
+# PCS est derrière Cloudflare, qui sert un "managed challenge" aux IP de
+# datacenter (runners GitHub) -> 403. Si MPV_FLARESOLVERR_URL est défini (ex.
+# http://localhost:8191/v1), on récupère le HTML via FlareSolverr (Chrome
+# headless qui franchit le défi) et on le passe aux classes procyclingstats.
+# Sinon (dev local, IP résidentielle), la lib fait sa requête directe.
+_PCS_BASE = "https://www.procyclingstats.com/"
+_FS_URL = os.environ.get("MPV_FLARESOLVERR_URL", "").strip()
+_fs_session_id = None  # session FlareSolverr : réutilise le cookie cf_clearance
+
+
+def _fs_post(cmd: str, **extra) -> dict:
+    r = requests.post(_FS_URL, json={"cmd": cmd, **extra}, timeout=180)
+    r.raise_for_status()
+    return r.json()
+
+
+def _fs_session() -> str | None:
+    """Crée une fois une session FlareSolverr : le défi Cloudflare n'est résolu
+    qu'au premier appel, puis le cookie est réutilisé pour les ~180 coureurs."""
+    global _fs_session_id
+    if _fs_session_id is None:
+        try:
+            _fs_session_id = _fs_post("sessions.create").get("session")
+            log.info("session FlareSolverr créée (%s)", _fs_session_id)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("FlareSolverr sessions.create a échoué (%s)", exc)
+    return _fs_session_id
+
+
+def _abs(url: str) -> str:
+    return url if url.startswith("http") else _PCS_BASE + url.lstrip("/")
+
+
+def _fetch_html(url: str) -> str | None:
+    """HTML d'une page PCS via FlareSolverr (None si échec). 2 tentatives."""
+    extra = {"url": _abs(url), "maxTimeout": 90000}
+    sid = _fs_session()
+    if sid:
+        extra["session"] = sid
+    for attempt in range(2):
+        try:
+            sol = _fs_post("request.get", **extra).get("solution") or {}
+            html = sol.get("response") or ""
+            if sol.get("status") == 200 and "Just a moment" not in html:
+                return html
+            log.warning("FlareSolverr : défi non franchi pour %s (status=%s)",
+                        url, sol.get("status"))
+        except Exception as exc:  # noqa: BLE001
+            log.warning("FlareSolverr : échec requête %s (%s)", url, exc)
+        if attempt == 0:
+            time.sleep(3)
+    return None
+
+
+def _make(cls, url: str):
+    """Instancie une classe procyclingstats. Avec FlareSolverr on fournit le
+    HTML (update_html=False) ; sinon la lib fait sa requête directe."""
+    if not _FS_URL:
+        return cls(url)
+    html = _fetch_html(url)
+    if not html:
+        raise ConnectionError(f"HTML PCS indisponible via FlareSolverr : {url}")
+    return cls(url, html=html, update_html=False)
 
 MAX_STAGES = 25  # garde-fou (le Tour compte 21 étapes)
 
@@ -62,20 +129,12 @@ def _stage_url(slug: str, season: int, n: int) -> str:
 
 def _load_stage(slug: str, season: int, n: int) -> StageInfo | None:
     url = _stage_url(slug, season, n)
-    st = None
-    last_exc = None
-    for attempt in range(3):  # PCS/Cloudflare renvoie parfois 403/timeout : on réessaie
-        try:
-            st = Stage(url)
-            break
-        except Exception as exc:  # noqa: BLE001
-            last_exc = exc
-            if attempt < 2:
-                time.sleep(2 * (attempt + 1))
-    if st is None:
+    try:
+        st = _make(Stage, url)
+    except Exception as exc:  # noqa: BLE001
         # WARNING (pas DEBUG) : sinon la vraie cause (ex. 403 Cloudflare depuis
         # un runner CI) reste invisible et on ne voit que « introuvable ».
-        log.warning("chargement étape %s échoué (%s)", url, last_exc)
+        log.warning("chargement étape %s échoué (%s)", url, exc)
         return None
     date = _safe(st.date)
     if not date:
@@ -106,7 +165,7 @@ def find_stage(season: int, slug: str, *, date: str | None = None,
 def get_startlist(season: int, slug: str) -> list[RiderEntry]:
     url = f"race/{slug}/{season}/startlist"
     try:
-        raw = RaceStartlist(url).startlist()
+        raw = _make(RaceStartlist, url).startlist()
     except Exception as exc:  # noqa: BLE001
         log.warning("startlist indisponible (%s)", exc)
         return []
@@ -185,7 +244,7 @@ def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
         form = 0.0
         if r.pcs_id:
             try:
-                rd = Rider(r.pcs_id)
+                rd = _make(Rider, r.pcs_id)
                 spec = _normalize_specialties(_safe(rd.points_per_speciality) or {})
                 form = _season_form(rd, ref_date)   # forme pondérée par la récence
             except Exception as exc:  # noqa: BLE001
@@ -202,7 +261,7 @@ def get_results(stage_url: str, top_n: int) -> list[tuple[int, str]]:
     """Renvoie [(position, nom)] pour les `top_n` premiers, ou [] si l'étape
     n'a pas encore de résultat."""
     try:
-        rows = Stage(stage_url).results()
+        rows = _make(Stage, stage_url).results()
     except Exception as exc:  # noqa: BLE001
         log.warning("résultats indisponibles (%s)", exc)
         return []

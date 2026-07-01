@@ -26,6 +26,12 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install --no-cache-dir -r jobs/requirements.txt
+      - name: Démarrer FlareSolverr (contournement Cloudflare PCS)
+        run: |
+          docker run -d --name flaresolverr -p 8191:8191 ghcr.io/flaresolverr/flaresolverr:latest
+          for i in $(seq 1 40); do
+            curl -s http://localhost:8191/ | grep -qi "ready" && { echo "FlareSolverr prêt"; break; } || sleep 3
+          done
       - name: Récupération des résultats et scoring
         working-directory: jobs
         env:
@@ -33,6 +39,7 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
           MPV_SEASON: ${{ vars.MPV_SEASON }}
           MPV_RACE_SLUG: ${{ vars.MPV_RACE_SLUG }}
+          MPV_FLARESOLVERR_URL: http://localhost:8191/v1
         run: |
           if [ -n "${{ inputs.stage_no }}" ]; then
             python fetch_results.py --stage "${{ inputs.stage_no }}"
