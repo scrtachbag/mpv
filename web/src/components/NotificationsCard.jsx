@@ -64,38 +64,42 @@ export default function NotificationsCard() {
           Les notifications sont bloquées dans les réglages du navigateur pour ce site.
           Autorise-les, puis recharge la page.
         </p>
-      ) : (
+      ) : !subscribed ? (
         <>
           <p className="muted">
-            Active les notifications sur <strong>chaque appareil</strong> que tu utilises.
+            Reçois une alerte pour les moments clés du jeu. À activer sur
+            <strong> chaque appareil</strong> où tu veux les recevoir.
           </p>
-          <button className="primary" style={{ width: 'auto' }} disabled={busy}
-            onClick={subscribed ? disable : enable}>
-            {busy ? '…' : subscribed ? 'Désactiver sur cet appareil' : 'Activer sur cet appareil'}
+          <button className="primary" style={{ width: 'auto' }} disabled={busy} onClick={enable}>
+            {busy ? '…' : 'Activer les notifications sur cet appareil'}
           </button>
+          {msg && <p className={msg.type}>{msg.text}</p>}
+        </>
+      ) : (
+        <>
+          <p className="success" style={{ margin: '.2rem 0 .1rem' }}>✅ Activées sur cet appareil</p>
           {msg && <p className={msg.type}>{msg.text}</p>}
 
           {prefs && (
-            <div style={{ marginTop: '1.1rem' }}>
-              <label className="checkbox">
-                <input type="checkbox" checked={prefs.notify_enabled}
-                  onChange={(e) => savePref({ notify_enabled: e.target.checked })} />
-                Recevoir les notifications
-              </label>
-              <p className="muted" style={{ margin: '.15rem 0 .3rem 1.7rem', fontSize: '.85rem' }}>
-                Décoche pour tout couper d’un coup. Ces choix s’appliquent à tous tes appareils.
-              </p>
-              <div style={{ marginLeft: '1.7rem' }}>
-                {TYPES.map((t) => (
-                  <label key={t.key} className={`checkbox ${!prefs.notify_enabled ? 'disabled' : ''}`}>
-                    <input type="checkbox" checked={prefs[t.key]} disabled={!prefs.notify_enabled}
-                      onChange={(e) => savePref({ [t.key]: e.target.checked })} />
-                    {t.label}
-                  </label>
-                ))}
-              </div>
-            </div>
+            <>
+              <p style={{ fontWeight: 600, margin: '.9rem 0 .3rem' }}>Me prévenir quand :</p>
+              {TYPES.map((t) => (
+                <label key={t.key} className="checkbox">
+                  <input type="checkbox" checked={prefs[t.key]}
+                    onChange={(e) => savePref({ [t.key]: e.target.checked })} />
+                  {t.label}
+                </label>
+              ))}
+            </>
           )}
+
+          <p className="muted" style={{ fontSize: '.85rem', margin: '.9rem 0 .3rem' }}>
+            Ces choix s’appliquent à tous tes appareils. Pour ne plus rien recevoir ici,
+            désactive sur cet appareil :
+          </p>
+          <button className="link" type="button" disabled={busy} onClick={disable}>
+            Désactiver sur cet appareil
+          </button>
         </>
       )}
     </div>
