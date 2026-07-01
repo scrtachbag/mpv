@@ -26,13 +26,14 @@ log = logging.getLogger("mpv.pcs")
 
 # --- Accès HTTP à PCS (contournement Cloudflare) ----------------------------
 # PCS est derrière Cloudflare, qui sert un "managed challenge" aux IP de
-# datacenter (runners GitHub) -> 403. Si MPV_FLARESOLVERR_URL est défini (ex.
-# http://localhost:8191/v1), on récupère le HTML via FlareSolverr (Chrome
-# headless qui franchit le défi) et on le passe aux classes procyclingstats.
-# Sinon (dev local, IP résidentielle), la lib fait sa requête directe.
+# datacenter (runners GitHub) -> 403. Stratégie RAPIDE : on résout le défi UNE
+# fois via FlareSolverr (vrai navigateur), on récupère le cookie cf_clearance +
+# le User-Agent, puis on charge les ~180 pages en HTTP DIRECT (comme avant, sans
+# navigateur). Si le cookie est refusé/expiré, on le renouvelle et on réessaie.
+# Sans MPV_FLARESOLVERR_URL (dev local, IP résidentielle) : requête directe.
 _PCS_BASE = "https://www.procyclingstats.com/"
 _FS_URL = os.environ.get("MPV_FLARESOLVERR_URL", "").strip()
-_fs_session_id = None  # session FlareSolverr : réutilise le cookie cf_clearance
+_http = None  # requests.Session porteuse du cookie cf_clearance (voie rapide)
 
 
 def _fs_post(cmd: str, **extra) -> dict:
@@ -41,55 +42,55 @@ def _fs_post(cmd: str, **extra) -> dict:
     return r.json()
 
 
-def _fs_session() -> str | None:
-    """Crée une fois une session FlareSolverr : le défi Cloudflare n'est résolu
-    qu'au premier appel, puis le cookie est réutilisé pour les ~180 coureurs."""
-    global _fs_session_id
-    if _fs_session_id is None:
-        try:
-            _fs_session_id = _fs_post("sessions.create").get("session")
-            log.info("session FlareSolverr créée (%s)", _fs_session_id)
-        except Exception as exc:  # noqa: BLE001
-            log.warning("FlareSolverr sessions.create a échoué (%s)", exc)
-    return _fs_session_id
-
-
-def _fs_reset_session() -> None:
-    """Détruit la session courante (navigateur probablement planté) pour en
-    recréer une propre au prochain appel — sans fuiter d'instances (OOM)."""
-    global _fs_session_id
-    if _fs_session_id:
-        try:
-            _fs_post("sessions.destroy", session=_fs_session_id)
-        except Exception:  # noqa: BLE001
-            pass
-    _fs_session_id = None
-
-
 def _abs(url: str) -> str:
     return url if url.startswith("http") else _PCS_BASE + url.lstrip("/")
 
 
-def _fetch_html(url: str) -> str | None:
-    """HTML d'une page PCS via FlareSolverr (None si échec). La session est
-    auto-réparée en cas d'erreur (500 = navigateur planté)."""
-    for attempt in range(3):
+def _renew_clearance() -> None:
+    """Résout le défi Cloudflare via FlareSolverr et construit une session
+    requests réutilisant le cookie cf_clearance + le même User-Agent. Une seule
+    résolution navigateur ; ensuite tout passe en HTTP direct (rapide)."""
+    global _http
+    sol = _fs_post("request.get", url=_PCS_BASE, maxTimeout=90000).get("solution") or {}
+    s = requests.Session()
+    ua = sol.get("userAgent")
+    if ua:
+        s.headers["User-Agent"] = ua
+    s.headers.setdefault("Accept-Language", "en-US,en;q=0.9")
+    n = 0
+    for c in sol.get("cookies", []):
         try:
-            extra = {"url": _abs(url), "maxTimeout": 90000}
-            sid = _fs_session()
-            if sid:
-                extra["session"] = sid
-            sol = _fs_post("request.get", **extra).get("solution") or {}
-            html = sol.get("response") or ""
-            if sol.get("status") == 200 and "Just a moment" not in html:
-                return html
-            log.warning("FlareSolverr : défi non franchi pour %s (status=%s)",
-                        url, sol.get("status"))
+            s.cookies.set(c.get("name"), c.get("value"), domain=c.get("domain"))
+            n += 1
+        except Exception:  # noqa: BLE001
+            pass
+    _http = s
+    log.info("clearance Cloudflare obtenue (FlareSolverr) : %d cookies, UA=%s",
+             n, (ua or "?")[:40])
+
+
+def _fetch_html(url: str) -> str | None:
+    """HTML d'une page PCS via la voie rapide (cookie cf_clearance en HTTP
+    direct). Renouvelle le cookie via FlareSolverr si refusé. None si échec."""
+    global _http
+    for attempt in range(3):
+        if _http is None:
+            try:
+                _renew_clearance()
+            except Exception as exc:  # noqa: BLE001
+                log.warning("FlareSolverr indisponible (%s)", exc)
+                time.sleep(3)
+                continue
+        try:
+            r = _http.get(_abs(url), timeout=30)
+            if r.status_code == 200 and "Just a moment" not in r.text:
+                return r.text
+            log.warning("PCS %s -> HTTP %s (clearance refusée ? renouvellement)",
+                        url, r.status_code)
         except Exception as exc:  # noqa: BLE001
-            log.warning("FlareSolverr : échec requête %s (%s)", url, exc)
-            _fs_reset_session()  # session vraisemblablement morte : on la recrée
-        if attempt < 2:
-            time.sleep(3)
+            log.warning("échec requête %s (%s)", url, exc)
+        _http = None  # force le renouvellement du cookie au tour suivant
+        time.sleep(1)
     return None
 
 
@@ -252,8 +253,6 @@ def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
     riders = get_startlist(season, slug)
     if limit:
         riders = riders[:limit]
-    if sleep == 0.0 and _FS_URL:
-        sleep = 0.4  # via FlareSolverr : petite pause pour ménager le navigateur
     total = len(riders)
     log.info("récupération forme/spécialités pour %d coureurs "
              "(1 page PCS/coureur ; via FlareSolverr, plusieurs minutes)…", total)
