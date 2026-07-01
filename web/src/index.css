@@ -62,6 +62,8 @@ small { font-size: .7em; color: var(--muted); }
 .nav .user { display: flex; align-items: center; gap: .55rem; }
 .nav .pseudo { font-weight: 700; }
 .nav .link { color: #b9bdca; }
+.nav .logout { display: inline-flex; align-items: center; padding: .25rem; }
+.nav .logout:hover { color: #fff; }
 
 /* ---------------- cards ---------------- */
 .card {
