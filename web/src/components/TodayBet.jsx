@@ -15,6 +15,7 @@ export default function TodayBet() {
   const [myBet, setMyBet] = useState(null)
   const [bonusCount, setBonusCount] = useState(0)
   const [othersBets, setOthersBets] = useState([])
+  const [resultPos, setResultPos] = useState({})   // rider_name (min.) -> place finale
   const [loading, setLoading] = useState(true)
   const [now, setNow] = useState(Date.now())
 
@@ -50,6 +51,15 @@ export default function TodayBet() {
           .from('bets').select('user_id, rider_name, bonus_used, profiles(pseudo, avatar)')
           .eq('stage_id', st.id)
         setOthersBets(others ?? [])
+      }
+
+      // Place finale de chaque coureur (pour l'afficher à côté des pronostics).
+      if (st.results_status === 'official') {
+        const { data: res } = await supabase
+          .from('stage_results').select('position, rider_name').eq('stage_id', st.id)
+        const map = {}
+        for (const r of res ?? []) map[(r.rider_name || '').toLowerCase()] = r.position
+        setResultPos(map)
       }
     }
 
@@ -166,6 +176,13 @@ export default function TodayBet() {
                 <Avatar name={b.profiles?.avatar} size={26} />
                 <strong>{b.profiles?.pseudo ?? '?'}</strong> → {riderName(b.rider_name)}
                 {b.bonus_used ? ' ⚡️' : ''}
+                {resultsOfficial && (
+                  <span className="muted">
+                    {resultPos[(b.rider_name || '').toLowerCase()]
+                      ? ` — ${resultPos[(b.rider_name || '').toLowerCase()]}ᵉ`
+                      : ' — non classé'}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
