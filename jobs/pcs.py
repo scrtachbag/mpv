@@ -238,8 +238,11 @@ def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
     riders = get_startlist(season, slug)
     if limit:
         riders = riders[:limit]
+    total = len(riders)
+    log.info("récupération forme/spécialités pour %d coureurs "
+             "(1 page PCS/coureur ; via FlareSolverr, plusieurs minutes)…", total)
     forms: list[RiderForm] = []
-    for r in riders:
+    for i, r in enumerate(riders, 1):
         spec: dict[str, float] = {}
         form = 0.0
         if r.pcs_id:
@@ -251,6 +254,8 @@ def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
                 log.warning("forme indisponible pour %s (%s)", r.name, exc)
         forms.append(RiderForm(name=r.name, pcs_id=r.pcs_id, form=form, specialties=spec,
                                nationality=r.nationality, team=r.team))
+        if i % 20 == 0 or i == total:
+            log.info("… %d/%d coureurs traités", i, total)
         if sleep:
             time.sleep(sleep)
     log.info("forme/spécialités récupérées pour %d coureurs", len(forms))
