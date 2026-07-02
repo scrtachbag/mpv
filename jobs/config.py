@@ -61,6 +61,10 @@ ODDS_FORM_BONUS = _float("MPV_ODDS_FORM_BONUS", 1.0)
 ODDS_FORM_TAU_DAYS = _float("MPV_ODDS_FORM_TAU_DAYS", 30.0)
 # Poids des résultats sans date (classements généraux/annexes PCS).
 ODDS_FORM_UNDATED_WEIGHT = _float("MPV_ODDS_FORM_UNDATED_WEIGHT", 0.5)
+# Sur une étape "hilly" (arrivée en bosse), on ajoute une part des points de
+# grimpeur à la force one_day : certaines bosses (ex. Mûr-de-Bretagne) se jouent
+# entre grimpeurs, pas seulement entre puncheurs/classicmen. 0 = désactivé.
+ODDS_HILLY_CLIMBER = _float("MPV_ODDS_HILLY_CLIMBER", 0.5)
 
 # Nombre de positions de résultat à enregistrer (le top 10 suffit au score).
 RESULTS_TOP_N = _int("MPV_RESULTS_TOP_N", 30)

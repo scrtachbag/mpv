@@ -42,11 +42,18 @@ def specialty_for_profile(profile: str | None) -> str | None:
 
 
 def spec_points(rider: RiderForm, profile: str | None) -> float:
-    """Points du coureur dans la spécialité pertinente pour le profil d'étape."""
+    """Points du coureur dans la spécialité pertinente pour le profil d'étape.
+
+    Cas "hilly" (one_day) : on ajoute une part des points de grimpeur, car une
+    arrivée en bosse peut se jouer entre grimpeurs (Mûr-de-Bretagne…), pas
+    seulement entre puncheurs/classicmen."""
     spec = specialty_for_profile(profile)
-    if spec is not None:
-        return float(rider.specialties.get(spec, 0.0))
-    return max(rider.specialties.values(), default=0.0)  # profil inconnu : meilleure spé
+    if spec is None:
+        return max(rider.specialties.values(), default=0.0)  # profil inconnu : meilleure spé
+    pts = float(rider.specialties.get(spec, 0.0))
+    if spec == "one_day" and config.ODDS_HILLY_CLIMBER > 0:
+        pts += config.ODDS_HILLY_CLIMBER * float(rider.specialties.get("climber", 0.0))
+    return pts
 
 
 def compute_odds(riders: list[RiderForm], profile: str | None,
