@@ -123,7 +123,7 @@ export default function Chat() {
               <div key={m.id} className={`msg${mine ? ' mine' : ''}`}>
                 {!mine && <Avatar name={m.avatar} size={32} />}
                 <div className="msg-col">
-                  <div className="bubble">
+                  <div className="bubble" onClick={() => setPickerFor(pickerFor === m.id ? null : m.id)}>
                     {!mine && <span className="msg-author" title={m.first_name || undefined}>{m.pseudo}</span>}
                     <span className="msg-text">{m.content}</span>
                   </div>
@@ -135,17 +135,11 @@ export default function Chat() {
                         {g.emoji} {g.count}
                       </button>
                     ))}
-                    <button type="button" className="react-add" title="Réagir"
-                      onClick={() => setPickerFor(pickerFor === m.id ? null : m.id)}>
-                      🙂+
-                    </button>
-                    {pickerFor === m.id && (
-                      <span className="react-picker">
-                        {EMOJIS.map((e) => (
-                          <button key={e} type="button" onClick={() => toggleReaction(m.id, e)}>{e}</button>
-                        ))}
-                      </span>
-                    )}
+                    <span className={`react-picker${pickerFor === m.id ? ' open' : ''}`}>
+                      {EMOJIS.map((e) => (
+                        <button key={e} type="button" onClick={() => toggleReaction(m.id, e)}>{e}</button>
+                      ))}
+                    </span>
                   </div>
                 </div>
                 {mine && <Avatar name={profile?.avatar} size={32} />}
