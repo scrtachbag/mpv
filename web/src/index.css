@@ -295,6 +295,20 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 /* ---------------- footer ---------------- */
 .footer { text-align: center; padding: 1.5rem 1rem; font-size: .82rem; }
 
+/* filigrane de la ville d'arrivée — desktop uniquement (mobile : fond actuel) */
+.stage-bg { display: none; }
+@media (min-width: 900px) {
+  .stage-bg {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .stage-bg span {
+    font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 700; line-height: 1;
+    font-size: 15vw; white-space: nowrap; letter-spacing: -.03em;
+    color: rgba(27, 28, 34, .055); transform: rotate(-8deg);
+  }
+}
+
 /* ---------------- mobile (téléphones) ---------------- */
 /* Zones sûres iPhone (encoche / barre gestuelle) sur la nav sticky et le footer. */
 .nav { padding-left: max(1.2rem, env(safe-area-inset-left)); padding-right: max(1.2rem, env(safe-area-inset-right)); }

@@ -11,6 +11,7 @@ import Chat from './components/Chat.jsx'
 import Admin from './components/Admin.jsx'
 import Profile from './components/Profile.jsx'
 import Rules from './components/Rules.jsx'
+import StageBackdrop from './components/StageBackdrop.jsx'
 
 export default function App() {
   const { session, profile, loading, profileLoading, recovery } = useAuth()
@@ -37,6 +38,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <StageBackdrop />
       <Nav view={view} setView={setView} />
       <main className="container">
         {view === 'tour' && <Dashboard />}
