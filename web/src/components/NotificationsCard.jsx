@@ -9,6 +9,7 @@ const TYPES = [
   { key: 'notify_reminder', label: 'Rappel avant la clôture (~30 min)' },
   { key: 'notify_close', label: 'Paris fermés' },
   { key: 'notify_results', label: 'Résultats publiés' },
+  { key: 'notify_chat', label: 'Nouveau message dans le chat' },
 ]
 
 export default function NotificationsCard() {
@@ -23,7 +24,7 @@ export default function NotificationsCard() {
   useEffect(() => { if (supported) isSubscribed().then(setSubscribed).catch(() => {}) }, [supported])
   useEffect(() => {
     supabase.from('profiles')
-      .select('notify_enabled, notify_open, notify_reminder, notify_close, notify_results')
+      .select('notify_enabled, notify_open, notify_reminder, notify_close, notify_results, notify_chat')
       .eq('id', user.id).single()
       .then(({ data }) => { if (data) setPrefs(data) })
   }, [user.id])
