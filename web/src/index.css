@@ -251,7 +251,7 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 .msg-author { display: block; font-size: .72rem; font-weight: 800; color: var(--yellow-deep); margin-bottom: .1rem; }
 .msg-text { white-space: pre-wrap; word-break: break-word; }
 /* réactions emoji sur les messages */
-.msg-col { display: flex; flex-direction: column; gap: .2rem; min-width: 0; max-width: 100%; }
+.msg-col { display: flex; flex-direction: column; gap: .2rem; min-width: 0; max-width: 100%; position: relative; }
 .msg.mine .msg-col { align-items: flex-end; }
 .msg-reactions { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem; }
 .reaction {
@@ -259,11 +259,13 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
   border: 1px solid transparent; border-radius: 999px; padding: 0 .5rem; cursor: pointer;
 }
 .reaction.mine { background: #fff3c4; border-color: var(--yellow-deep); font-weight: 700; }
-/* palette révélée au survol du message (ou .open pour le tap mobile) */
+/* palette flottante au-dessus du message (ne décale pas les autres messages) */
 .react-picker {
-  display: none; gap: .1rem; background: #fff; border: 1px solid var(--border);
-  border-radius: 999px; padding: .1rem .25rem; box-shadow: var(--shadow);
+  display: none; position: absolute; bottom: 100%; left: 0; z-index: 5;
+  gap: .1rem; background: #fff; border: 1px solid var(--border);
+  border-radius: 999px; padding: .15rem .3rem; box-shadow: var(--shadow); white-space: nowrap;
 }
+.msg.mine .react-picker { left: auto; right: 0; }
 .msg:hover .react-picker, .react-picker.open { display: inline-flex; }
 .react-picker button { background: none; border: 0; cursor: pointer; font-size: 1.05rem; padding: .05rem .2rem; border-radius: 50%; }
 .react-picker button:hover { background: #f0f1f4; }

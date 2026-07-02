@@ -67,6 +67,14 @@ export default function Chat() {
     })()
   }, [resolveProfile, loadReactions])
 
+  // Ferme la palette (ouverte au tap) dès qu'on clique ailleurs.
+  useEffect(() => {
+    if (pickerFor == null) return
+    const close = () => setPickerFor(null)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [pickerFor])
+
   async function send(e) {
     e.preventDefault()
     const content = text.trim()
@@ -112,30 +120,36 @@ export default function Chat() {
           : messages.length === 0 ? <p className="muted">Personne n’a encore causé. Lance la discussion !</p>
           : messages.map((m) => {
             const mine = m.user_id === user.id
-            const counts = {}; const mineSet = new Set()
+            const byEmoji = {}; const mineSet = new Set()
             for (const r of reactions) {
               if (r.message_id !== m.id) continue
-              counts[r.emoji] = (counts[r.emoji] || 0) + 1
+              const who = r.user_id === user.id ? 'Toi'
+                : (profilesMap[r.user_id]?.pseudo || '?')
+              ;(byEmoji[r.emoji] ??= []).push(who)
               if (r.user_id === user.id) mineSet.add(r.emoji)
             }
-            const grouped = Object.entries(counts).map(([emoji, count]) => ({ emoji, count }))
+            const grouped = Object.entries(byEmoji)
+              .map(([emoji, names]) => ({ emoji, count: names.length, names: names.join(', ') }))
             return (
-              <div key={m.id} className={`msg${mine ? ' mine' : ''}`}>
+              <div key={m.id} className={`msg${mine ? ' mine' : ''}`}
+                onMouseLeave={() => setPickerFor((p) => (p === m.id ? null : p))}>
                 {!mine && <Avatar name={m.avatar} size={32} />}
                 <div className="msg-col">
-                  <div className="bubble" onClick={() => setPickerFor(pickerFor === m.id ? null : m.id)}>
+                  <div className="bubble"
+                    onClick={(e) => { e.stopPropagation(); setPickerFor(pickerFor === m.id ? null : m.id) }}>
                     {!mine && <span className="msg-author" title={m.first_name || undefined}>{m.pseudo}</span>}
                     <span className="msg-text">{m.content}</span>
                   </div>
                   <div className="msg-reactions">
                     {grouped.map((g) => (
-                      <button key={g.emoji} type="button"
+                      <button key={g.emoji} type="button" title={g.names}
                         className={`reaction${mineSet.has(g.emoji) ? ' mine' : ''}`}
                         onClick={() => toggleReaction(m.id, g.emoji)}>
                         {g.emoji} {g.count}
                       </button>
                     ))}
-                    <span className={`react-picker${pickerFor === m.id ? ' open' : ''}`}>
+                    <span className={`react-picker${pickerFor === m.id ? ' open' : ''}`}
+                      onClick={(e) => e.stopPropagation()}>
                       {EMOJIS.map((e) => (
                         <button key={e} type="button" onClick={() => toggleReaction(m.id, e)}>{e}</button>
                       ))}
