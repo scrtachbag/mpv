@@ -16,8 +16,6 @@ MARGIN > 1 simule la marge bookmaker ; ALPHA règle l'écart favoris/outsiders.
 """
 from __future__ import annotations
 
-import math
-
 import config
 from models import RiderForm
 
@@ -63,11 +61,8 @@ def compute_odds(riders: list[RiderForm], profile: str | None,
     force = points_spécialité × (1 + form_bonus × forme/forme_max)
     poids = force ** alpha ; côte_brute = MARGIN / (poids/Σ).
 
-    Les côtes brutes sont ensuite **compressées** (pas coupées) vers le plafond
-    ODDS_MAX : on garde le favori comme ancre et on tasse la longue traîne des
-    outsiders via une mise à l'échelle logarithmique (favori → favori,
-    côte la plus haute → ODDS_MAX). L'écart entre coureurs est donc réduit de
-    façon homogène, le 1er/2e inclus.
+    Les côtes sont bornées [ODDS_MIN, ODDS_MAX] par un **plafond dur** : on coupe
+    simplement à ODDS_MAX, sans recalculer/compresser les côtes inférieures.
     """
     if not riders:
         return []
@@ -84,17 +79,7 @@ def compute_odds(riders: list[RiderForm], profile: str | None,
         weights.append(strength ** alpha)
 
     total = sum(weights) or 1.0
-    raw = [max(config.ODDS_MARGIN / (w / total), floor) for w in weights]
-
-    lo, hi = min(raw), max(raw)
-    if hi > cap and hi > lo:
-        # tasse [lo, hi] -> [lo, cap] en conservant l'ordre et les écarts relatifs
-        k = math.log(cap / lo) / math.log(hi / lo)
-        comp = [lo * (o / lo) ** k for o in raw]
-    else:
-        comp = raw
-
     return [{"rider_name": r.name, "rider_pcs_id": r.pcs_id,
-             "odds": round(min(o, cap), 2),
+             "odds": round(min(max(config.ODDS_MARGIN / (w / total), floor), cap), 2),
              "nationality": r.nationality, "team": r.team}
-            for r, o in zip(riders, comp)]
+            for r, w in zip(riders, weights)]

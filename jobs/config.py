@@ -43,10 +43,9 @@ BET_HOUR = _int("MPV_BET_HOUR", 12)
 ODDS_ALPHA = _float("MPV_ODDS_ALPHA", 3.0)
 ODDS_MARGIN = _float("MPV_ODDS_MARGIN", 1.15)
 ODDS_MIN = _float("MPV_ODDS_MIN", 1.5)
-# Cible de compression des côtes (pas un couperet) : la courbe est tassée pour
-# que la plus haute côte atteigne ~ODDS_MAX, en réduisant aussi un peu l'écart
-# entre favoris. 200 = un coup gagnant rapporte au plus ~200 pts.
-ODDS_MAX = _float("MPV_ODDS_MAX", 200.0)
+# Plafond DUR des côtes : on coupe simplement à ODDS_MAX, sans recalculer les
+# côtes inférieures. 100 = un coup gagnant rapporte au plus ~100 (×2 si 1er, ×10).
+ODDS_MAX = _float("MPV_ODDS_MAX", 100.0)
 # Points plancher pour un coureur absent du classement PCS (évite côte = MAX).
 ODDS_FLOOR_POINTS = _float("MPV_ODDS_FLOOR_POINTS", 5.0)
 # Modèle : force = points_spécialité_du_profil × (1 + FORM_BONUS × forme_normalisée).
