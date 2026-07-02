@@ -8,7 +8,6 @@ import Nav from './components/Nav.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import History from './components/History.jsx'
 import Chat from './components/Chat.jsx'
-import Admin from './components/Admin.jsx'
 import Profile from './components/Profile.jsx'
 import Rules from './components/Rules.jsx'
 import StageBackdrop from './components/StageBackdrop.jsx'
@@ -48,7 +47,6 @@ export default function App() {
         {view === 'chat' && <Chat />}
         {view === 'rules' && <Rules />}
         {view === 'profile' && <Profile />}
-        {view === 'admin' && profile.is_admin && <Admin />}
       </main>
       <footer className="footer muted">
         🚵 Mon Petit Vélo — entre amis, sans argent, pour la gloire. Côtes calculées depuis ProCyclingStats.

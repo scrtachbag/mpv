@@ -10,7 +10,7 @@ const TABS = [
 
 export default function Nav({ view, setView }) {
   const { profile, signOut } = useAuth()
-  const tabs = profile?.is_admin ? [...TABS, { key: 'admin', label: '⚙️ Admin' }] : TABS
+  const tabs = TABS   // l'admin est désormais dans la page Profil
 
   return (
     <header className="nav">

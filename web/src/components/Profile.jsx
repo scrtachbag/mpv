@@ -4,6 +4,7 @@ import { useAuth } from '../auth.jsx'
 import { AVATARS } from '../lib/avatars'
 import Avatar from './Avatar.jsx'
 import NotificationsCard from './NotificationsCard.jsx'
+import Admin from './Admin.jsx'
 
 export default function Profile() {
   const { user, profile, refreshProfile, signOut, setNotice } = useAuth()
@@ -119,6 +120,9 @@ export default function Profile() {
         </button>
         {msgDel && <p className={msgDel.type}>{msgDel.text}</p>}
       </div>
+
+      {/* --- Administration (réservé aux admins) --- */}
+      {profile.is_admin && <Admin />}
     </div>
   )
 }
