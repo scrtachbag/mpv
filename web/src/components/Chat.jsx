@@ -3,13 +3,22 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
 import Avatar from './Avatar.jsx'
 
+const EMOJIS = ['👍', '❤️', '😂', '🔥', '😮', '🚴']
+
 export default function Chat() {
   const { user, profile } = useAuth()
   const [messages, setMessages] = useState([])
   const [profilesMap, setProfilesMap] = useState({})
+  const [reactions, setReactions] = useState([])   // { message_id, user_id, emoji }
+  const [pickerFor, setPickerFor] = useState(null)  // message dont le sélecteur est ouvert
   const [text, setText] = useState('')
   const [loading, setLoading] = useState(true)
   const bottomRef = useRef(null)
+
+  const loadReactions = useCallback(async () => {
+    const { data } = await supabase.from('message_reactions').select('message_id, user_id, emoji')
+    setReactions(data ?? [])
+  }, [])
 
   const scrollDown = () => bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
 
@@ -39,6 +48,7 @@ export default function Chat() {
       })))
       setLoading(false)
       setTimeout(scrollDown, 50)
+      loadReactions()
 
       const channel = supabase.channel('mpv-chat')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' },
@@ -50,10 +60,12 @@ export default function Chat() {
             }])
             setTimeout(scrollDown, 50)
           })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'message_reactions' },
+          () => loadReactions())
         .subscribe()
       return () => supabase.removeChannel(channel)
     })()
-  }, [resolveProfile])
+  }, [resolveProfile, loadReactions])
 
   async function send(e) {
     e.preventDefault()
@@ -75,6 +87,23 @@ export default function Chat() {
     }
   }
 
+  // Ajoute/retire sa réaction (optimiste ; le temps réel resynchronise).
+  async function toggleReaction(messageId, emoji) {
+    setPickerFor(null)
+    const mine = reactions.some((r) =>
+      r.message_id === messageId && r.user_id === user.id && r.emoji === emoji)
+    if (mine) {
+      setReactions((prev) => prev.filter((r) =>
+        !(r.message_id === messageId && r.user_id === user.id && r.emoji === emoji)))
+      await supabase.from('message_reactions').delete()
+        .match({ message_id: messageId, user_id: user.id, emoji })
+    } else {
+      setReactions((prev) => [...prev, { message_id: messageId, user_id: user.id, emoji }])
+      await supabase.from('message_reactions')
+        .insert({ message_id: messageId, user_id: user.id, emoji })
+    }
+  }
+
   return (
     <div className="card chat">
       <h2>💬 Le café des parieurs</h2>
@@ -83,12 +112,41 @@ export default function Chat() {
           : messages.length === 0 ? <p className="muted">Personne n’a encore causé. Lance la discussion !</p>
           : messages.map((m) => {
             const mine = m.user_id === user.id
+            const counts = {}; const mineSet = new Set()
+            for (const r of reactions) {
+              if (r.message_id !== m.id) continue
+              counts[r.emoji] = (counts[r.emoji] || 0) + 1
+              if (r.user_id === user.id) mineSet.add(r.emoji)
+            }
+            const grouped = Object.entries(counts).map(([emoji, count]) => ({ emoji, count }))
             return (
               <div key={m.id} className={`msg${mine ? ' mine' : ''}`}>
                 {!mine && <Avatar name={m.avatar} size={32} />}
-                <div className="bubble">
-                  {!mine && <span className="msg-author" title={m.first_name || undefined}>{m.pseudo}</span>}
-                  <span className="msg-text">{m.content}</span>
+                <div className="msg-col">
+                  <div className="bubble">
+                    {!mine && <span className="msg-author" title={m.first_name || undefined}>{m.pseudo}</span>}
+                    <span className="msg-text">{m.content}</span>
+                  </div>
+                  <div className="msg-reactions">
+                    {grouped.map((g) => (
+                      <button key={g.emoji} type="button"
+                        className={`reaction${mineSet.has(g.emoji) ? ' mine' : ''}`}
+                        onClick={() => toggleReaction(m.id, g.emoji)}>
+                        {g.emoji} {g.count}
+                      </button>
+                    ))}
+                    <button type="button" className="react-add" title="Réagir"
+                      onClick={() => setPickerFor(pickerFor === m.id ? null : m.id)}>
+                      🙂+
+                    </button>
+                    {pickerFor === m.id && (
+                      <span className="react-picker">
+                        {EMOJIS.map((e) => (
+                          <button key={e} type="button" onClick={() => toggleReaction(m.id, e)}>{e}</button>
+                        ))}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 {mine && <Avatar name={profile?.avatar} size={32} />}
               </div>

@@ -250,6 +250,27 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 .msg.mine .bubble { background: linear-gradient(180deg, var(--yellow), var(--yellow-deep)); color: var(--ink); }
 .msg-author { display: block; font-size: .72rem; font-weight: 800; color: var(--yellow-deep); margin-bottom: .1rem; }
 .msg-text { white-space: pre-wrap; word-break: break-word; }
+/* réactions emoji sur les messages */
+.msg-col { display: flex; flex-direction: column; gap: .2rem; min-width: 0; max-width: 100%; }
+.msg.mine .msg-col { align-items: flex-end; }
+.msg-reactions { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem; }
+.reaction {
+  font-size: .78rem; line-height: 1.6; background: #eef1f5; color: var(--ink);
+  border: 1px solid transparent; border-radius: 999px; padding: 0 .5rem; cursor: pointer;
+}
+.reaction.mine { background: #fff3c4; border-color: var(--yellow-deep); font-weight: 700; }
+.react-add {
+  font-size: .72rem; background: none; border: 1px solid var(--border); color: var(--muted);
+  border-radius: 999px; padding: 0 .45rem; cursor: pointer; line-height: 1.6; opacity: .6;
+}
+.react-add:hover { opacity: 1; }
+.react-picker {
+  display: inline-flex; gap: .1rem; background: #fff; border: 1px solid var(--border);
+  border-radius: 999px; padding: .1rem .25rem; box-shadow: var(--shadow);
+}
+.react-picker button { background: none; border: 0; cursor: pointer; font-size: 1.05rem; padding: .05rem .2rem; border-radius: 50%; }
+.react-picker button:hover { background: #f0f1f4; }
+
 .chat-input { display: flex; gap: .5rem; margin-top: .6rem; }
 .chat-input input { flex: 1; }
 .chat-input button.primary { width: auto; margin: 0; }
