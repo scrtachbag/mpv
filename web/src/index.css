@@ -328,12 +328,14 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
   .nav .brand { order: 1; font-size: 1.02rem; }
   .nav .user { order: 2; margin-left: auto; gap: .4rem; }
   .nav nav {
-    order: 3; flex-basis: 100%; flex-wrap: nowrap; overflow-x: auto;
-    gap: .2rem; padding-bottom: 3px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    order: 3; flex-basis: 100%; display: flex; flex-wrap: nowrap;
+    gap: .25rem; padding-bottom: 2px;
   }
-  .nav nav::-webkit-scrollbar { display: none; }
-  /* onglets resserrés pour que les 4 (hors admin) tiennent sur la largeur */
-  .tab { flex: none; white-space: nowrap; padding: .4rem .55rem; font-size: .82rem; }
+  /* 4 onglets répartis sur toute la largeur ; police adaptée à la largeur dispo */
+  .tab {
+    flex: 1 1 0; min-width: 0; text-align: center; white-space: nowrap;
+    padding: .45rem .3rem; font-size: clamp(.72rem, 3.3vw, .92rem);
+  }
   .nav .pseudo { max-width: 7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* Titres / hero plus compacts sur mobile (moins de retours à la ligne). */
@@ -360,5 +362,4 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 /* Très petits écrans : on resserre encore. */
 @media (max-width: 380px) {
   .nav .pseudo { max-width: 4.5rem; }
-  .tab { padding: .35rem .45rem; font-size: .78rem; }
 }
