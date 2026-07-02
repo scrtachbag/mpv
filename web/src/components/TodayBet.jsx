@@ -8,6 +8,9 @@ import Bonus from './Bonus.jsx'
 import TeamBadge from './TeamBadge.jsx'
 import StageResults from './StageResults.jsx'
 
+// Normalise pour une recherche insensible aux accents et à la casse.
+const norm = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+
 export default function TodayBet() {
   const { user } = useAuth()
   const [stage, setStage] = useState(null)
@@ -21,6 +24,7 @@ export default function TodayBet() {
 
   // choix en cours
   const [rider, setRider] = useState('')
+  const [riderQuery, setRiderQuery] = useState('')
   const [bonus, setBonus] = useState(false)
   const [msg, setMsg] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -97,6 +101,9 @@ export default function TodayBet() {
   // Méta (drapeau/équipe/côte) par coureur, pour l'affichage des pronostics.
   const ridersByName = {}
   for (const r of riders) ridersByName[r.rider_name.toLowerCase()] = r
+  // Liste filtrée par la recherche.
+  const q = norm(riderQuery)
+  const shown = q ? riders.filter((r) => norm(riderName(r.rider_name)).includes(q)) : riders
 
   async function submit(e) {
     e.preventDefault()
@@ -147,8 +154,14 @@ export default function TodayBet() {
           </div>
             <form onSubmit={submit}>
               <label>Coureur que tu vois gagner</label>
+              <input type="text" value={riderQuery} placeholder="🔍 Rechercher un coureur…"
+                autoComplete="off" style={{ marginBottom: '.4rem' }}
+                onChange={(e) => setRiderQuery(e.target.value)} />
               <div className="rider-pick">
-                {riders.map((r) => (
+                {shown.length === 0 && (
+                  <div className="muted" style={{ padding: '.6rem .7rem' }}>Aucun coureur trouvé.</div>
+                )}
+                {shown.map((r) => (
                   <button type="button" key={r.rider_name}
                     className={`rider-row${rider === r.rider_name ? ' selected' : ''}`}
                     onClick={() => setRider(r.rider_name)}>
