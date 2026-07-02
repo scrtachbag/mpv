@@ -1,0 +1,35 @@
+name: Déploiement Edge Functions (Supabase)
+
+# Déploie les fonctions Supabase depuis GitHub (pas besoin du CLI en local).
+# Requiert le secret GitHub SUPABASE_ACCESS_TOKEN (Supabase → Account → Access Tokens).
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'supabase/functions/**'
+      - '.github/workflows/deploy-functions.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF || 'lprhfzmligohzucyurjm' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Déployer la fonction notify-chat
+        run: supabase functions deploy notify-chat --project-ref "$PROJECT_REF" --no-verify-jwt
+
+      - name: Définir les secrets de la fonction
+        run: |
+          supabase secrets set --project-ref "$PROJECT_REF" \
+            VAPID_PUBLIC_KEY="${{ secrets.VAPID_PUBLIC_KEY }}" \
+            VAPID_PRIVATE_KEY="${{ secrets.VAPID_PRIVATE_KEY }}" \
+            VAPID_SUBJECT="${{ vars.VAPID_SUBJECT }}" \
+            MPV_SITE_URL="${{ vars.MPV_SITE_URL }}" \
+            NOTIFY_HOOK_SECRET="${{ secrets.NOTIFY_HOOK_SECRET }}"
