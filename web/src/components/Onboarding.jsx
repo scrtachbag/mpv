@@ -8,6 +8,7 @@ import Avatar from './Avatar.jsx'
 export default function Onboarding() {
   const { user, refreshProfile } = useAuth()
   const [pseudo, setPseudo] = useState('')
+  const [firstName, setFirstName] = useState('')
   const [password, setPassword] = useState('')
   const [avatar, setAvatar] = useState(() => randomAvatarKey())
   const [error, setError] = useState(null)
@@ -21,7 +22,8 @@ export default function Onboarding() {
     if (pwErr) { setBusy(false); setError(pwErr.message); return }
 
     const { error } = await supabase.from('profiles').insert({
-      id: user.id, email: user.email, pseudo: pseudo.trim(), avatar,
+      id: user.id, email: user.email, pseudo: pseudo.trim(),
+      first_name: firstName.trim() || null, avatar,
     })
     setBusy(false)
     if (error) {
@@ -41,6 +43,10 @@ export default function Onboarding() {
         <label htmlFor="pseudo">Pseudo</label>
         <input id="pseudo" type="text" required minLength={2} maxLength={24} value={pseudo}
           onChange={(e) => setPseudo(e.target.value)} placeholder="Le Blaireau" />
+
+        <label htmlFor="firstname">Prénom <span className="muted">(visible au survol de ton pseudo)</span></label>
+        <input id="firstname" type="text" maxLength={40} value={firstName}
+          onChange={(e) => setFirstName(e.target.value)} placeholder="Bernard" />
 
         <label htmlFor="password">Mot de passe</label>
         <input id="password" type="password" required minLength={6} value={password}

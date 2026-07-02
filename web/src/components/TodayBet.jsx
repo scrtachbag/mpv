@@ -48,7 +48,7 @@ export default function TodayBet() {
       // Pronostics des autres : visibles seulement après la deadline (RLS).
       if (msUntil(st.bet_deadline) <= 0) {
         const { data: others } = await supabase
-          .from('bets').select('user_id, rider_name, bonus_used, profiles(pseudo, avatar)')
+          .from('bets').select('user_id, rider_name, bonus_used, profiles(pseudo, first_name, avatar)')
           .eq('stage_id', st.id)
         setOthersBets(others ?? [])
       }
@@ -193,7 +193,7 @@ export default function TodayBet() {
               return (
                 <li key={b.user_id} className={b.user_id === user.id ? 'mine' : ''}>
                   <Avatar name={b.profiles?.avatar} size={26} />
-                  <strong>{b.profiles?.pseudo ?? '?'}</strong>
+                  <strong title={b.profiles?.first_name || undefined}>{b.profiles?.pseudo ?? '?'}</strong>
                   <span className="muted">→</span>
                   <span className="rp-flag">{flag(meta?.nationality)}</span>
                   <TeamBadge name={meta?.team} size={18} />

@@ -35,7 +35,7 @@ export default function Leaderboard() {
             {i === lastIdx && hasSpread ? '💩' : (MEDALS[i] ?? i + 1)}
           </span>
           <Avatar name={r.avatar} size={34} />
-          <span className="lb-name">{r.pseudo}</span>
+          <span className="lb-name" title={r.first_name || undefined}>{r.pseudo}</span>
           <span className="lb-bonus" title={`${Number(r.bonus_used || 0)} bonus utilisé(s) sur 2`}>
             {'⚡'.repeat(Number(r.bonus_used || 0))}
           </span>

@@ -10,6 +10,7 @@ export default function Profile() {
   const { user, profile, refreshProfile, signOut, setNotice } = useAuth()
 
   const [pseudo, setPseudo] = useState(profile.pseudo)
+  const [firstName, setFirstName] = useState(profile.first_name ?? '')
   const [avatar, setAvatar] = useState(profile.avatar)
   const [msgP, setMsgP] = useState(null)
   const [savingP, setSavingP] = useState(false)
@@ -22,13 +23,15 @@ export default function Profile() {
   const [msgDel, setMsgDel] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
-  const dirtyProfile = pseudo.trim() !== profile.pseudo || avatar !== profile.avatar
+  const dirtyProfile = pseudo.trim() !== profile.pseudo
+    || firstName.trim() !== (profile.first_name ?? '')
+    || avatar !== profile.avatar
 
   async function saveProfile(e) {
     e.preventDefault()
     setSavingP(true); setMsgP(null)
     const { error } = await supabase.from('profiles')
-      .update({ pseudo: pseudo.trim(), avatar })
+      .update({ pseudo: pseudo.trim(), first_name: firstName.trim() || null, avatar })
       .eq('id', user.id)
     setSavingP(false)
     if (error) {
@@ -68,6 +71,10 @@ export default function Profile() {
           <label htmlFor="pseudo">Pseudo</label>
           <input id="pseudo" type="text" required minLength={2} maxLength={24} value={pseudo}
             onChange={(e) => setPseudo(e.target.value)} />
+
+          <label htmlFor="firstname">Prénom <span className="muted">(visible au survol de ton pseudo)</span></label>
+          <input id="firstname" type="text" maxLength={40} value={firstName}
+            onChange={(e) => setFirstName(e.target.value)} placeholder="Bernard" />
 
           <label>Avatar</label>
           <div className="avatar-grid">

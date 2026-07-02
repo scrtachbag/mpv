@@ -16,7 +16,7 @@ export default function Chat() {
   // Résout pseudo/avatar d'un user, en complétant le cache au besoin.
   const resolveProfile = useCallback(async (uid, map) => {
     if (map[uid]) return map[uid]
-    const { data } = await supabase.from('profiles').select('id, pseudo, avatar').eq('id', uid).maybeSingle()
+    const { data } = await supabase.from('profiles').select('id, pseudo, first_name, avatar').eq('id', uid).maybeSingle()
     if (data) setProfilesMap((m) => ({ ...m, [uid]: data }))
     return data
   }, [])
@@ -24,9 +24,9 @@ export default function Chat() {
   useEffect(() => {
     (async () => {
       const [{ data: profs }, { data: msgs }] = await Promise.all([
-        supabase.from('profiles').select('id, pseudo, avatar'),
+        supabase.from('profiles').select('id, pseudo, first_name, avatar'),
         supabase.from('messages')
-          .select('id, content, created_at, user_id, profiles(pseudo, avatar)')
+          .select('id, content, created_at, user_id, profiles(pseudo, first_name, avatar)')
           .order('created_at', { ascending: true }).limit(200),
       ])
       const map = Object.fromEntries((profs ?? []).map((p) => [p.id, p]))
@@ -34,6 +34,7 @@ export default function Chat() {
       setMessages((msgs ?? []).map((m) => ({
         ...m,
         pseudo: m.profiles?.pseudo ?? map[m.user_id]?.pseudo ?? '?',
+        first_name: m.profiles?.first_name ?? map[m.user_id]?.first_name,
         avatar: m.profiles?.avatar ?? map[m.user_id]?.avatar,
       })))
       setLoading(false)
@@ -45,7 +46,7 @@ export default function Chat() {
             const m = payload.new
             const p = await resolveProfile(m.user_id, map)
             setMessages((prev) => prev.some((x) => x.id === m.id) ? prev : [...prev, {
-              ...m, pseudo: p?.pseudo ?? '?', avatar: p?.avatar,
+              ...m, pseudo: p?.pseudo ?? '?', first_name: p?.first_name, avatar: p?.avatar,
             }])
             setTimeout(scrollDown, 50)
           })
@@ -86,7 +87,7 @@ export default function Chat() {
               <div key={m.id} className={`msg${mine ? ' mine' : ''}`}>
                 {!mine && <Avatar name={m.avatar} size={32} />}
                 <div className="bubble">
-                  {!mine && <span className="msg-author">{m.pseudo}</span>}
+                  {!mine && <span className="msg-author" title={m.first_name || undefined}>{m.pseudo}</span>}
                   <span className="msg-text">{m.content}</span>
                 </div>
                 {mine && <Avatar name={profile?.avatar} size={32} />}

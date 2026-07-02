@@ -29,7 +29,7 @@ export default function StageResults({ stageId }) {
         supabase.from('stage_results').select('position, rider_name').eq('stage_id', stageId).order('position'),
         supabase.from('stage_riders').select('rider_name, odds, nationality, team').eq('stage_id', stageId),
         supabase.from('bets').select('user_id, rider_name, bonus_used').eq('stage_id', stageId),
-        supabase.from('profiles').select('id, pseudo, avatar'),
+        supabase.from('profiles').select('id, pseudo, first_name, avatar'),
       ])
       if (cancelled) return
       const prof = Object.fromEntries((profiles ?? []).map((p) => [p.id, p]))
@@ -46,6 +46,7 @@ export default function StageResults({ stageId }) {
         nameBy[k] = b.rider_name
         ;(bettorsBy[k] ??= []).push({
           pseudo: prof[b.user_id]?.pseudo ?? '?',
+          first_name: prof[b.user_id]?.first_name,
           avatar: prof[b.user_id]?.avatar,
           bonus_used: b.bonus_used,
           isMe: b.user_id === user.id,
@@ -108,7 +109,7 @@ export default function StageResults({ stageId }) {
               {r.bettors.length === 0
                 ? null
                 : r.bettors.map((b, i) => (
-                  <span key={i} className={`bettor${b.isMe ? ' me' : ''}`}>
+                  <span key={i} className={`bettor${b.isMe ? ' me' : ''}`} title={b.first_name || undefined}>
                     <Avatar name={b.avatar} size={20} />
                     {b.pseudo}{b.bonus_used ? ' ⚡' : ''}
                   </span>
@@ -134,7 +135,7 @@ export default function StageResults({ stageId }) {
                 </div>
                 <div className="res-bettors">
                   {r.bettors.map((b, i) => (
-                    <span key={i} className={`bettor${b.isMe ? ' me' : ''}`}>
+                    <span key={i} className={`bettor${b.isMe ? ' me' : ''}`} title={b.first_name || undefined}>
                       <Avatar name={b.avatar} size={20} />
                       {b.pseudo}{b.bonus_used ? ' ⚡' : ''}
                     </span>
