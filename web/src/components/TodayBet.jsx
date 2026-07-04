@@ -32,9 +32,22 @@ export default function TodayBet() {
   const load = useCallback(async () => {
     setLoading(true)
     const today = parisToday()
-    const { data: st } = await supabase
-      .from('stages').select('*').eq('date', today)
-      .order('stage_no', { ascending: false }).limit(1).maybeSingle()
+    // 1) L'étape à parier : cotes publiées + deadline pas encore passée. Elle
+    //    devient donc visible dès la publication des côtes (la veille au soir),
+    //    ce qui colle à la notification « paris ouverts ».
+    let { data: st } = await supabase
+      .from('stages').select('*')
+      .gte('date', today).eq('odds_status', 'published')
+      .gt('bet_deadline', new Date().toISOString())
+      .order('date', { ascending: true }).order('bet_deadline', { ascending: true })
+      .limit(1).maybeSingle()
+    // 2) Sinon : l'étape du jour (course en cours ou résultats).
+    if (!st) {
+      const r = await supabase
+        .from('stages').select('*').eq('date', today)
+        .order('stage_no', { ascending: false }).limit(1).maybeSingle()
+      st = r.data
+    }
     setStage(st ?? null)
 
     if (st) {
