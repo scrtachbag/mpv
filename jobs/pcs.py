@@ -298,7 +298,8 @@ def get_results(stage_url: str, top_n: int) -> list[tuple[int, str]]:
         log.warning("résultats indisponibles (%s)", exc)
         return []
     out: list[tuple[int, str]] = []
-    for r in rows or []:
+    seen: set[int] = set()   # une seule ligne par position (évite les doublons
+    for r in rows or []:     # de classements annexes concaténés / ex-aequo -> 500 upsert)
         name = r.get("rider_name")
         rank = r.get("rank")
         if not name or rank in (None, "", "DNF", "DNS", "DSQ", "OTL"):
@@ -307,6 +308,9 @@ def get_results(stage_url: str, top_n: int) -> list[tuple[int, str]]:
             pos = int(rank)
         except (TypeError, ValueError):
             continue
+        if pos in seen:
+            continue
+        seen.add(pos)
         out.append((pos, name.strip()))
         if len(out) >= top_n:
             break
