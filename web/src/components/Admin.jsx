@@ -9,6 +9,24 @@ export default function Admin() {
   const [stages, setStages] = useState([])
   const [busy, setBusy] = useState(null)   // stage_no en cours, ou 'today'
   const [msg, setMsg] = useState(null)
+  const [reopenTime, setReopenTime] = useState('17:00')
+  const [deadlineMsg, setDeadlineMsg] = useState(null)
+
+  async function reopenBets() {
+    setBusy('reopen'); setDeadlineMsg(null)
+    const { error } = await supabase.rpc('admin_reopen_bets', { p_time: reopenTime })
+    setBusy(null)
+    if (error) setDeadlineMsg({ type: 'error', text: error.message })
+    else { setDeadlineMsg({ type: 'success', text: `Paris rouverts jusqu'à ${reopenTime}.` }); load() }
+  }
+
+  async function closeBets() {
+    setBusy('close'); setDeadlineMsg(null)
+    const { error } = await supabase.rpc('admin_close_bets')
+    setBusy(null)
+    if (error) setDeadlineMsg({ type: 'error', text: error.message })
+    else { setDeadlineMsg({ type: 'success', text: 'Paris fermés.' }); load() }
+  }
 
   async function load() {
     const { data } = await supabase.from('stages')
@@ -58,6 +76,28 @@ export default function Admin() {
             (Ou manuellement : <a href={ACTIONS_URL} target="_blank" rel="noreferrer">GitHub Actions → Run workflow</a>.)
           </p>
         )}
+      </div>
+
+      <div className="card">
+        <h3>⏱️ Paris de l’étape du jour</h3>
+        <p className="muted">
+          Rouvrir ou fermer manuellement les paris — uniquement l’étape
+          d’aujourd’hui, et seulement si les résultats ne sont pas encore officiels.
+          N’affecte pas les étapes suivantes.
+        </p>
+        <div className="row" style={{ gap: '.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <label style={{ margin: 0 }}>Rouvrir jusqu’à</label>
+          <input type="time" value={reopenTime} style={{ width: 'auto' }}
+            onChange={(e) => setReopenTime(e.target.value)} />
+          <button className="primary" style={{ width: 'auto', margin: 0 }}
+            disabled={busy === 'reopen'} onClick={reopenBets}>
+            {busy === 'reopen' ? '…' : 'Rouvrir les paris'}
+          </button>
+          <button className="link" disabled={busy === 'close'} onClick={closeBets}>
+            {busy === 'close' ? '…' : 'Fermer les paris maintenant'}
+          </button>
+        </div>
+        {deadlineMsg && <p className={deadlineMsg.type}>{deadlineMsg.text}</p>}
       </div>
 
       <div className="card">
