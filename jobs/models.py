@@ -13,6 +13,7 @@ class StageInfo:
     name: str | None
     profile_type: str | None
     url: str
+    start_time: str | None = None   # heure de départ "HH:MM" (heure locale de course)
 
 
 @dataclass

@@ -142,6 +142,17 @@ def _stage_url(slug: str, season: int, n: int) -> str:
     return f"race/{slug}/{season}/stage-{n}"
 
 
+def _parse_start_time(raw) -> str | None:
+    """Normalise l'heure de départ PCS ('13:05 ', '13:05 (13:05 CEST)') -> 'HH:MM'."""
+    if not raw:
+        return None
+    head = str(raw).strip().split()
+    parts = (head[0] if head else "").split(":")
+    if len(parts) >= 2 and parts[0].isdigit() and parts[1][:2].isdigit():
+        return f"{int(parts[0]):02d}:{parts[1][:2]}"
+    return None
+
+
 def _load_stage(slug: str, season: int, n: int) -> StageInfo | None:
     url = _stage_url(slug, season, n)
     try:
@@ -158,8 +169,9 @@ def _load_stage(slug: str, season: int, n: int) -> StageInfo | None:
     arr = _safe(st.arrival)
     name = f"{dep} → {arr}" if dep and arr else None
     profile = _normalize_profile(_safe(st.profile_icon), _safe(st.stage_type))
+    start = _parse_start_time(_safe(st.start_time))
     return StageInfo(stage_no=n, date=str(date)[:10], name=name,
-                     profile_type=profile, url=url)
+                     profile_type=profile, url=url, start_time=start)
 
 
 def find_stage(season: int, slug: str, *, date: str | None = None,

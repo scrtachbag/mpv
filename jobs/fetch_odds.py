@@ -24,9 +24,18 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(messag
 log = logging.getLogger("mpv.odds")
 
 
-def _deadline_iso(date_str: str) -> str:
+def _deadline_iso(date_str: str, start_time: str | None = None) -> str:
+    """Deadline de pari = heure de DÉPART de l'étape (heure locale de course) si
+    connue, sinon repli sur BET_HOUR (midi par défaut)."""
     d = datetime.strptime(date_str, "%Y-%m-%d").date()
-    return datetime.combine(d, time(hour=config.BET_HOUR), tzinfo=config.TZ).isoformat()
+    t = time(hour=config.BET_HOUR)
+    if start_time:
+        try:
+            hh, mm = start_time.split(":")[:2]
+            t = time(hour=int(hh), minute=int(mm))
+        except (ValueError, IndexError):
+            pass
+    return datetime.combine(d, t, tzinfo=config.TZ).isoformat()
 
 
 def _print_favorites(rows):
@@ -80,8 +89,9 @@ def main() -> int:
         else:
             log.info("Aucune étape datée du %s pour %s %s. Rien à faire.", target, slug, season)
         return 0
-    log.info("Étape %s du %s : %s [profil: %s]", info.stage_no, info.date,
-             info.name or "?", info.profile_type)
+    log.info("Étape %s du %s : %s [profil: %s] — clôture des paris à %s",
+             info.stage_no, info.date, info.name or "?", info.profile_type,
+             info.start_time or f"{config.BET_HOUR}h (défaut)")
 
     # Récence mesurée par rapport à la date de l'étape (les résultats des étapes
     # déjà courues du Tour comptent fortement le soir de la veille).
@@ -116,7 +126,7 @@ def main() -> int:
         "season": season, "stage_no": info.stage_no,
         "label": f"Étape {info.stage_no}", "name": info.name,
         "profile_type": info.profile_type, "date": info.date,
-        "bet_deadline": _deadline_iso(info.date), "odds_status": "pending",
+        "bet_deadline": _deadline_iso(info.date, info.start_time), "odds_status": "pending",
     })
     for r in rows:
         r["stage_id"] = stage_id
