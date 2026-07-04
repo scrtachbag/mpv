@@ -1,21 +1,22 @@
 name: Notifications (rappel + clôture)
 
 # ⏰ cron en UTC. En juillet, Paris = UTC+2 (CEST).
-#   09:30 UTC = 11h30 Paris → rappel (~30 min avant la clôture) aux non-parieurs.
-#   10:00 UTC = 12h00 Paris → paris fermés.
-# Les notifications « étape ouverte » et « résultats » sont déclenchées par les
-# workflows Côtes et Résultats (au moment de la transition).
+#   Rappel + clôture suivent la VRAIE deadline (= heure de départ de l'étape).
+#   Un "tick" tourne toutes les 20 min de 11h à 15h40 Paris (09:00–13:40 UTC) :
+#     - rappel dès qu'on entre dans la fenêtre avant la deadline (une fois),
+#     - clôture dès que la deadline est passée (une fois).
+#   « Étape ouverte » et « résultats » sont déclenchées par les workflows
+#   Côtes et Résultats (au moment de la transition).
 on:
   schedule:
-    - cron: '30 9 * * *'
-    - cron: '0 10 * * *'
+    - cron: '*/20 9-13 * * *'
   workflow_dispatch:
     inputs:
       event:
         description: "Événement à notifier"
         type: choice
-        options: [reminder, close, open, results]
-        default: reminder
+        options: [tick, reminder, close, open, results]
+        default: tick
 
 jobs:
   notify:
@@ -36,16 +37,4 @@ jobs:
           VAPID_SUBJECT: ${{ vars.VAPID_SUBJECT }}
           MPV_SITE_URL: ${{ vars.MPV_SITE_URL }}
           MPV_SEASON: ${{ vars.MPV_SEASON }}
-          SCHEDULE: ${{ github.event.schedule }}
-          INPUT_EVENT: ${{ github.event.inputs.event }}
-        run: |
-          EVENT="$INPUT_EVENT"
-          if [ -z "$EVENT" ]; then
-            case "$SCHEDULE" in
-              '30 9 * * *') EVENT=reminder ;;
-              '0 10 * * *') EVENT=close ;;
-              *) EVENT=reminder ;;
-            esac
-          fi
-          echo "→ notify.py --event $EVENT"
-          python notify.py --event "$EVENT"
+        run: python notify.py --event "${{ github.event.inputs.event || 'tick' }}"

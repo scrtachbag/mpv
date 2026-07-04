@@ -78,7 +78,8 @@ def cmd_open(season, slug, stage_no, hours):
               {"date": today, "bet_deadline": deadline,
                "odds_status": "published", "results_status": "pending",
                # ré-arme les notifications pour ce cycle bêta
-               "notified_open": False, "notified_close": False, "notified_results": False})
+               "notified_open": False, "notified_reminder": False,
+               "notified_close": False, "notified_results": False})
 
     fav = sorted(rows, key=lambda x: x["odds"])[:5]
     log.info("[1/3] Étape %s — PARIS OUVERTS jusqu'à %s. Favoris : %s",

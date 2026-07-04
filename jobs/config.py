@@ -32,8 +32,10 @@ TZ = ZoneInfo(os.environ.get("MPV_TZ", "Europe/Paris"))
 RACE_SLUG = os.environ.get("MPV_RACE_SLUG", "tour-de-france")
 SEASON = _int("MPV_SEASON", datetime.now(TZ).year)
 
-# Heure limite des paris (12h00 par défaut, heure locale TZ).
+# Heure limite des paris (repli si l'heure de départ PCS est inconnue).
 BET_HOUR = _int("MPV_BET_HOUR", 12)
+# Fenêtre (minutes avant la deadline) pendant laquelle le rappel est envoyé.
+REMINDER_WINDOW_MIN = _int("MPV_REMINDER_WINDOW_MIN", 45)
 
 # --- Paramètres de calcul des côtes "maison" -------------------------------
 # poids = force ** ALPHA (force = spécialité × bonus de forme, cf. odds.py),
