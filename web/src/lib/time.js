@@ -24,6 +24,17 @@ export function msUntil(iso) {
   return new Date(iso).getTime() - Date.now()
 }
 
+// Heure de Paris "13h05" à partir d'un ISO (timestamptz).
+export function formatTimeParis(iso) {
+  if (!iso) return ''
+  const parts = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: PARIS, hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date(iso))
+  const h = parts.find((p) => p.type === 'hour')?.value ?? ''
+  const m = parts.find((p) => p.type === 'minute')?.value ?? ''
+  return `${h}h${m}`
+}
+
 // "2 h 14 min" à partir d'un nombre de ms.
 export function formatCountdown(ms) {
   if (ms <= 0) return 'clôturé'

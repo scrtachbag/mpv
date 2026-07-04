@@ -21,8 +21,8 @@ export default function Rules() {
         <ul className="rules-list">
           <li>Va dans <strong>« Le Tour »</strong> et choisis un coureur parmi les partants du jour.</li>
           <li>Chaque coureur a une <strong>côte</strong> : basse pour un favori, élevée pour un outsider.</li>
-          <li>Tu peux changer ton pari autant que tu veux <strong>jusqu’à midi (12h00)</strong>.</li>
-          <li>À midi, les paris sont <strong>verrouillés</strong> : impossible de modifier après.</li>
+          <li>Tu peux changer ton pari autant que tu veux <strong>jusqu’au départ de l’étape</strong> (heure affichée dans le compte à rebours).</li>
+          <li>Au départ, les paris sont <strong>verrouillés</strong> : impossible de modifier après.</li>
           <li>Un seul pari par étape.</li>
         </ul>
       </div>
@@ -52,7 +52,7 @@ export default function Rules() {
         <ul className="rules-list">
           <li>Tu disposes de <strong>2 bonus</strong> pour <strong>tout le Tour</strong>.</li>
           <li>Un bonus <strong>double tes points</strong> sur l’étape choisie (cumulable avec le ×2 victoire).</li>
-          <li>À activer <strong>au moment du pari, avant midi</strong>. Une fois utilisés, ils sont consommés.</li>
+          <li>À activer <strong>au moment du pari, avant le départ</strong>. Une fois utilisés, ils sont consommés.</li>
         </ul>
         <p className="muted">Exemple : ton coureur (côte 8.0) gagne avec un bonus → 8 ÷ 1 × 2 (victoire) × 2 (bonus) × 10 = <strong>320 pts</strong>.</p>
       </div>

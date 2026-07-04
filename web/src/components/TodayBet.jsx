@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../auth.jsx'
-import { parisToday, formatDateFr, msUntil, formatCountdown } from '../lib/time'
+import { parisToday, formatDateFr, msUntil, formatCountdown, formatTimeParis } from '../lib/time'
 import { riderName, flag } from '../lib/format'
 import Avatar from './Avatar.jsx'
 import Bonus from './Bonus.jsx'
@@ -142,7 +142,7 @@ export default function TodayBet() {
             <p className="muted">{formatDateFr(stage.date)}</p>
           </div>
           <div className={`deadline ${!closed ? 'open' : resultsOfficial ? 'done' : 'running'}`}>
-            {!closed ? `⏳ ${formatCountdown(ms)} avant 12h00`
+            {!closed ? `⏳ ${formatCountdown(ms)} avant ${formatTimeParis(stage.bet_deadline)}`
               : resultsOfficial ? '✅ Classement publié'
               : '🏁 Course en cours…'}
           </div>
