@@ -42,7 +42,7 @@ REMINDER_WINDOW_MIN = _int("MPV_REMINDER_WINDOW_MIN", 45)
 # proba = poids/Σ, côte = MARGIN/proba (bornée [ODDS_MIN, ODDS_MAX]).
 # ALPHA pilote la concentration : ~3 => favori ~2-3 sur un sommet ; plus haut
 # = favoris très écrasants, plus bas = côtes plus resserrées.
-ODDS_ALPHA = _float("MPV_ODDS_ALPHA", 3.0)
+ODDS_ALPHA = _float("MPV_ODDS_ALPHA", 2.0)
 ODDS_MARGIN = _float("MPV_ODDS_MARGIN", 1.15)
 ODDS_MIN = _float("MPV_ODDS_MIN", 1.5)
 # Plafond DUR des côtes : on coupe simplement à ODDS_MAX, sans recalculer les
