@@ -25,11 +25,17 @@ jobs:
       - name: Déployer la fonction notify-chat
         run: supabase functions deploy notify-chat --project-ref "$PROJECT_REF" --no-verify-jwt
 
-      - name: Définir les secrets de la fonction
+      - name: Déployer la fonction trigger-results
+        run: supabase functions deploy trigger-results --project-ref "$PROJECT_REF"
+
+      - name: Définir les secrets des fonctions
         run: |
           supabase secrets set --project-ref "$PROJECT_REF" \
             VAPID_PUBLIC_KEY="${{ secrets.VAPID_PUBLIC_KEY }}" \
             VAPID_PRIVATE_KEY="${{ secrets.VAPID_PRIVATE_KEY }}" \
             VAPID_SUBJECT="${{ vars.VAPID_SUBJECT }}" \
             MPV_SITE_URL="${{ vars.MPV_SITE_URL }}" \
-            NOTIFY_HOOK_SECRET="${{ secrets.NOTIFY_HOOK_SECRET }}"
+            NOTIFY_HOOK_SECRET="${{ secrets.NOTIFY_HOOK_SECRET }}" \
+            GH_REPO="scrtachbag/mpv" \
+            GH_REF="master" \
+            GH_DISPATCH_TOKEN="${{ secrets.GH_DISPATCH_TOKEN }}"
