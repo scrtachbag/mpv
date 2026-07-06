@@ -53,13 +53,12 @@ ODDS_FLOOR_POINTS = _float("MPV_ODDS_FLOOR_POINTS", 5.0)
 # Modèle : force = points_spécialité_du_profil × (1 + FORM_BONUS × forme_normalisée).
 # La spécialité (discipline) prime ; la forme récente (points PCS de la saison
 # en cours) module : un coureur en forme remonte au-dessus des vétérans moins
-# actifs. FORM_BONUS = bonus max (1.0 => +100% pour le coureur le plus en forme).
-ODDS_FORM_BONUS = _float("MPV_ODDS_FORM_BONUS", 1.0)
-# Forme = Σ pcs_points × exp(-jours_écoulés / TAU). Plus TAU est petit, plus
-# seules les courses TRÈS récentes comptent. 30 j => une course d'il y a 1
-# mois pèse ~37 %, le Tour de Suisse (~3 sem. avant le Tour) ~50 %, et un
-# résultat d'étape de la veille ~97 %.
-ODDS_FORM_TAU_DAYS = _float("MPV_ODDS_FORM_TAU_DAYS", 30.0)
+# actifs. FORM_BONUS = bonus max (2.0 => +200% pour le coureur le plus en forme).
+ODDS_FORM_BONUS = _float("MPV_ODDS_FORM_BONUS", 2.0)
+# Forme = Σ pcs_points × exp(-jours_écoulés / TAU). 75 j => une course d'il y a
+# ~2,5 mois pèse ~37 %, les classiques de printemps comptent encore un peu, et
+# un résultat récent (Dauphiné/Tour de Suisse) pèse fortement.
+ODDS_FORM_TAU_DAYS = _float("MPV_ODDS_FORM_TAU_DAYS", 75.0)
 # Poids des résultats sans date (classements généraux/annexes PCS).
 ODDS_FORM_UNDATED_WEIGHT = _float("MPV_ODDS_FORM_UNDATED_WEIGHT", 0.5)
 # Sur une étape "hilly" (arrivée en bosse), on ajoute une part des points de
