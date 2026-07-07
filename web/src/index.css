@@ -353,15 +353,28 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
   h1 { font-size: 1.35rem; }
   h2 { font-size: 1.02rem; }
   h3 { font-size: 1rem; }
-  .dash-hero { padding: 1rem 1.1rem; }
-  .dash-hero h1 { font-size: 1.15rem; }
-  .dash-hero p { font-size: .85rem; }
-  .hero-jerseys { font-size: 1.25rem; }
+  /* Hero décoratif masqué sur mobile : on gagne de la place (contexte déjà clair). */
+  .dash-hero { display: none; }
   .card { padding: 1rem; }
 
+  /* En-tête d'étape : titre au-dessus, deadline compacte en dessous. */
+  .stage-head { flex-direction: column; align-items: flex-start; gap: .35rem; }
+  .stage-head h2 { font-size: 1.05rem; line-height: 1.25; }
+  .stage-head .deadline { font-size: .78rem; padding: .3rem .6rem; }
+
   /* Listes défilables : plafonds adaptés à un petit écran. */
-  .rider-pick { max-height: 300px; }
+  .rider-pick { max-height: 260px; }
   .avatar-grid { max-height: 200px; }
+
+  /* Résultats d'étape : une seule ligne, « pts » ne saute plus, chips alignées. */
+  .res-head { gap: .45rem; }
+  .res-pos { width: 1.3rem; }
+  .res-rider { font-size: .95rem; }
+  .res-odds { font-size: .82rem; }
+  .res-pts { min-width: 0; white-space: nowrap; font-size: .9rem; }
+  .res-pts small { font-size: .68rem; }
+  .res-bettors { padding-left: 0; }
+  .bettor { font-size: .78rem; }
 
   /* Chat : hauteur basée sur la hauteur visible réelle (barre d'adresse mobile). */
   .chat { height: calc(100dvh - 230px); }

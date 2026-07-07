@@ -13,14 +13,19 @@ export default function Chat() {
   const [pickerFor, setPickerFor] = useState(null)  // message dont le sélecteur est ouvert
   const [text, setText] = useState('')
   const [loading, setLoading] = useState(true)
-  const bottomRef = useRef(null)
+  const feedRef = useRef(null)
 
   const loadReactions = useCallback(async () => {
     const { data } = await supabase.from('message_reactions').select('message_id, user_id, emoji')
     setReactions(data ?? [])
   }, [])
 
-  const scrollDown = () => bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  // On fait défiler UNIQUEMENT le fil (pas scrollIntoView, qui ferait défiler
+  // toute la page/fenêtre — c'est ce qui décalait la page Chat vers le bas).
+  const scrollDown = () => {
+    const f = feedRef.current
+    if (f) f.scrollTop = f.scrollHeight
+  }
 
   // Résout pseudo/avatar d'un user, en complétant le cache au besoin.
   const resolveProfile = useCallback(async (uid, map) => {
@@ -115,7 +120,7 @@ export default function Chat() {
   return (
     <div className="card chat">
       <h2>💬 Le café des parieurs</h2>
-      <div className="chat-feed">
+      <div className="chat-feed" ref={feedRef}>
         {loading ? <p className="muted">Chargement…</p>
           : messages.length === 0 ? <p className="muted">Personne n’a encore causé. Lance la discussion !</p>
           : messages.map((m) => {
@@ -160,7 +165,6 @@ export default function Chat() {
               </div>
             )
           })}
-        <div ref={bottomRef} />
       </div>
       <form className="chat-input" onSubmit={send}>
         <input value={text} maxLength={500} placeholder="Balance ta vanne…"

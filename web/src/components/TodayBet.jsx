@@ -136,7 +136,7 @@ export default function TodayBet() {
   return (
     <div className="stack">
       <div className="card">
-        <div className="row spread">
+        <div className="row spread stage-head">
           <div>
             <h2>{stage.label}{stage.name ? ` — ${stage.name}` : ''}</h2>
             <p className="muted">{formatDateFr(stage.date)}</p>
