@@ -22,7 +22,11 @@ export default function App() {
       introDone.current = true
       if (!profile.seen_intro) {
         setView('rules')
+        // .then() est indispensable : les builders postgrest-js sont lazy, la
+        // requête n'est envoyée qu'au await/then (sinon seen_intro reste false
+        // et les Règles se rouvrent à chaque connexion).
         supabase.from('profiles').update({ seen_intro: true }).eq('id', profile.id)
+          .then(({ error }) => { if (error) console.error('seen_intro update:', error) })
       }
     }
   }, [profile])

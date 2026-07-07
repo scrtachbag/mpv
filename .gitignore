@@ -9,6 +9,8 @@ web/.env.*.local
 jobs/__pycache__/
 jobs/.venv/
 jobs/.env
+# clé service_role pour les runs locaux (ne PAS committer)
+jobs/.mpv-secrets*
 jobs/snap_*.json        # captures locales (--save-snapshot) ; les fixtures sont dans tests/fixtures
 *.pyc
 
