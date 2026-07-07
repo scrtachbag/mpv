@@ -35,31 +35,6 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install --no-cache-dir -r jobs/requirements.txt
-      - name: Démarrer FlareSolverr (contournement Cloudflare PCS)
-        run: |
-          # Version ÉPINGLÉE : le tag :latest a été repoussé en 3.5.0 (Chromium
-          # 148) qui ne résout plus le défi Cloudflare de PCS (timeout 90 s).
-          # v3.3.21 = dernier release stable qui passait jusqu'au 2026-07-06.
-          docker run -d --name flaresolverr --shm-size=2g -p 8191:8191 \
-            ghcr.io/flaresolverr/flaresolverr:v3.3.21
-          for i in $(seq 1 40); do
-            curl -s http://localhost:8191/ | grep -qi "ready" && { echo "FlareSolverr prêt"; break; } || sleep 3
-          done
-          # Vérifie que le Chrome interne RÉSOUT vraiment PCS (un 500 ici = Chrome
-          # planté, souvent /dev/shm — d'où --shm-size=2g ci-dessus).
-          code=0
-          for i in $(seq 1 5); do
-            code=$(curl -s -o /tmp/fs.json -w '%{http_code}' -X POST http://localhost:8191/v1 \
-              -H 'Content-Type: application/json' \
-              -d '{"cmd":"request.get","url":"https://www.procyclingstats.com/","maxTimeout":90000}')
-            [ "$code" = "200" ] && { echo "FlareSolverr résout OK (HTTP 200)"; break; }
-            echo "warm-up FlareSolverr tentative $i : HTTP $code"; sleep 5
-          done
-          if [ "$code" != "200" ]; then
-            echo "::error::FlareSolverr ne résout pas PCS (HTTP $code). Logs conteneur :"
-            docker logs --tail 100 flaresolverr || true
-            exit 1
-          fi
       - name: Pilotage bêta
         working-directory: jobs
         env:
@@ -70,7 +45,8 @@ jobs:
           MPV_ODDS_ALPHA: ${{ vars.MPV_ODDS_ALPHA }}
           MPV_ODDS_FORM_BONUS: ${{ vars.MPV_ODDS_FORM_BONUS }}
           MPV_ODDS_FORM_TAU_DAYS: ${{ vars.MPV_ODDS_FORM_TAU_DAYS }}
-          MPV_FLARESOLVERR_URL: http://localhost:8191/v1
+          # Contournement Cloudflare via API de scraping (voir pcs.py).
+          MPV_SCRAPER_API_URL: ${{ secrets.MPV_SCRAPER_API_URL }}
           # Notifications push déclenchées par beta.py (open/close/results).
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}

@@ -35,6 +35,15 @@ _PCS_BASE = "https://www.procyclingstats.com/"
 _FS_URL = os.environ.get("MPV_FLARESOLVERR_URL", "").strip()
 _http = None  # requests.Session porteuse du cookie cf_clearance (voie rapide)
 
+# API de scraping (ScraperAPI / ZenRows / Scrapfly…) : gère Cloudflare + IP
+# résidentielles côté fournisseur — la seule voie fiable depuis une IP datacenter
+# GitHub (FlareSolverr ne passe plus le défi Cloudflare de PCS depuis 2026-07).
+# MPV_SCRAPER_API_URL = base AVEC la clé et les options anti-bot ; l'URL PCS
+# cible est ajoutée en paramètre `url`. Exemples :
+#   ScraperAPI : https://api.scraperapi.com/?api_key=XXX&ultra_premium=true
+#   ZenRows    : https://api.zenrows.com/v1/?apikey=XXX&js_render=true&antibot=true
+_SCRAPER_URL = os.environ.get("MPV_SCRAPER_API_URL", "").strip()
+
 
 def _fs_post(cmd: str, **extra) -> dict:
     r = requests.post(_FS_URL, json={"cmd": cmd, **extra}, timeout=180)
@@ -94,14 +103,33 @@ def _fetch_html(url: str) -> str | None:
     return None
 
 
+def _fetch_via_scraper(url: str) -> str | None:
+    """HTML d'une page PCS via l'API de scraping (contourne Cloudflare). L'URL
+    PCS cible passe en paramètre `url` ; renvoie None après 3 échecs."""
+    for attempt in range(3):
+        try:
+            r = requests.get(_SCRAPER_URL, params={"url": _abs(url)}, timeout=120)
+            if r.status_code == 200 and "Just a moment" not in r.text:
+                return r.text
+            log.warning("scraper %s -> HTTP %s (tentative %d/3)", url, r.status_code, attempt + 1)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("scraper échec %s (%s)", url, exc)
+        time.sleep(2)
+    return None
+
+
 def _make(cls, url: str):
-    """Instancie une classe procyclingstats. Avec FlareSolverr on fournit le
-    HTML (update_html=False) ; sinon la lib fait sa requête directe."""
-    if not _FS_URL:
+    """Instancie une classe procyclingstats. Via l'API de scraping ou FlareSolverr
+    on fournit le HTML (update_html=False) ; sinon la lib fait sa requête directe
+    (dev local, IP résidentielle)."""
+    if _SCRAPER_URL:
+        html = _fetch_via_scraper(url)
+    elif _FS_URL:
+        html = _fetch_html(url)
+    else:
         return cls(url)
-    html = _fetch_html(url)
     if not html:
-        raise ConnectionError(f"HTML PCS indisponible via FlareSolverr : {url}")
+        raise ConnectionError(f"HTML PCS indisponible : {url}")
     return cls(url, html=html, update_html=False)
 
 MAX_STAGES = 25  # garde-fou (le Tour compte 21 étapes)
