@@ -1,15 +1,16 @@
 name: Notifications (rappel + clôture)
 
 # ⏰ cron en UTC. En juillet, Paris = UTC+2 (CEST).
-#   Rappel + clôture suivent la VRAIE deadline (= heure de départ de l'étape).
-#   Un "tick" tourne toutes les 20 min de 11h à 15h40 Paris (09:00–13:40 UTC) :
-#     - rappel dès qu'on entre dans la fenêtre avant la deadline (une fois),
-#     - clôture dès que la deadline est passée (une fois).
-#   « Étape ouverte » et « résultats » sont déclenchées par les workflows
-#   Côtes et Résultats (au moment de la transition).
+#   Toutes les 20 min de 11h à ~23h40 Paris (09:00–21:40 UTC), on envoie TOUTES
+#   les notifs (chacune idempotente via les drapeaux notified_*) :
+#     - rappel + clôture : dès la fenêtre / la deadline passée (midi),
+#     - étape ouverte + résultats : dès que la donnée est écrite (le soir).
+#   NB : la RÉCUPÉRATION des cotes/résultats tourne désormais en local (PCS est
+#   bloqué depuis les IP GitHub) ; seul l'ENVOI des notifs reste ici, car il ne
+#   lit que Supabase et dispose des clés VAPID.
 on:
   schedule:
-    - cron: '*/20 9-13 * * *'
+    - cron: '*/20 9-21 * * *'
   workflow_dispatch:
     inputs:
       event:
@@ -37,4 +38,13 @@ jobs:
           VAPID_SUBJECT: ${{ vars.VAPID_SUBJECT }}
           MPV_SITE_URL: ${{ vars.MPV_SITE_URL }}
           MPV_SEASON: ${{ vars.MPV_SEASON }}
-        run: python notify.py --event "${{ github.event.inputs.event || 'tick' }}"
+        run: |
+          EVENT="${{ github.event.inputs.event }}"
+          if [ -n "$EVENT" ]; then
+            python notify.py --event "$EVENT"          # déclenchement manuel : 1 seul événement
+          else
+            # Cron : on couvre tout (idempotent). open/results dès que le local a écrit.
+            python notify.py --event tick
+            python notify.py --event open
+            python notify.py --event results
+          fi

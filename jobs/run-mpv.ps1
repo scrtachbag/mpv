@@ -35,38 +35,21 @@ if (-not $env:SUPABASE_SERVICE_KEY) {
 $env:SUPABASE_URL = 'https://lprhfzmligohzucyurjm.supabase.co'
 if (-not $env:MPV_SEASON)    { $env:MPV_SEASON = '2026' }
 if (-not $env:MPV_RACE_SLUG) { $env:MPV_RACE_SLUG = 'tour-de-france' }
-# Notifications push (facultatif) : cible ouverte au clic + expéditeur VAPID.
-# Les clés VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY vont dans .mpv-secrets.ps1.
-if (-not $env:MPV_SITE_URL)  { $env:MPV_SITE_URL  = 'https://www.mon-petit-velo.fr' }
-if (-not $env:VAPID_SUBJECT) { $env:VAPID_SUBJECT = 'mailto:contact@mon-petit-velo.fr' }
 # Requête DIRECTE : pas de scraper ni FlareSolverr (inutiles depuis chez toi).
 Remove-Item Env:MPV_SCRAPER_API_URL  -ErrorAction SilentlyContinue
 Remove-Item Env:MPV_FLARESOLVERR_URL -ErrorAction SilentlyContinue
 
-# Envoi d'une notif push. Ignoré si pas de clé VAPID ; ne fait jamais échouer le
-# run (l'écriture des données reste prioritaire). notify.py est idempotent
-# (drapeaux notified_* -> une transition n'est notifiée qu'une fois).
-function Send-Notif([string]$ev) {
-  if (-not $env:VAPID_PRIVATE_KEY) {
-    Write-Host "notif '$ev' ignoree (ajoute VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY dans .mpv-secrets.ps1)"
-    return
-  }
-  try { python notify.py --event $ev } catch { Write-Warning "notif '$ev' : $_" }
-}
+# NB : les notifications push (étape ouverte / résultats) sont envoyées par le
+# cron GitHub notify.yml (qui a les clés VAPID et ne lit que Supabase) dès que
+# ce script a écrit les données. Rien à faire ici.
 
 switch ($Cmd) {
   'results' {
     if ($Rest) { python fetch_results.py --stage $Rest[0] } else { python fetch_results.py }
-    Send-Notif 'results'
   }
-  'odds' {
-    python fetch_odds.py @Rest
-    Send-Notif 'open'
-  }
+  'odds' { python fetch_odds.py @Rest }
   'soir' {
     if ($Rest) { python fetch_results.py --stage $Rest[0] } else { python fetch_results.py }
-    Send-Notif 'results'
     python fetch_odds.py
-    Send-Notif 'open'
   }
 }
