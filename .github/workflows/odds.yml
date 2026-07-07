@@ -39,8 +39,11 @@ jobs:
       - run: pip install --no-cache-dir -r jobs/requirements.txt
       - name: Démarrer FlareSolverr (contournement Cloudflare PCS)
         run: |
+          # Version ÉPINGLÉE : le tag :latest a été repoussé en 3.5.0 (Chromium
+          # 148) qui ne résout plus le défi Cloudflare de PCS (timeout 90 s).
+          # v3.3.21 = dernier release stable qui passait jusqu'au 2026-07-06.
           docker run -d --name flaresolverr --shm-size=2g -p 8191:8191 \
-            ghcr.io/flaresolverr/flaresolverr:latest
+            ghcr.io/flaresolverr/flaresolverr:v3.3.21
           for i in $(seq 1 40); do
             curl -s http://localhost:8191/ | grep -qi "ready" && { echo "FlareSolverr prêt"; break; } || sleep 3
           done
