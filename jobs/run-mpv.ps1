@@ -39,17 +39,44 @@ if (-not $env:MPV_RACE_SLUG) { $env:MPV_RACE_SLUG = 'tour-de-france' }
 Remove-Item Env:MPV_SCRAPER_API_URL  -ErrorAction SilentlyContinue
 Remove-Item Env:MPV_FLARESOLVERR_URL -ErrorAction SilentlyContinue
 
-# NB : les notifications push (étape ouverte / résultats) sont envoyées par le
-# cron GitHub notify.yml (qui a les clés VAPID et ne lit que Supabase) dès que
-# ce script a écrit les données. Rien à faire ici.
+# Notifs : l'ENVOI se fait sur GitHub (notify.yml a les clés VAPID). Pour être
+# RÉACTIF, on déclenche le workflow tout de suite (workflow_dispatch) au lieu
+# d'attendre le prochain tick du cron (~20 min + retard GitHub). Nécessite un PAT
+# fine-grained (permission "Actions: write" sur le dépôt) dans .mpv-secrets.ps1 :
+#     $env:MPV_GH_TOKEN = "github_pat_..."
+# Sans token : ignoré (le cron enverra la notif au tick suivant, juste moins vite).
+function Dispatch-Notif([string]$ev) {
+  if (-not $env:MPV_GH_TOKEN) { Write-Host "notif '$ev' : pas de MPV_GH_TOKEN -> le cron s'en chargera"; return }
+  $body = @{ ref = 'master'; inputs = @{ event = $ev } } | ConvertTo-Json -Compress
+  try {
+    Invoke-RestMethod -Method Post -TimeoutSec 20 `
+      -Uri 'https://api.github.com/repos/scrtachbag/mpv/actions/workflows/notify.yml/dispatches' `
+      -Headers @{ Authorization = "Bearer $env:MPV_GH_TOKEN"; Accept = 'application/vnd.github+json';
+                  'User-Agent' = 'mpv-local'; 'X-GitHub-Api-Version' = '2022-11-28' } `
+      -Body $body -ContentType 'application/json' | Out-Null
+    Write-Host "notif '$ev' declenchee sur GitHub (envoi imminent)"
+  } catch { Write-Warning "dispatch notif '$ev' : $_" }
+}
+
+# Publie les résultats et, SEULEMENT si un classement est réellement tombé
+# (log 'enregistrée'), déclenche la notif -> pas de run inutile aux polls à vide.
+function Invoke-Results([string[]]$extra) {
+  $out = (python fetch_results.py @extra 2>&1) | Out-String
+  Write-Host $out
+  if ($out -match 'enregistr') { Dispatch-Notif 'results' }
+}
 
 switch ($Cmd) {
   'results' {
-    if ($Rest) { python fetch_results.py --stage $Rest[0] } else { python fetch_results.py }
+    if ($Rest) { Invoke-Results @('--stage', $Rest[0]) } else { Invoke-Results @() }
   }
-  'odds' { python fetch_odds.py @Rest }
+  'odds' {
+    python fetch_odds.py @Rest
+    Dispatch-Notif 'open'   # 1×/jour à 20h : ouverture des paris du lendemain
+  }
   'soir' {
-    if ($Rest) { python fetch_results.py --stage $Rest[0] } else { python fetch_results.py }
+    if ($Rest) { Invoke-Results @('--stage', $Rest[0]) } else { Invoke-Results @() }
     python fetch_odds.py
+    Dispatch-Notif 'open'
   }
 }

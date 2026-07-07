@@ -27,7 +27,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install --no-cache-dir -r jobs/requirements.txt
+      # notify.py ne lit que Supabase + envoie du Web Push : install allégée
+      # (pas de procyclingstats/cloudscraper) -> job bien plus rapide/réactif.
+      - run: pip install --no-cache-dir "requests>=2.31" "pywebpush>=1.14.1"
       - name: Envoi des notifications
         working-directory: jobs
         env:
