@@ -22,6 +22,18 @@ jobs:
         with:
           version: latest
 
+      - name: Contrôle préalable des secrets requis
+        run: |
+          fail=0
+          [ -z "$SUPABASE_ACCESS_TOKEN" ] && { echo "::error::SUPABASE_ACCESS_TOKEN absent."; fail=1; }
+          if [ -z "${{ secrets.GH_DISPATCH_TOKEN }}" ]; then
+            echo "::error::Le secret GitHub GH_DISPATCH_TOKEN est vide/absent — le bouton admin 'Récupérer les résultats' ne marchera pas. À créer dans Settings > Secrets and variables > Actions > onglet Secrets (pas Variables), nom exact GH_DISPATCH_TOKEN."
+            fail=1
+          else
+            echo "GH_DISPATCH_TOKEN présent (valeur masquée)."
+          fi
+          exit $fail
+
       - name: Déployer la fonction notify-chat
         run: supabase functions deploy notify-chat --project-ref "$PROJECT_REF" --no-verify-jwt
 
@@ -39,3 +51,6 @@ jobs:
             GH_REPO="scrtachbag/mpv" \
             GH_REF="master" \
             GH_DISPATCH_TOKEN="${{ secrets.GH_DISPATCH_TOKEN }}"
+
+      - name: Confirmer les secrets enregistrés (noms + digest, valeurs masquées)
+        run: supabase secrets list --project-ref "$PROJECT_REF"
