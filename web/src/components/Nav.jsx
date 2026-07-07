@@ -1,16 +1,19 @@
 import { useAuth } from '../auth.jsx'
 import Avatar from './Avatar.jsx'
 
-const TABS = [
-  { key: 'tour', label: '🚴 Le Tour' },
-  { key: 'history', label: '📅 Historique' },
-  { key: 'chat', label: '💬 Chat' },
-  { key: 'rules', label: '📖 Règles' },
+const TOUR       = { key: 'tour', icon: '🚴', label: 'Le Tour' }
+const CLASSEMENT = { key: 'classement', icon: '🏆', label: 'Classement' }
+const REST = [
+  { key: 'history', icon: '📅', label: 'Historique' },
+  { key: 'chat', icon: '💬', label: 'Chat' },
+  { key: 'rules', icon: '📖', label: 'Règles' },
 ]
 
-export default function Nav({ view, setView }) {
+export default function Nav({ view, setView, isMobile }) {
   const { profile, signOut } = useAuth()
-  const tabs = TABS   // l'admin est désormais dans la page Profil
+  // Sur mobile, la page « Le Tour » est scindée : on ajoute un onglet Classement.
+  // Sur desktop, le classement reste dans la page Le Tour (rien ne change).
+  const tabs = isMobile ? [TOUR, CLASSEMENT, ...REST] : [TOUR, ...REST]
 
   return (
     <header className="nav">
@@ -22,8 +25,10 @@ export default function Nav({ view, setView }) {
         {tabs.map((t) => (
           <button key={t.key}
             className={view === t.key ? 'tab active' : 'tab'}
-            onClick={() => setView(t.key)}>
-            {t.label}
+            onClick={() => setView(t.key)}
+            title={t.label} aria-label={t.label}>
+            <span className="tab-icon" aria-hidden="true">{t.icon}</span>
+            <span className="tab-text">{t.label}</span>
           </button>
         ))}
       </nav>

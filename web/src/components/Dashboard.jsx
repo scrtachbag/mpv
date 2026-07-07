@@ -1,7 +1,8 @@
 import TodayBet from './TodayBet.jsx'
 import Leaderboard from './Leaderboard.jsx'
 
-export default function Dashboard() {
+// withLeaderboard=false sur mobile : le classement a son propre onglet.
+export default function Dashboard({ withLeaderboard = true }) {
   return (
     <div className="dash">
       <section className="dash-hero">
@@ -21,12 +22,14 @@ export default function Dashboard() {
         <div className="dash-col main">
           <TodayBet />
         </div>
-        <aside className="dash-col side">
-          <div className="card">
-            <h2>🏆 Classement</h2>
-            <Leaderboard />
-          </div>
-        </aside>
+        {withLeaderboard && (
+          <aside className="dash-col side">
+            <div className="card">
+              <h2>🏆 Classement</h2>
+              <Leaderboard />
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   )

@@ -10,11 +10,16 @@ import History from './components/History.jsx'
 import Chat from './components/Chat.jsx'
 import Profile from './components/Profile.jsx'
 import Rules from './components/Rules.jsx'
+import Leaderboard from './components/Leaderboard.jsx'
 import StageBackdrop from './components/StageBackdrop.jsx'
+import { useIsMobile } from './lib/useIsMobile.js'
 
 export default function App() {
   const { session, profile, loading, profileLoading, recovery } = useAuth()
+  const isMobile = useIsMobile()
   const [view, setView] = useState('tour')  // par défaut : Le Tour
+  // 'classement' n'existe qu'en mobile : sur desktop on retombe sur Le Tour.
+  const activeView = (!isMobile && view === 'classement') ? 'tour' : view
   // Toute première connexion du compte : on ouvre les Règles, une seule fois.
   const introDone = useRef(false)
   useEffect(() => {
@@ -42,15 +47,18 @@ export default function App() {
   return (
     <div className="app">
       <StageBackdrop />
-      <Nav view={view} setView={setView} />
+      <Nav view={activeView} setView={setView} isMobile={isMobile} />
       <main className="container">
-        {view === 'tour' && <Dashboard />}
-        {view === 'history' && (
+        {activeView === 'tour' && <Dashboard withLeaderboard={!isMobile} />}
+        {activeView === 'classement' && (
+          <div className="card"><h2>🏆 Classement</h2><Leaderboard /></div>
+        )}
+        {activeView === 'history' && (
           <div className="card"><h2>📅 Historique des étapes</h2><History /></div>
         )}
-        {view === 'chat' && <Chat />}
-        {view === 'rules' && <Rules />}
-        {view === 'profile' && <Profile />}
+        {activeView === 'chat' && <Chat />}
+        {activeView === 'rules' && <Rules />}
+        {activeView === 'profile' && <Profile />}
       </main>
       <footer className="footer muted">
         🚵 Mon Petit Vélo — entre amis, sans argent, pour la gloire. Côtes calculées depuis ProCyclingStats.

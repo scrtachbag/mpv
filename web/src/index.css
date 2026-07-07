@@ -56,9 +56,11 @@ small { font-size: .7em; color: var(--muted); }
 .tab {
   background: transparent; color: #d4d7e0; border: 0; cursor: pointer;
   padding: .5rem .9rem; border-radius: 999px; font-size: .95rem; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center; gap: .35rem;
 }
 .tab:hover { background: rgba(255,255,255,.1); color: #fff; }
 .tab.active { background: var(--yellow); color: var(--ink); }
+.tab-icon { line-height: 1; }
 .nav .user { display: flex; align-items: center; gap: .55rem; }
 .nav .pseudo { font-weight: 700; }
 .nav .link { color: #b9bdca; }
@@ -341,11 +343,10 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
     order: 3; flex-basis: 100%; display: flex; flex-wrap: nowrap;
     gap: .25rem; padding-bottom: 2px;
   }
-  /* 4 onglets répartis sur toute la largeur ; police adaptée à la largeur dispo */
-  .tab {
-    flex: 1 1 0; min-width: 0; text-align: center; white-space: nowrap;
-    padding: .45rem .3rem; font-size: clamp(.72rem, 3.3vw, .92rem);
-  }
+  /* 5 onglets répartis sur toute la largeur : ICÔNES SEULES (pas de scroll horizontal). */
+  .tab { flex: 1 1 0; min-width: 0; padding: .5rem .2rem; }
+  .tab-text { display: none; }
+  .tab-icon { font-size: 1.35rem; }
   .nav .pseudo { max-width: 7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* Titres / hero plus compacts sur mobile (moins de retours à la ligne). */
