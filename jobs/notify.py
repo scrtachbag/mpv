@@ -18,6 +18,7 @@ Ce job n'envoie que des notifications ; il ne touche ni au scoring ni aux côtes
 import argparse
 import json
 import logging
+import os
 from datetime import datetime, timedelta
 
 import config
@@ -164,11 +165,40 @@ def notify_event(event: str) -> int:
     return 1
 
 
+def notify_test(email: str) -> int:
+    """Envoie une notif de TEST au seul compte `email` (aucun autre abonné).
+    Sert à vérifier le déclenchement/la réactivité sans déranger le groupe."""
+    config.require_supabase()
+    if not (config.VAPID_PRIVATE_KEY and config.VAPID_PUBLIC_KEY):
+        log.warning("Clés VAPID absentes : notifications désactivées.")
+        return 0
+    if not email:
+        log.error("Précise l'email cible : --email toi@exemple.com (ou variable MPV_TEST_EMAIL).")
+        return 1
+    ids = {p["id"] for p in db.select("profiles", {"email": f"eq.{email}", "select": "id"})}
+    if not ids:
+        log.error("Aucun profil pour l'email %s.", email)
+        return 1
+    targets = [s for s in _subs() if s["user_id"] in ids]
+    n = _send(targets, "🔔 Test — Mon Petit Vélo",
+              "Si tu vois cette notif, le déclenchement marche ! (test, visible par toi seul)",
+              "mpv-test", ttl=600)
+    log.info("Test pour %s : %d abonnement(s) ciblé(s).", email, n)
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--event", required=True,
-                    choices=["open", "reminder", "close", "results", "tick"])
-    return notify_event(ap.parse_args().event)
+    ap.add_argument("--event", choices=["open", "reminder", "close", "results", "tick"])
+    ap.add_argument("--test", action="store_true",
+                    help="notif de test au seul compte --email / MPV_TEST_EMAIL")
+    ap.add_argument("--email", help="email cible du test (défaut : variable MPV_TEST_EMAIL)")
+    args = ap.parse_args()
+    if args.test:
+        return notify_test(args.email or os.environ.get("MPV_TEST_EMAIL", ""))
+    if not args.event:
+        ap.error("précise --event <open|reminder|close|results|tick> ou --test")
+    return notify_event(args.event)
 
 
 if __name__ == "__main__":

@@ -14,10 +14,14 @@ on:
   workflow_dispatch:
     inputs:
       event:
-        description: "Événement à notifier"
+        description: "Événement à notifier (test = notif à toi seul)"
         type: choice
-        options: [tick, reminder, close, open, results]
+        options: [tick, reminder, close, open, results, test]
         default: tick
+      email:
+        description: "Email cible (uniquement pour event=test)"
+        required: false
+        default: ''
 
 jobs:
   notify:
@@ -42,7 +46,9 @@ jobs:
           MPV_SEASON: ${{ vars.MPV_SEASON }}
         run: |
           EVENT="${{ github.event.inputs.event }}"
-          if [ -n "$EVENT" ]; then
+          if [ "$EVENT" = "test" ]; then
+            python notify.py --test --email "${{ github.event.inputs.email }}"   # notif à toi seul
+          elif [ -n "$EVENT" ]; then
             python notify.py --event "$EVENT"          # déclenchement manuel : 1 seul événement
           else
             # Cron : on couvre tout (idempotent). open/results dès que le local a écrit.
