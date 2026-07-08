@@ -38,10 +38,32 @@ def _deadline_iso(date_str: str, start_time: str | None = None) -> str:
     return datetime.combine(d, t, tzinfo=config.TZ).isoformat()
 
 
-def _print_favorites(rows):
+def _print_favorites(rows, label="Favoris"):
     fav = sorted(rows, key=lambda x: x["odds"])[:8]
-    log.info("%d coureurs cotés. Favoris : %s", len(rows),
+    log.info("%s (%d coureurs) : %s", label, len(rows),
              ", ".join(f"{r['rider_name']} ({r['odds']})" for r in fav))
+
+
+def _apply_market(rows, stage_no, weight):
+    """Calibre nos cotes sur le marché Unibet (si weight>0 et marché disponible).
+    Repli silencieux sur le modèle maison si Unibet est injoignable / non matché."""
+    if weight <= 0:
+        return rows
+    import market  # import tardif (réseau)
+    desc, mkt = market.get_stage_market(stage_no)
+    if not mkt:
+        log.info("Marché indisponible : cotes 100%% maison.")
+        return rows
+    by_name = market.match([r["rider_name"] for r in rows], mkt)
+    top = ", ".join(f"{n} {o}" for n, o in sorted(mkt, key=lambda x: x[1])[:5])
+    log.info("Marché Unibet « %s » : %d cotés, %d matchés. Favoris book : %s",
+             desc, len(mkt), len(by_name), top)
+    if not by_name:
+        log.warning("Aucun favori marché matché (noms ?) : cotes maison conservées.")
+        return rows
+    rows = odds.blend_market(rows, by_name, weight)
+    log.info("Ancrage marché appliqué (poids %.2f).", weight)
+    return rows
 
 
 def main() -> int:
@@ -59,6 +81,8 @@ def main() -> int:
                     help="décalage de date (1 = étape de DEMAIN, pour un calcul la veille au soir)")
     ap.add_argument("--alpha", type=float, help="surcharge ALPHA (concentration des favoris)")
     ap.add_argument("--form-bonus", type=float, help="surcharge FORM_BONUS (poids de la forme)")
+    ap.add_argument("--market-weight", type=float,
+                    help="ancrage sur le marché Unibet [0..1] (surcharge MPV_ODDS_MARKET_WEIGHT)")
     args = ap.parse_args()
     from models import RiderForm  # local (pas de PCS)
 
@@ -114,7 +138,11 @@ def main() -> int:
         log.info("Snapshot écrit : %s", args.save_snapshot)
 
     rows = odds.compute_odds(forms, info.profile_type, alpha=args.alpha, form_bonus=args.form_bonus)
-    _print_favorites(rows)
+    _print_favorites(rows, "Modèle maison")
+    mw = args.market_weight if args.market_weight is not None else config.ODDS_MARKET_WEIGHT
+    rows = _apply_market(rows, info.stage_no, mw)
+    if mw > 0:
+        _print_favorites(rows, "Après ancrage marché")
 
     if args.dry_run:
         log.info("--dry-run : rien écrit en base.")

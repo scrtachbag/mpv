@@ -83,3 +83,35 @@ def compute_odds(riders: list[RiderForm], profile: str | None,
              "odds": round(min(max(config.ODDS_MARGIN / (w / total), floor), cap), 2),
              "nationality": r.nationality, "team": r.team}
             for r, w in zip(riders, weights)]
+
+
+def blend_market(rows: list[dict], market_by_name: dict[str, float],
+                 weight: float | None = None) -> list[dict]:
+    """Rapproche nos côtes de celles du MARCHÉ (cf. market.py).
+
+    On mélange les probabilités implicites : p = weight·p_marché + (1−weight)·p_maison,
+    puis côte = MARGIN / p (bornée). Les favoris du book se raccourcissent, les
+    coureurs qu'il ne cote pas s'allongent, et CHAQUE coureur garde une côte
+    cohérente. weight<=0 ou marché vide -> `rows` inchangé (repli sur le modèle).
+
+    Fonction PURE (aucun réseau) : testable hors-ligne."""
+    weight = config.ODDS_MARKET_WEIGHT if weight is None else weight
+    if not rows or not market_by_name or weight <= 0:
+        return rows
+    weight = min(max(weight, 0.0), 1.0)
+    margin, floor, cap = config.ODDS_MARGIN, config.ODDS_MIN, config.ODDS_MAX
+
+    inv = {r["rider_name"]: 1.0 / max(r["odds"], 1e-9) for r in rows}
+    tot_model = sum(inv.values()) or 1.0
+    p_model = {k: v / tot_model for k, v in inv.items()}
+
+    mk = {n: 1.0 / max(o, 1e-9) for n, o in market_by_name.items() if n in p_model}
+    tot_mkt = sum(mk.values()) or 1.0
+    p_mkt = {k: v / tot_mkt for k, v in mk.items()}
+
+    out = []
+    for r in rows:
+        p = weight * p_mkt.get(r["rider_name"], 0.0) + (1.0 - weight) * p_model[r["rider_name"]]
+        odds = round(min(max(margin / max(p, 1e-12), floor), cap), 2)
+        out.append({**r, "odds": odds})
+    return out

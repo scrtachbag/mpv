@@ -59,6 +59,22 @@ def test_cotes_dans_les_bornes():
         assert 1.5 <= o["odds"] <= 500
 
 
+def test_blend_market_rapproche_du_book():
+    rows = odds.compute_odds(riders(), "flat")
+    o0 = {r["rider_name"]: r["odds"] for r in rows}
+    # marché fictif : le Grimpeur est ultra-favori du book (ce qu'il n'est PAS chez nous sur plat)
+    blended = odds.blend_market(rows, {"Grimpeur": 1.5, "Sprinteur": 4.0}, weight=0.9)
+    bo = {r["rider_name"]: r["odds"] for r in blended}
+    assert bo["Grimpeur"] < o0["Grimpeur"]        # favori marché -> côte raccourcie
+    assert bo["Grimpeur"] == min(bo.values())      # devient favori après ancrage
+
+
+def test_blend_market_noop_sans_marche_ni_poids():
+    rows = odds.compute_odds(riders(), "flat")
+    assert odds.blend_market(rows, {}, weight=0.9) == rows          # pas de marché
+    assert odds.blend_market(rows, {"Grimpeur": 1.5}, weight=0) == rows  # poids nul
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for t in tests:

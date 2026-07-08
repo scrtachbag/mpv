@@ -66,6 +66,13 @@ ODDS_FORM_UNDATED_WEIGHT = _float("MPV_ODDS_FORM_UNDATED_WEIGHT", 0.5)
 # entre grimpeurs, pas seulement entre puncheurs/classicmen. 0 = désactivé.
 ODDS_HILLY_CLIMBER = _float("MPV_ODDS_HILLY_CLIMBER", 0.5)
 
+# --- Calibrage sur le MARCHÉ (Unibet, cf. market.py) ------------------------
+# Poids [0..1] de la proba implicite du book dans nos cotes finales : 0 = 100 %
+# maison (défaut, comportement inchangé) ; 0.8 = fort ancrage marché (nos favoris
+# ≈ ceux du book) ; 1 = quasi-copie du marché pour les coureurs cotés. Le scraping
+# Unibet ne marche que depuis une IP résidentielle FR ; sinon repli sur le modèle.
+ODDS_MARKET_WEIGHT = _float("MPV_ODDS_MARKET_WEIGHT", 0.0)
+
 # Nombre de positions de résultat à enregistrer (le top 10 suffit au score).
 RESULTS_TOP_N = _int("MPV_RESULTS_TOP_N", 30)
 
