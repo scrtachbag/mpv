@@ -10,12 +10,12 @@
 #
 # Usage (PowerShell, depuis le dossier jobs) :
 #     .\run-mpv.ps1 results [n°étape]     # publie le classement (défaut: étape du jour)
-#     .\run-mpv.ps1 odds    [args...]     # calcule les cotes (défaut: étape de demain)
-#     .\run-mpv.ps1 soir    [n°étape]     # résultats du jour PUIS cotes de demain
+#     .\run-mpv.ps1 odds    [args...]     # cote l'étape du JOUR par défaut
+#     .\run-mpv.ps1 soir    [n°étape]     # résultats du jour PUIS cotes de DEMAIN
 # Exemples :
 #     .\run-mpv.ps1 results 4             # classement de l'étape 4
-#     .\run-mpv.ps1 odds                  # cotes de l'étape de demain
-#     .\run-mpv.ps1 odds --stage 5        # cotes forcées sur l'étape 5
+#     .\run-mpv.ps1 odds --stage 6        # cotes forcées sur l'étape 6
+#     .\run-mpv.ps1 odds --offset-days 1  # cotes de DEMAIN (ce que fait la tâche du soir)
 # Si l'exécution est bloquée par la stratégie PowerShell :
 #     powershell -ExecutionPolicy Bypass -File .\run-mpv.ps1 results 4
 # --------------------------------------------------------------------------
@@ -25,6 +25,10 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
+
+# Journalise chaque exécution (diagnostic des tâches planifiées). Fichier *.log ignoré par git.
+$log = Join-Path $PSScriptRoot ('mpv-run-' + (Get-Date -Format 'yyyy-MM') + '.log')
+try { Start-Transcript -Path $log -Append -ErrorAction SilentlyContinue | Out-Null } catch {}
 
 # Secret : chargé depuis .mpv-secrets.ps1, ou déjà présent dans l'environnement.
 if (Test-Path '.mpv-secrets.ps1') { . .\.mpv-secrets.ps1 }
@@ -61,7 +65,12 @@ function Dispatch-Notif([string]$ev) {
 # Publie les résultats et, SEULEMENT si un classement est réellement tombé
 # (log 'enregistrée'), déclenche la notif -> pas de run inutile aux polls à vide.
 function Invoke-Results([string[]]$extra) {
-  $out = (python fetch_results.py @extra 2>&1) | Out-String
+  # $ErrorActionPreference='Stop' + capture 2>&1 : un log INFO de Python (émis sur
+  # stderr) serait vu comme une erreur FATALE (NativeCommandError) -> la tâche
+  # planterait APRÈS avoir publié. On repasse en 'Continue' le temps de l'appel.
+  $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+  $out = (python fetch_results.py @extra 2>&1 | Out-String)
+  $ErrorActionPreference = $prev
   Write-Host $out
   if ($out -match 'enregistr') { Dispatch-Notif 'results' }
 }
@@ -76,7 +85,9 @@ switch ($Cmd) {
   }
   'soir' {
     if ($Rest) { Invoke-Results @('--stage', $Rest[0]) } else { Invoke-Results @() }
-    python fetch_odds.py
+    python fetch_odds.py --offset-days 1   # cote l'étape de DEMAIN (veille au soir)
     Dispatch-Notif 'open'
   }
 }
+
+try { Stop-Transcript -ErrorAction SilentlyContinue | Out-Null } catch {}

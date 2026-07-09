@@ -36,8 +36,8 @@ function New-MpvAction([string]$mpvArgs) {
 $tOdds = New-ScheduledTaskTrigger -Daily -At '20:00'
 $tOdds.EndBoundary = $end
 Register-ScheduledTask -TaskName 'MPV - Cotes du soir' -Force -Settings $settings `
-  -Action (New-MpvAction 'odds') -Trigger $tOdds `
-  -Description 'Mon Petit Velo : calcule les cotes de l etape du lendemain (ouvre les paris).'
+  -Action (New-MpvAction 'odds --offset-days 1') -Trigger $tOdds `
+  -Description 'Mon Petit Velo : calcule les cotes de l etape du LENDEMAIN (ouvre les paris la veille au soir).'
 
 # --- Résultats : chaque soir de 17:00 à 22:00, toutes les 20 min ---
 $tRes = New-ScheduledTaskTrigger -Daily -At '17:00'
