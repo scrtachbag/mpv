@@ -27,8 +27,11 @@ $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries `
   -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 1)
 
 function New-MpvAction([string]$mpvArgs) {
-  New-ScheduledTaskAction -Execute 'powershell.exe' `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$script`" $mpvArgs" `
+  # Lancé par wscript + run-hidden.vbs -> exécution SANS fenêtre (pas de terminal
+  # qui apparaît pendant que tu travailles). run-hidden.vbs appelle run-mpv.ps1.
+  $vbs = Join-Path $here 'run-hidden.vbs'
+  New-ScheduledTaskAction -Execute 'wscript.exe' `
+    -Argument "`"$vbs`" $mpvArgs" `
     -WorkingDirectory $here
 }
 

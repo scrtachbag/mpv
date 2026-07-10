@@ -65,12 +65,11 @@ function Dispatch-Notif([string]$ev) {
 # Publie les résultats et, SEULEMENT si un classement est réellement tombé
 # (log 'enregistrée'), déclenche la notif -> pas de run inutile aux polls à vide.
 function Invoke-Results([string[]]$extra) {
-  # $ErrorActionPreference='Stop' + capture 2>&1 : un log INFO de Python (émis sur
-  # stderr) serait vu comme une erreur FATALE (NativeCommandError) -> la tâche
-  # planterait APRÈS avoir publié. On repasse en 'Continue' le temps de l'appel.
-  $prev = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
-  $out = (python fetch_results.py @extra 2>&1 | Out-String)
-  $ErrorActionPreference = $prev
+  # Les logs INFO de Python arrivent sur stderr. Si PowerShell fait le 2>&1, il
+  # crée des ErrorRecord (NativeCommandError) -> tâche en échec / journal pollué.
+  # On laisse cmd /c fusionner stderr+stdout AVANT : PowerShell ne voit que du
+  # texte. On détecte la publication au mot 'enregistr'.
+  $out = (& cmd /c "python fetch_results.py $($extra -join ' ') 2>&1" | Out-String)
   Write-Host $out
   if ($out -match 'enregistr') { Dispatch-Notif 'results' }
 }
