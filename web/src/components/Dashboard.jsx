@@ -1,4 +1,5 @@
 import TodayBet from './TodayBet.jsx'
+import AdvanceBets from './AdvanceBets.jsx'
 import Leaderboard from './Leaderboard.jsx'
 
 // withLeaderboard=false sur mobile : le classement a son propre onglet.
@@ -21,6 +22,7 @@ export default function Dashboard({ withLeaderboard = true }) {
       <div className="dash-grid">
         <div className="dash-col main">
           <TodayBet />
+          <AdvanceBets />
         </div>
         {withLeaderboard && (
           <aside className="dash-col side">

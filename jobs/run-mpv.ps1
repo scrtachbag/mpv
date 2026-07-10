@@ -20,7 +20,7 @@
 #     powershell -ExecutionPolicy Bypass -File .\run-mpv.ps1 results 4
 # --------------------------------------------------------------------------
 param(
-  [Parameter(Mandatory = $true)][ValidateSet('results', 'odds', 'soir')][string]$Cmd,
+  [Parameter(Mandatory = $true)][ValidateSet('results', 'odds', 'soir', 'precreate')][string]$Cmd,
   [Parameter(ValueFromRemainingArguments = $true)][string[]]$Rest
 )
 $ErrorActionPreference = 'Stop'
@@ -86,6 +86,9 @@ switch ($Cmd) {
     if ($Rest) { Invoke-Results @('--stage', $Rest[0]) } else { Invoke-Results @() }
     python fetch_odds.py --offset-days 1   # cote l'étape de DEMAIN (veille au soir)
     Dispatch-Notif 'open'
+  }
+  'precreate' {
+    python precreate_stages.py @Rest       # crée les étapes à venir (pré-choix sans cotes)
   }
 }
 
