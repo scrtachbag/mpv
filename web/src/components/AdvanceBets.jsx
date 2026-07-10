@@ -20,6 +20,7 @@ export default function AdvanceBets() {
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -55,12 +56,13 @@ export default function AdvanceBets() {
   useEffect(() => { load() }, [load])
 
   async function choose(stage, rider_name) {
-    setSaving(true)
-    await supabase.from('bets').upsert(
+    setSaving(true); setError(null)
+    const { error: err } = await supabase.from('bets').upsert(
       { user_id: user.id, stage_id: stage.id, rider_name },
       { onConflict: 'user_id,stage_id' },
     )
     setSaving(false)
+    if (err) { setError(err.message); return }   // ne plus échouer en silence
     setOpenStage(null); setQuery('')
     load()
   }
@@ -77,6 +79,7 @@ export default function AdvanceBets() {
         Choisis ton coureur pour les étapes à venir. La cote sera figée à l’ouverture
         (la veille) ; tu pourras encore ajuster jusqu’au départ.
       </p>
+      {error && <p className="error">{error}</p>}
       <ul className="adv-list">
         {stages.map((s) => {
           const mine = picks[s.id]

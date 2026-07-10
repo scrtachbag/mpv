@@ -176,12 +176,16 @@ begin
     raise exception 'Les paris pour cette étape sont clôturés (deadline %).', v_deadline;
   end if;
 
-  -- 2) le coureur doit faire partie des partants cotés de l'étape
-  if not exists (
-    select 1 from public.stage_riders
-    where stage_id = new.stage_id and rider_name = new.rider_name
-  ) then
-    raise exception 'Coureur "%" non disponible pour cette étape.', new.rider_name;
+  -- 2) coureur valide — UNIQUEMENT si l'étape est déjà cotée (a des stage_riders).
+  --    Sur une étape non cotée (pré-choix / paris à l'avance), la liste des
+  --    partants n'existe pas encore : on laisse passer (front valide startlist).
+  if exists (select 1 from public.stage_riders where stage_id = new.stage_id) then
+    if not exists (
+      select 1 from public.stage_riders
+      where stage_id = new.stage_id and rider_name = new.rider_name
+    ) then
+      raise exception 'Coureur "%" non disponible pour cette étape.', new.rider_name;
+    end if;
   end if;
 
   -- 3) quota : 2 bonus maximum par parieur sur tout le Tour
