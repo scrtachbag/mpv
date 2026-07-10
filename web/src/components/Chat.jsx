@@ -14,6 +14,13 @@ export default function Chat() {
   const [text, setText] = useState('')
   const [loading, setLoading] = useState(true)
   const feedRef = useRef(null)
+  const taRef = useRef(null)
+
+  // Ajuste la hauteur du textarea à son contenu (multi-lignes), plafonnée par le CSS.
+  const growTextarea = () => {
+    const t = taRef.current
+    if (t) { t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight, 128) + 'px' }
+  }
 
   const loadReactions = useCallback(async () => {
     const { data } = await supabase.from('message_reactions').select('message_id, user_id, emoji')
@@ -85,6 +92,7 @@ export default function Chat() {
     const content = text.trim()
     if (!content) return
     setText('')
+    if (taRef.current) taRef.current.style.height = 'auto'   // reset la hauteur
     // On récupère la ligne insérée pour l'afficher tout de suite, sans dépendre
     // du temps réel (qui peut manquer un événement). Le handler Realtime déduplique
     // par id, donc aucun doublon si l'événement finit par arriver.
@@ -167,8 +175,10 @@ export default function Chat() {
           })}
       </div>
       <form className="chat-input" onSubmit={send}>
-        <input value={text} maxLength={500} placeholder="Balance ta vanne…"
-          onChange={(e) => setText(e.target.value)} />
+        <textarea ref={taRef} value={text} maxLength={500} rows={1}
+          placeholder="Balance ta vanne… (Maj+Entrée = nouvelle ligne)"
+          onChange={(e) => { setText(e.target.value); growTextarea() }}
+          onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(e) } }} />
         <button className="primary" type="submit" disabled={!text.trim()}>Envoyer</button>
       </form>
     </div>

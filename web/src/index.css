@@ -78,7 +78,7 @@ small { font-size: .7em; color: var(--muted); }
 
 /* ---------------- forms ---------------- */
 label { display: block; margin: .8rem 0 .3rem; font-weight: 600; font-size: .9rem; }
-input[type=email], input[type=text], input[type=password], input:not([type]), select, .chat-input input {
+input[type=email], input[type=text], input[type=password], input:not([type]), select, .chat-input input, .chat-input textarea {
   width: 100%; padding: .7rem .85rem; border: 1.5px solid #dcdfe6;
   border-radius: 11px; font-size: 1rem; background: #fbfbfc; color: var(--ink);
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
@@ -287,8 +287,9 @@ button.link { background: none; border: 0; color: var(--muted); cursor: pointer;
 .react-picker button { background: none; border: 0; cursor: pointer; font-size: 1.05rem; padding: .05rem .2rem; border-radius: 50%; }
 .react-picker button:hover { background: #f0f1f4; }
 
-.chat-input { display: flex; gap: .5rem; margin-top: .6rem; }
-.chat-input input { flex: 1; }
+.chat-input { display: flex; align-items: flex-end; gap: .5rem; margin-top: .6rem; }
+.chat-input input, .chat-input textarea { flex: 1; }
+.chat-input textarea { resize: none; min-height: 2.7rem; max-height: 8rem; font-family: inherit; line-height: 1.35; }
 .chat-input button.primary { width: auto; margin: 0; }
 
 /* ---------------- profil ---------------- */
