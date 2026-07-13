@@ -118,16 +118,49 @@ def _fetch_via_scraper(url: str) -> str | None:
     return None
 
 
+_cs = None  # session cloudscraper (résout le défi Cloudflare depuis une IP résidentielle)
+
+
+def _cloudscraper_html(url: str) -> str | None:
+    """HTML d'une page PCS via cloudscraper : identique à requests hors défi, et
+    résout le challenge Cloudflare (IUAM) quand il surgit — fiable depuis une IP
+    résidentielle. None si cloudscraper est absent ou échoue (repli sur la lib)."""
+    global _cs
+    try:
+        import cloudscraper
+    except ImportError:
+        return None
+    if _cs is None:
+        _cs = cloudscraper.create_scraper()
+    # PCS rate-limite (HTTP 429) : on temporise avec un backoff croissant.
+    for wait in (0, 4, 10, 25, 45):
+        if wait:
+            time.sleep(wait)
+        try:
+            r = _cs.get(_abs(url), timeout=40)
+            if r.status_code == 200 and "Just a moment" not in r.text:
+                return r.text
+            if r.status_code == 429:
+                log.warning("PCS %s -> 429 (rate-limit) ; pause avant réessai", url)
+                continue
+            log.warning("PCS %s -> HTTP %s", url, r.status_code)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("cloudscraper échec %s (%s)", url, exc)
+    return None
+
+
 def _make(cls, url: str):
-    """Instancie une classe procyclingstats. Via l'API de scraping ou FlareSolverr
-    on fournit le HTML (update_html=False) ; sinon la lib fait sa requête directe
-    (dev local, IP résidentielle)."""
+    """Instancie une classe procyclingstats. Via l'API de scraping / FlareSolverr /
+    cloudscraper on fournit le HTML (update_html=False)."""
     if _SCRAPER_URL:
         html = _fetch_via_scraper(url)
     elif _FS_URL:
         html = _fetch_html(url)
     else:
-        return cls(url)
+        # Local (IP résidentielle) : cloudscraper passe le défi Cloudflare
+        # intermittent de PCS ; repli sur la requête directe de la lib si absent.
+        html = _cloudscraper_html(url)
+        return cls(url, html=html, update_html=False) if html else cls(url)
     if not html:
         raise ConnectionError(f"HTML PCS indisponible : {url}")
     return cls(url, html=html, update_html=False)
