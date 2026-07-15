@@ -124,7 +124,10 @@ def main() -> int:
         ref_date = _date.fromisoformat(info.date)
     except (TypeError, ValueError):
         ref_date = None
-    forms = pcs.get_rider_forms(season, slug, ref_date=ref_date, sleep=args.sleep, limit=args.limit)
+    # Coureurs encore en course (GC de l'étape précédente) -> exclut les abandons.
+    active = pcs.get_active_rider_ids(season, slug, info.stage_no - 1)
+    forms = pcs.get_rider_forms(season, slug, ref_date=ref_date, sleep=args.sleep,
+                                limit=args.limit, active_ids=active)
     if not forms:
         log.error("Startlist vide : impossible de coter l'étape.")
         return 1

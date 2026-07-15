@@ -271,6 +271,21 @@ def get_startlist(season: int, slug: str) -> list[RiderEntry]:
     return out
 
 
+def get_active_rider_ids(season: int, slug: str, ref_stage_no: int | None) -> set[str]:
+    """pcs_ids des coureurs ENCORE EN COURSE d'après le classement général de
+    l'étape `ref_stage_no` (les abandons/éliminés en sont absents). Sert à exclure
+    les coureurs qui ont quitté la course. set() vide si indisponible -> pas de
+    filtre (on garde toute la startlist)."""
+    if not ref_stage_no or ref_stage_no < 1:
+        return set()
+    try:
+        gc = _make(Stage, _stage_url(slug, season, ref_stage_no)).gc()
+    except Exception as exc:  # noqa: BLE001
+        log.warning("GC étape %s indisponible (%s) : pas de filtre abandons.", ref_stage_no, exc)
+        return set()
+    return {g.get("rider_url") for g in (gc or []) if g.get("rider_url")}
+
+
 def _normalize_specialties(raw: dict) -> dict:
     out: dict[str, float] = {}
     for k, v in (raw or {}).items():
@@ -314,22 +329,31 @@ def _season_form(rider, ref_date: _date) -> float:
 
 
 def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
-                    sleep: float = 0.0, limit: int | None = None) -> list[RiderForm]:
+                    sleep: float = 0.0, limit: int | None = None,
+                    active_ids: set[str] | None = None) -> list[RiderForm]:
     """Pour chaque partant : points par spécialité + forme récente pondérée.
 
     `ref_date` = date de l'étape (la récence est mesurée par rapport à elle).
-    ⚠️ Une requête PCS par coureur (~180/jour) — politesse via `sleep`.
+    `active_ids` (optionnel) = pcs_ids des coureurs encore en course : les autres
+    (abandons) sont exclus. ⚠️ Une requête PCS par coureur — politesse via `sleep`.
     """
     if ref_date is None:
         from datetime import datetime
         ref_date = datetime.now(config.TZ).date()
     riders = get_startlist(season, slug)
+    if active_ids:
+        before = len(riders)
+        riders = [r for r in riders if r.pcs_id in active_ids]
+        if before - len(riders):
+            log.info("%d coureur(s) ayant abandonné exclu(s) (classement général).",
+                     before - len(riders))
     if limit:
         riders = riders[:limit]
     total = len(riders)
     log.info("récupération forme/spécialités pour %d coureurs "
-             "(1 page PCS/coureur ; via FlareSolverr, plusieurs minutes)…", total)
+             "(1 page PCS/coureur ; via cloudscraper, plusieurs minutes)…", total)
     forms: list[RiderForm] = []
+    missing: list[str] = []   # coureurs dont la page PCS n'a pas pu être récupérée
     for i, r in enumerate(riders, 1):
         spec: dict[str, float] = {}
         form = 0.0
@@ -340,13 +364,20 @@ def get_rider_forms(season: int, slug: str, *, ref_date: _date | None = None,
                 form = _season_form(rd, ref_date)   # forme pondérée par la récence
             except Exception as exc:  # noqa: BLE001
                 log.warning("forme indisponible pour %s (%s)", r.name, exc)
+                missing.append(r.name)
+        else:
+            missing.append(r.name)
         forms.append(RiderForm(name=r.name, pcs_id=r.pcs_id, form=form, specialties=spec,
                                nationality=r.nationality, team=r.team))
         if i % 20 == 0 or i == total:
             log.info("… %d/%d coureurs traités", i, total)
         if sleep:
             time.sleep(sleep)
-    log.info("forme/spécialités récupérées pour %d coureurs", len(forms))
+    if missing:
+        log.warning("⚠️ %d/%d coureur(s) SANS données (récupération PCS échouée) : %s",
+                    len(missing), total, ", ".join(missing))
+    else:
+        log.info("forme/spécialités récupérées pour %d coureurs (aucun manquant).", total)
     return forms
 
 
